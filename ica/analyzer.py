@@ -24,7 +24,8 @@ def get_sql_query(query_name):
     return query
 
 
-# Return a pandas dataframe representing all messages in a particular conversation
+# Return a pandas dataframe representing all messages in a particular
+# conversation (identified by the given phone number)
 def get_messages_dataframe(phone_number):
 
     with sqlite3.connect(get_db_path()) as connection:
