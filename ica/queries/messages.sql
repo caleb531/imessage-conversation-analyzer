@@ -1,5 +1,5 @@
 -- Get messages
-SELECT "text", "is_from_me", "attachment_id" FROM "message" WHERE "message"."ROWID" IN (
+SELECT "text", "is_from_me" FROM "message" WHERE "message"."ROWID" IN (
     -- Get all messages tied to chat
     SELECT "message_id" FROM "chat_message_join" WHERE "chat_id" IN (
         -- Get all chats with the specified phone number
