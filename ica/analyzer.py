@@ -59,7 +59,7 @@ def get_dataframes(phone_number):
 
 
 # Analyze the macOS Messages conversation with the given recipient phone number
-def run(phone_number):
+def analyze_conversation(phone_number):
 
     dataframes = get_dataframes(phone_number)
 

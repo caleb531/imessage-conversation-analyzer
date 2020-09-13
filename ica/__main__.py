@@ -19,7 +19,7 @@ def main():
     cli_args = get_cli_args()
 
     try:
-        analyzer.run(phone_number=cli_args.phone_number)
+        analyzer.analyze_conversation(phone_number=cli_args.phone_number)
     except KeyboardInterrupt:
         print('')
 
