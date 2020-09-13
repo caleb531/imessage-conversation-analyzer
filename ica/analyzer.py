@@ -3,6 +3,7 @@
 import os
 import os.path
 import sqlite3
+import sys
 
 import pandas
 
@@ -39,6 +40,9 @@ def run(phone_number):
 
     messages_dataframe = get_messages_dataframe(phone_number)
     total_message_count = len(messages_dataframe.index)
+    if not total_message_count:
+        print('Conversation not found', file=sys.stderr)
+        sys.exit(1)
     print(f'{total_message_count:,} total messages!')
     # for index, row in messages_dataframe.iterrows():
     #     print(row)
