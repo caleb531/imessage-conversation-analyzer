@@ -9,6 +9,7 @@ import types
 import pandas
 
 
+# Retrieve the path to the database file for the macOS Messages application
 def get_db_path():
 
     return os.path.expanduser(os.path.join(
@@ -57,6 +58,7 @@ def get_dataframes(phone_number):
             attachments=get_attachments_dataframe(connection, phone_number))
 
 
+# Analyze the macOS Messages conversation with the given recipient phone number
 def run(phone_number):
 
     dataframes = get_dataframes(phone_number)

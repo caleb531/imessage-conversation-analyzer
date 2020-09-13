@@ -4,6 +4,7 @@ import argparse
 import ica.analyzer as analyzer
 
 
+# Parse user arguments from the command line
 def get_cli_args():
 
     parser = argparse.ArgumentParser()
@@ -12,6 +13,7 @@ def get_cli_args():
     return parser.parse_args()
 
 
+# Program entry point
 def main():
 
     cli_args = get_cli_args()
