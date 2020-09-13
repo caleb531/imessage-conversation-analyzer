@@ -6,7 +6,7 @@ import sqlite3
 import sys
 import types
 
-import pandas
+import pandas as pd
 
 
 # Retrieve the path to the database file for the macOS Messages application
@@ -30,7 +30,7 @@ def get_sql_query(query_name):
 # conversation (identified by the given phone number)
 def get_messages_dataframe(connection, phone_number):
 
-    return pandas.read_sql_query(
+    return pd.read_sql_query(
         sql=get_sql_query('messages'),
         con=connection,
         params={'phone_number': phone_number},
@@ -43,7 +43,7 @@ def get_messages_dataframe(connection, phone_number):
 # conversation (identified by the given phone number)
 def get_attachments_dataframe(connection, phone_number):
 
-    return pandas.read_sql_query(
+    return pd.read_sql_query(
         sql=get_sql_query('attachments'),
         con=connection,
         params={'phone_number': phone_number})
