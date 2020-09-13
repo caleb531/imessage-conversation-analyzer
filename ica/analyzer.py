@@ -4,6 +4,7 @@ import os
 import os.path
 import sqlite3
 import sys
+import types
 
 import pandas
 
@@ -26,43 +27,49 @@ def get_sql_query(query_name):
 
 # Return a pandas dataframe representing all messages in a particular
 # conversation (identified by the given phone number)
-def get_messages_dataframe(phone_number):
+def get_messages_dataframe(connection, phone_number):
 
-    with sqlite3.connect(get_db_path()) as connection:
-        return pandas.read_sql_query(
-            sql=get_sql_query('messages'),
-            con=connection,
-            params={'phone_number': phone_number},
-            parse_dates={
-                'date': {'infer_datetime_format': True}
-            })
+    return pandas.read_sql_query(
+        sql=get_sql_query('messages'),
+        con=connection,
+        params={'phone_number': phone_number},
+        parse_dates={
+            'date': {'infer_datetime_format': True}
+        })
 
 
 # Return a pandas dataframe representing all attachments in a particular
 # conversation (identified by the given phone number)
-def get_attachments_dataframe(phone_number):
+def get_attachments_dataframe(connection, phone_number):
+
+    return pandas.read_sql_query(
+        sql=get_sql_query('attachments'),
+        con=connection,
+        params={'phone_number': phone_number})
+
+
+# Return all dataframes for a specific macOS Messages conversation
+def get_dataframes(phone_number):
 
     with sqlite3.connect(get_db_path()) as connection:
-        return pandas.read_sql_query(
-            sql=get_sql_query('attachments'),
-            con=connection,
-            params={'phone_number': phone_number})
+        return types.SimpleNamespace(
+            messages=get_messages_dataframe(connection, phone_number),
+            attachments=get_attachments_dataframe(connection, phone_number))
 
 
 def run(phone_number):
 
-    messages_dataframe = get_messages_dataframe(phone_number)
-    attachments_dataframe = get_attachments_dataframe(phone_number)
+    dataframes = get_dataframes(phone_number)
 
-    total_message_count = len(messages_dataframe.index)
+    total_message_count = len(dataframes.messages.index)
     if not total_message_count:
         print('Conversation not found', file=sys.stderr)
         sys.exit(1)
 
-    total_gif_count = attachments_dataframe.mime_type.eq('image/gif').sum()
+    total_gif_count = dataframes.attachments.mime_type.eq('image/gif').sum()
 
     print(f'{total_message_count:,} total messages!')
     print(f'{total_gif_count:,} total GIFs!')
-    # for index, row in messages_dataframe.iterrows():
+    # for index, row in dataframes.messages.iterrows():
     #     print(row)
     #     print('')
