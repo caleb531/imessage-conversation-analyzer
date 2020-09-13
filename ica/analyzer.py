@@ -63,15 +63,23 @@ def analyze_conversation(phone_number):
 
     dataframes = get_dataframes(phone_number)
 
+    # Total number of messages since the conversation was created
     total_message_count = len(dataframes.messages.index)
     if not total_message_count:
         print('Conversation not found', file=sys.stderr)
         sys.exit(1)
-
-    total_gif_count = dataframes.attachments.mime_type.eq('image/gif').sum()
-
     print(f'{total_message_count:,} total messages!')
+
+    # Total number of GIFs across all messages
+    total_gif_count = dataframes.attachments.mime_type.eq('image/gif').sum()
     print(f'{total_gif_count:,} total GIFs!')
-    # for index, row in dataframes.messages.iterrows():
-    #     print(row)
-    #     print('')
+
+    # Copy the messages dataframe so that we can count all "text" column values
+    # by converting them to integers (always 1)
+    messages_aggregate = dataframes.messages.copy()
+    messages_aggregate['text'] = messages_aggregate.text.apply(
+        pd.to_numeric, errors='coerce').isna()
+    groups_by_day = messages_aggregate.resample('D', on='datetime')
+    sums_by_day = groups_by_day.sum()
+    sums_by_day['is_not_from_me'] = sums_by_day['text'] - sums_by_day['is_from_me']
+    print(sums_by_day)
