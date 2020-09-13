@@ -32,9 +32,7 @@ def get_messages_dataframe(phone_number):
         return pandas.read_sql_query(
             sql=get_sql_query('messages'),
             con=connection,
-            params={
-                'phone_number': phone_number
-            })
+            params={'phone_number': phone_number})
 
 
 # Return a pandas dataframe representing all attachments in a particular
@@ -45,9 +43,7 @@ def get_attachments_dataframe(phone_number):
         return pandas.read_sql_query(
             sql=get_sql_query('attachments'),
             con=connection,
-            params={
-                'phone_number': phone_number
-            })
+            params={'phone_number': phone_number})
 
 
 def run(phone_number):
