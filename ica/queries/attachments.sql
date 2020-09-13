@@ -5,4 +5,4 @@ SELECT "mime_type" FROM "attachment" INNER JOIN "message_attachment_join" ON "at
         -- Get all chats with the specified phone number
         SELECT "chat"."ROWID" FROM "chat" WHERE "chat_identifier" LIKE ('%' || :phone_number)
     )
-) ORDER BY "date"
+)
