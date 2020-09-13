@@ -1,6 +1,6 @@
 # iMessage Conversation Analyzer
 
-*Copyright 2013-2020 Caleb Evans*  
+*Copyright 2020 Caleb Evans*  
 *Released under the MIT license*
 
 ## Credits
