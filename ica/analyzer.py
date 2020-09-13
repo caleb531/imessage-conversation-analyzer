@@ -15,9 +15,9 @@ def get_db_path():
 
 # Return the parameterized SQL query that retrieves an entire iMessage
 # conversation thread
-def get_sql_query():
+def get_sql_query(query_name):
 
-    with open('ica/query.sql', 'r') as query_file:
+    with open(f'ica/queries/{query_name}.sql', 'r') as query_file:
         query = query_file.read()
 
     return query
@@ -28,7 +28,7 @@ def get_messages_dataframe(phone_number):
 
     with sqlite3.connect(get_db_path()) as connection:
         return pandas.read_sql_query(
-            sql=get_sql_query(),
+            sql=get_sql_query('messages'),
             con=connection,
             params={
                 'phone_number': phone_number
