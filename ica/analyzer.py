@@ -35,7 +35,7 @@ def get_messages_dataframe(connection, phone_number):
         con=connection,
         params={'phone_number': phone_number},
         parse_dates={
-            'date': {'infer_datetime_format': True}
+            'datetime': {'infer_datetime_format': True}
         })
 
 
