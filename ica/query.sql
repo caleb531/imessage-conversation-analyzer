@@ -1,0 +1,8 @@
+-- Get messages
+SELECT "text", "is_from_me", "attachment_id" FROM "message" WHERE "message"."ROWID" IN (
+    -- Get all handles tied to chat
+    SELECT "message_id" FROM "chat_message_join" WHERE "chat_id" IN (
+        -- Get all chats with the specified phone number
+        SELECT "chat"."ROWID" FROM "chat" WHERE "guid" LIKE ('%' || :phone_number || '%')
+    )
+) ORDER BY "date"
