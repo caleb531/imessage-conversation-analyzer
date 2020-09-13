@@ -81,5 +81,6 @@ def analyze_conversation(phone_number):
         pd.to_numeric, errors='coerce').isna()
     groups_by_day = messages_aggregate.resample('D', on='datetime')
     sums_by_day = groups_by_day.sum()
-    sums_by_day['is_not_from_me'] = sums_by_day['text'] - sums_by_day['is_from_me']
+    sums_by_day['is_not_from_me'] = (sums_by_day['text']
+                                     - sums_by_day['is_from_me'])
     print(sums_by_day)
