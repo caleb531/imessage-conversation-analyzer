@@ -10,7 +10,7 @@ import pandas as pd
 
 
 # The respective emojis to count across the entire iMessage conversation
-EMOJIS = ('❤️', '😍', '😘', '😂', '😅', '🌙')
+EMOJIS = ('❤️', '😍', '😘', '🥰', '😂', '😅', '🌙')
 
 
 # Retrieve the path to the database file for the macOS Messages application
