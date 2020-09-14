@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-import collections
+import json
+
 import pandas as pd
 
 
@@ -8,17 +9,14 @@ import pandas as pd
 # computing this metric
 def get_emoji_list():
 
-    with open('ica/emojis.txt', 'r', encoding='utf-8') as emojis_file:
-        # Filter out duplicates
-        return tuple(collections.OrderedDict.fromkeys(emojis_file.read()))
+    with open('ica/emojis.json', 'r') as emojis_file:
+        return json.load(emojis_file)
 
 
 # Output the occurrences of specific emojis
 def analyze(dfs):
 
     emojis = get_emoji_list()
-    print(emojis)
-    return
     most_frequent_emojis = pd.DataFrame({
         'emoji': emojis,
         'count': [dfs.messages['text'].str.extract('(' + emoji + ')')
