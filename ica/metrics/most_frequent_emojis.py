@@ -22,4 +22,6 @@ def analyze(dfs):
         'count': [dfs.messages['text'].str.extract('(' + emoji + ')')
                   .count().item() for emoji in emojis]
     })
-    return most_frequent_emojis.sort_values(by='count', ascending=False)
+    return (most_frequent_emojis
+            .sort_values(by='count', ascending=False)
+            .head(10))
