@@ -12,9 +12,10 @@ def analyze(dfs):
         'links': (dfs.messages['text'].str
                   .extract('https?://(.*?)$')
                   .drop_duplicates()
-                  .count())
+                  .count()
+                  .item())
     }
     return pd.DataFrame({
         'type': totals_map.keys(),
         'total': totals_map.values()
-    })
+    }).sort_values(by='total', ascending=False)
