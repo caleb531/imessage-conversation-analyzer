@@ -9,6 +9,10 @@ import types
 import pandas as pd
 
 
+# The respective emojis to count across the entire iMessage conversation
+EMOJIS = ('❤️', '😍', '😘', '😂', '😅', '🌙')
+
+
 # Retrieve the path to the database file for the macOS Messages application
 def get_db_path():
 
@@ -63,6 +67,8 @@ def analyze_conversation(phone_number):
 
     dataframes = get_dataframes(phone_number)
 
+    pd.options.display.float_format = '{:,}'.format
+
     # Total number of messages since the conversation was created
     total_message_count = len(dataframes.messages.index)
     if not total_message_count:
@@ -73,6 +79,14 @@ def analyze_conversation(phone_number):
     # Total number of GIFs across all messages
     total_gif_count = dataframes.attachments.mime_type.eq('image/gif').sum()
     print(f'{total_gif_count:,} total GIFs!')
+
+    # Output the occurrences of specific emojis
+    most_frequent_emojis = pd.DataFrame({
+        'emoji': EMOJIS,
+        'count': [dataframes.messages.text.str.extract('(' + emoji + ')')
+                  .count().item() for emoji in EMOJIS]
+    }, columns=['emoji', 'count'])
+    print(most_frequent_emojis.sort_values(by='count', ascending=False))
 
     # Copy the messages dataframe so that we can count all "text" column values
     # by converting them to integers (always 1)
