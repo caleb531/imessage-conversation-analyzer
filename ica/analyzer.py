@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import importlib.machinery
+import importlib.util
 import os
 import os.path
 import sqlite3
@@ -7,10 +9,7 @@ import sys
 import types
 
 import pandas as pd
-
-
-# The respective emojis to count across the entire iMessage conversation
-EMOJIS = ('❤️', '😍', '😘', '🥰', '😂', '😅', '🌙')
+from tabulate import tabulate
 
 
 # Retrieve the path to the database file for the macOS Messages application
@@ -63,37 +62,18 @@ def get_dataframes(phone_number):
 
 
 # Analyze the macOS Messages conversation with the given recipient phone number
-def analyze_conversation(phone_number):
+def analyze_conversation(phone_number, metric_file):
 
-    dataframes = get_dataframes(phone_number)
+    dfs = get_dataframes(phone_number)
 
     # Quit if no messages were found for the specified conversation
-    if not len(dataframes.messages.index):
+    if not len(dfs.messages.index):
         print('Conversation not found', file=sys.stderr)
         sys.exit(1)
 
-    # Total number of messages since the conversation was created
-    total_message_count = len(dataframes.messages.index)
-    print(f'{total_message_count:,} total messages!')
-    # Total number of GIFs across all messages
-    total_gif_count = dataframes.attachments.mime_type.eq('image/gif').sum()
-    print(f'{total_gif_count:,} total GIFs!')
-
-    # Output the occurrences of specific emojis
-    most_frequent_emojis = pd.DataFrame({
-        'emoji': EMOJIS,
-        'count': [dataframes.messages['text'].str.extract('(' + emoji + ')')
-                  .count().item() for emoji in EMOJIS]
-    }, columns=['emoji', 'count'])
-    print(most_frequent_emojis.sort_values(by='count', ascending=False))
-
-    # Copy the messages dataframe so that we can count all "text" column values
-    # by converting them to integers (always 1)
-    messages_aggregate = dataframes.messages.copy()
-    messages_aggregate['text'] = messages_aggregate['text'].apply(
-        pd.to_numeric, errors='coerce').isna()
-    groups_by_day = messages_aggregate.resample('D', on='datetime')
-    sums_by_day = groups_by_day.sum()
-    sums_by_day['is_not_from_me'] = (sums_by_day['text']
-                                     - sums_by_day['is_from_me'])
-    print(sums_by_day)
+    loader = importlib.machinery.SourceFileLoader('metric_file', metric_file)
+    spec = importlib.util.spec_from_loader(loader.name, loader)
+    module = importlib.util.module_from_spec(spec)
+    loader.exec_module(module)
+    metric_df = module.analyze(dfs)
+    print(tabulate(metric_df, headers=metric_df.columns))

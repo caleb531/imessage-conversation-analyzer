@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import argparse
+import os
+import os.path
 import ica.analyzer as analyzer
 
 
@@ -8,7 +10,15 @@ import ica.analyzer as analyzer
 def get_cli_args():
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('phone_number')
+    parser.add_argument(
+        '--phone-number',
+        '-p',
+        required=True)
+    parser.add_argument(
+        '--metric-file',
+        '-m',
+        type=os.path.expanduser,
+        required=True)
 
     return parser.parse_args()
 
@@ -19,7 +29,7 @@ def main():
     cli_args = get_cli_args()
 
     try:
-        analyzer.analyze_conversation(phone_number=cli_args.phone_number)
+        analyzer.analyze_conversation(**vars(cli_args))
     except KeyboardInterrupt:
         print('')
 
