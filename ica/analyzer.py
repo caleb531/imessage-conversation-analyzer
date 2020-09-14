@@ -67,13 +67,14 @@ def analyze_conversation(phone_number):
 
     dataframes = get_dataframes(phone_number)
 
-    # Total number of messages since the conversation was created
-    total_message_count = len(dataframes.messages.index)
-    if not total_message_count:
+    # Quit if no messages were found for the specified conversation
+    if not len(dataframes.messages.index):
         print('Conversation not found', file=sys.stderr)
         sys.exit(1)
-    print(f'{total_message_count:,} total messages!')
 
+    # Total number of messages since the conversation was created
+    total_message_count = len(dataframes.messages.index)
+    print(f'{total_message_count:,} total messages!')
     # Total number of GIFs across all messages
     total_gif_count = dataframes.attachments.mime_type.eq('image/gif').sum()
     print(f'{total_gif_count:,} total GIFs!')
