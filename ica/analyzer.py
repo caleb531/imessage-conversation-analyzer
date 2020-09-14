@@ -76,4 +76,4 @@ def analyze_conversation(phone_number, metric_file):
     module = importlib.util.module_from_spec(spec)
     loader.exec_module(module)
     metric_df = module.analyze(dfs)
-    print(tabulate(metric_df, headers=metric_df.columns))
+    print(tabulate(metric_df, showindex=False, headers=metric_df.columns))
