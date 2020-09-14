@@ -67,8 +67,6 @@ def analyze_conversation(phone_number):
 
     dataframes = get_dataframes(phone_number)
 
-    pd.options.display.float_format = '{:,}'.format
-
     # Total number of messages since the conversation was created
     total_message_count = len(dataframes.messages.index)
     if not total_message_count:
