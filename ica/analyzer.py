@@ -62,7 +62,7 @@ def get_dataframes(phone_number):
 
 
 # Analyze the macOS Messages conversation with the given recipient phone number
-def analyze_conversation(phone_number, metric_file):
+def analyze_conversation(phone_number, metric_file, format):
 
     dfs = get_dataframes(phone_number)
 
@@ -76,4 +76,7 @@ def analyze_conversation(phone_number, metric_file):
     module = importlib.util.module_from_spec(spec)
     loader.exec_module(module)
     metric_df = module.analyze(dfs)
-    print(tabulate(metric_df, showindex=False, headers=metric_df.columns))
+    if format == 'csv':
+        print(metric_df.to_csv())
+    else:
+        print(tabulate(metric_df, showindex=False, headers=metric_df.columns))

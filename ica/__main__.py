@@ -19,6 +19,10 @@ def get_cli_args():
         '-m',
         type=os.path.expanduser,
         required=True)
+    parser.add_argument(
+        '--format',
+        '-f',
+        choices=('csv'))
 
     return parser.parse_args()
 
