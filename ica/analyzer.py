@@ -76,7 +76,9 @@ def analyze_conversation(phone_number, metric_file, format):
     module = importlib.util.module_from_spec(spec)
     loader.exec_module(module)
     metric_df = module.analyze(dfs)
+    # Make all indices start from 1 instead of 0
+    metric_df.index += 1
     if format == 'csv':
         print(metric_df.to_csv())
     else:
-        print(tabulate(metric_df, showindex=False, headers=metric_df.columns))
+        print(tabulate(metric_df, headers=metric_df.columns))

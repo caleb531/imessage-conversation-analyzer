@@ -24,4 +24,5 @@ def analyze(dfs):
     })
     return (most_frequent_emojis
             .sort_values(by='count', ascending=False)
+            .reset_index(drop=True)
             .head(10))
