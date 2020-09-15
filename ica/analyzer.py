@@ -76,9 +76,14 @@ def analyze_conversation(phone_number, metric_file, format):
     module = importlib.util.module_from_spec(spec)
     loader.exec_module(module)
     metric_df = module.analyze(dfs)
-    # Make all indices start from 1 instead of 0
-    metric_df.index += 1
+    # Make all indices start from 1 instead of 0, but only if the index is the
+    # default (rather than a custom column)
+    is_default_index = (not metric_df.index.name)
+    if is_default_index:
+        metric_df.index += 1
     if format == 'csv':
-        print(metric_df.to_csv())
+        print(metric_df.to_csv(index=not is_default_index))
     else:
-        print(tabulate(metric_df, headers=metric_df.columns))
+        print(tabulate(metric_df,
+                       showindex=not is_default_index,
+                       headers=metric_df.columns))

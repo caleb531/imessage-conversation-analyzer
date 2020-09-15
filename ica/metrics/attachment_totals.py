@@ -15,7 +15,10 @@ def analyze(dfs):
                   .count()
                   .item())
     }
-    return pd.DataFrame({
+    attachment_totals = pd.DataFrame({
         'type': totals_map.keys(),
         'total': totals_map.values()
-    }).sort_values(by='total', ascending=False)
+    })
+    return (attachment_totals
+            .sort_values(by='total', ascending=False)
+            .reset_index(drop=True))
