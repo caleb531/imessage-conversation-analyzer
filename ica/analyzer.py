@@ -71,16 +71,21 @@ def analyze_conversation(phone_number, metric_file, format):
         print('Conversation not found', file=sys.stderr)
         sys.exit(1)
 
+    # Load and execute the given Python file as a module to retrieve the
+    # relevant DataFrame
     loader = importlib.machinery.SourceFileLoader('metric_file', metric_file)
     spec = importlib.util.spec_from_loader(loader.name, loader)
     module = importlib.util.module_from_spec(spec)
     loader.exec_module(module)
     metric_df = module.analyze(dfs)
+
     # Make all indices start from 1 instead of 0, but only if the index is the
     # default (rather than a custom column)
     is_default_index = (not metric_df.index.name)
     if is_default_index:
         metric_df.index += 1
+
+    # Output executed DataFrame to correct format
     if format == 'csv':
         print(metric_df.to_csv(index=not is_default_index))
     else:
