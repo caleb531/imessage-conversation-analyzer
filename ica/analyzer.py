@@ -61,6 +61,17 @@ def get_dataframes(phone_number):
             attachments=get_attachments_dataframe(connection, phone_number))
 
 
+# Load the given metric file as a Python module, and return the DataFrame
+# provided by its analyze() function
+def run_analyzer_for_metric_file(metric_file, dfs):
+    loader = importlib.machinery.SourceFileLoader('metric_file', metric_file)
+    spec = importlib.util.spec_from_loader(loader.name, loader)
+    module = importlib.util.module_from_spec(spec)
+    loader.exec_module(module)
+    metric_df = module.analyze(dfs)
+    return metric_df
+
+
 # Analyze the macOS Messages conversation with the given recipient phone number
 def analyze_conversation(phone_number, metric_file, format):
 
@@ -73,11 +84,7 @@ def analyze_conversation(phone_number, metric_file, format):
 
     # Load and execute the given Python file as a module to retrieve the
     # relevant DataFrame
-    loader = importlib.machinery.SourceFileLoader('metric_file', metric_file)
-    spec = importlib.util.spec_from_loader(loader.name, loader)
-    module = importlib.util.module_from_spec(spec)
-    loader.exec_module(module)
-    metric_df = module.analyze(dfs)
+    metric_df = run_analyzer_for_metric_file(metric_file, dfs)
 
     # Make all indices start from 1 instead of 0, but only if the index is the
     # default (rather than a custom column)
