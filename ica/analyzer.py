@@ -72,6 +72,17 @@ def run_analyzer_for_metric_file(metric_file, dfs):
     return metric_df
 
 
+# Format the given header name to be more human-readable (e.g. "foo_bar" =>
+# "Foo Bar")
+def prettify_header_name(header_name):
+    return header_name.replace('_', ' ').title()
+
+
+# Format the given sequence of header names
+def prettify_header_names(header_names):
+    return [prettify_header_name(header_name) for header_name in header_names]
+
+
 # Analyze the macOS Messages conversation with the given recipient phone number
 def analyze_conversation(phone_number, metric_file, format):
 
@@ -86,6 +97,12 @@ def analyze_conversation(phone_number, metric_file, format):
     # relevant DataFrame
     metric_df = run_analyzer_for_metric_file(metric_file, dfs)
 
+    # Prettify header row (i.e. textual values in first column)
+    first_column_name = metric_df.columns[0]
+    if metric_df[first_column_name].dtypes == object:
+        metric_df[first_column_name] = metric_df[first_column_name].apply(
+            prettify_header_name)
+
     # Make all indices start from 1 instead of 0, but only if the index is the
     # default (rather than a custom column)
     is_default_index = (not metric_df.index.name)
@@ -94,8 +111,10 @@ def analyze_conversation(phone_number, metric_file, format):
 
     # Output executed DataFrame to correct format
     if format == 'csv':
-        print(metric_df.to_csv(index=not is_default_index))
+        print(metric_df.to_csv(
+            index=not is_default_index,
+            header=prettify_header_names(metric_df.columns)))
     else:
         print(tabulate(metric_df,
                        showindex=not is_default_index,
-                       headers=metric_df.columns))
+                       headers=prettify_header_names(metric_df.columns)))
