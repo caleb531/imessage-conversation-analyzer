@@ -97,7 +97,9 @@ def analyze_conversation(phone_number, metric_file, format):
     # relevant DataFrame
     metric_df = run_analyzer_for_metric_file(metric_file, dfs)
 
-    # Prettify header row (i.e. textual values in first column)
+    # Prettify header row (i.e. column names)
+    metric_df.columns = prettify_header_names(metric_df.columns)
+    # Prettify header column (i.e. textual values in first column)
     first_column_name = metric_df.columns[0]
     if metric_df[first_column_name].dtypes == object:
         metric_df[first_column_name] = metric_df[first_column_name].apply(
@@ -113,8 +115,8 @@ def analyze_conversation(phone_number, metric_file, format):
     if format == 'csv':
         print(metric_df.to_csv(
             index=not is_default_index,
-            header=prettify_header_names(metric_df.columns)))
+            header=metric_df.columns))
     else:
         print(tabulate(metric_df,
                        showindex=not is_default_index,
-                       headers=prettify_header_names(metric_df.columns)))
+                       headers=metric_df.columns))
