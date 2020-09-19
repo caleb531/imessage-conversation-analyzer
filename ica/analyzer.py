@@ -98,6 +98,9 @@ def analyze_conversation(phone_number, metric_file, format):
     metric_df = run_analyzer_for_metric_file(metric_file, dfs)
 
     # Prettify header row (i.e. column names)
+    if metric_df.index.name:
+        metric_df.index.rename(
+            prettify_header_name(metric_df.index.name), inplace=True)
     metric_df.columns = prettify_header_names(metric_df.columns)
     # Prettify header column (i.e. textual values in first column)
     first_column_name = metric_df.columns[0]
