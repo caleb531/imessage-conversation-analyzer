@@ -13,6 +13,10 @@
 
 ### 1. Set up virtualenv
 
+```
+pip3 install virtualenv
+```
+
 ```sh
 virtualenv --python=python3 .virtualenv
 source .virtualenv/bin/activate
