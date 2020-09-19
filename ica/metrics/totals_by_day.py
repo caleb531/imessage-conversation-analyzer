@@ -10,7 +10,8 @@ DATE_FORMAT = '%Y-%m-%d'
 
 def analyze(dfs):
 
-    # Count all "text" column values by converting them to integers (always 1)
+    # Count all "text" column values by converting them to integers (always 1),
+    # because resampling the DataFrame will remove all non-numeric columns
     dfs.messages['text'] = dfs.messages['text'].apply(
         pd.to_numeric, errors='coerce').isna()
     groups_by_day = dfs.messages.resample('D', on='datetime')
