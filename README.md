@@ -13,7 +13,7 @@
 
 ### 1. Set up virtualenv
 
-```
+```sh
 pip3 install virtualenv
 ```
 
