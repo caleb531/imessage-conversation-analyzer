@@ -47,5 +47,12 @@ Optional; the output format of the result. Omit this argument for a simple
 textual table, or specify `csv` to print output as CSV.
 
 ```sh
-ica -p 1234567890 -m ica/metrics/message_totals.py -f csv
+ica -p 1234567890 -m ica/metrics/message_totals.py
+```
+
+If you are running macOS, you can output as CSV and use the `pbcopy` command for
+easy copy/pasting into a spreadsheet program (like Excel or Numbers).
+
+```sh
+ica -p 1234567890 -m ica/metrics/message_totals.py -f csv | pbcopy
 ```
