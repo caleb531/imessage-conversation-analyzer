@@ -6,7 +6,7 @@ import pandas as pd
 
 
 # The maximum number of least frequent emojis to output in the table
-EMOJI_DISPLAY_COUNT = 10
+EMOJI_DISPLAY_COUNT = 20
 
 
 # Fetch a list of the most popular emoji on the Web to use as a basis for
