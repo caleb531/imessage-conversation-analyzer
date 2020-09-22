@@ -17,15 +17,15 @@ def get_emoji_list():
 def analyze(dfs):
 
     emojis = get_emoji_list()
-    most_frequent_emojis = pd.DataFrame({
+    least_frequent_emojis = pd.DataFrame({
         'emoji': emojis,
         'count': [dfs.messages['text'].str.extract('(' + emoji + ')')
                   .count().item() for emoji in emojis]
     })
     # Filter out all emojis that have never been sent
-    most_frequent_emojis = most_frequent_emojis[
-        (most_frequent_emojis[['count']] != 0).all(axis=1)]
-    return (most_frequent_emojis
+    least_frequent_emojis = least_frequent_emojis[
+        (least_frequent_emojis[['count']] != 0).all(axis=1)]
+    return (least_frequent_emojis
             .sort_values(by='count', ascending=True)
             .reset_index(drop=True)
             .head(10))
