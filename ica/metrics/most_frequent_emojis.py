@@ -5,6 +5,10 @@ import json
 import pandas as pd
 
 
+# The maximum number of most frequent emojis to output in the table
+EMOJI_DISPLAY_COUNT = 10
+
+
 # Fetch a list of the most popular emoji on the Web to use as a basis for
 # computing this metric
 def get_emoji_list():
@@ -25,4 +29,4 @@ def analyze(dfs):
     return (most_frequent_emojis
             .sort_values(by='count', ascending=False)
             .reset_index(drop=True)
-            .head(10))
+            .head(EMOJI_DISPLAY_COUNT))
