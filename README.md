@@ -59,7 +59,7 @@ or leading `+`.
 Required; a Python file with an `analyze()` function; this file must return a
 pandas `DataFrame`. See the examples in `ica/metrics`.
 
-### -f / --format
+#### -f / --format
 
 Optional; the output format of the result. Omit this argument for a simple
 textual table, or specify `csv` to print output as CSV.
