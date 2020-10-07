@@ -13,6 +13,11 @@ def analyze(dfs):
             .drop_duplicates()
             .count()
             .item()),
+        'apple_music': (dfs.messages['text'].str.extract(
+            r'(https?://(?:music\.apple\.com)/(?:.*?)(?:\s|$))')
+            .drop_duplicates()
+            .count()
+            .item()),
         'recorded_videos': (dfs.attachments['mime_type']
                             .eq('video/quicktime').sum())
     }
