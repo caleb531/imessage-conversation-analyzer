@@ -8,12 +8,13 @@ def analyze(dfs):
 
     totals_map = {
         'gifs': dfs.attachments['mime_type'].eq('image/gif').sum(),
-        'videos': dfs.attachments['mime_type'].eq('video/quicktime').sum(),
-        'links': (dfs.messages['text'].str
-                  .extract('https?://(.*?)$')
-                  .drop_duplicates()
-                  .count()
-                  .item())
+        'youtube_videos': (dfs.messages['text'].str.extract(
+            r'(https?://(?:www\.)(?:youtube\.com|youtu\.be)/(?:.*?)(?:\s|$))')
+            .drop_duplicates()
+            .count()
+            .item()),
+        'recorded_videos': (dfs.attachments['mime_type']
+                            .eq('video/quicktime').sum())
     }
     attachment_totals = pd.DataFrame({
         'type': totals_map.keys(),
