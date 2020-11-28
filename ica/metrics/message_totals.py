@@ -26,7 +26,7 @@ def get_dates_between(start_date, end_date):
 def get_all_message_datestrs(dfs):
 
     groups_by_day = dfs.messages.resample('D', on='datetime')
-    sums_by_day = groups_by_day.sum()
+    sums_by_day = groups_by_day.count()
     sums_by_day.index = sums_by_day.index.strftime(DATE_FORMAT)
     return list(sums_by_day.index)
 
