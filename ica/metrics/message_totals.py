@@ -63,9 +63,9 @@ def analyze(dfs):
         'messages': len(dfs.messages.index),
         'messages_from_me': dfs.messages['is_from_me'].eq(True).sum(),
         'messages_from_them': dfs.messages['is_from_me'].eq(False).sum(),
-        'no_reply': get_noreply_count(dfs),
         'days_messaged': len(message_datestrs),
-        'days_missed': len(all_datestrs) - len(message_datestrs)
+        'days_missed': len(all_datestrs) - len(message_datestrs),
+        'days_with_no_reply': get_noreply_count(dfs),
     }
     return pd.DataFrame({
         'metric': tuple(totals_map.keys()),
