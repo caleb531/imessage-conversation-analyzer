@@ -54,7 +54,10 @@ def get_messages_dataframe(connection, chat_identifiers):
     return pd.read_sql_query(
         sql=get_sql_query('messages'),
         con=connection,
-        params={'chat_identifiers': get_chat_identifier_str(chat_identifiers)},
+        params={
+            'chat_identifiers': get_chat_identifier_str(chat_identifiers),
+            'chat_identifier_delimiter': CHAT_IDENTIFIER_DELIMITER
+        },
         parse_dates={
             'datetime': {'infer_datetime_format': True}
         })
@@ -67,7 +70,10 @@ def get_attachments_dataframe(connection, chat_identifiers):
     return pd.read_sql_query(
         sql=get_sql_query('attachments'),
         con=connection,
-        params={'chat_identifiers': get_chat_identifier_str(chat_identifiers)})
+        params={
+            'chat_identifiers': get_chat_identifier_str(chat_identifiers),
+            'chat_identifier_delimiter': CHAT_IDENTIFIER_DELIMITER
+        })
 
 
 # Return all dataframes for a specific macOS Messages conversation
