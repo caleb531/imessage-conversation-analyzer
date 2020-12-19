@@ -11,8 +11,9 @@ def get_cli_args():
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '--phone-number',
-        '-p',
+        '--chat-identifiers',
+        '-c',
+        nargs='+',
         required=True)
     parser.add_argument(
         '--metric-file',

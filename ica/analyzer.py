@@ -12,6 +12,14 @@ import pandas as pd
 from tabulate import tabulate
 
 
+# In order to interpolate the user-specified list of chat identifiers into the
+# SQL queries, we must join the list into a string delimited by a common
+# symbol, then perform a LIKE comparison on this string within the SQL query;
+# this is because named SQL parameters only support string values, rather than
+# variable-length sequences
+CHAT_IDENTIFIER_DELIMITER = '|'
+
+
 # Retrieve the path to the database file for the macOS Messages application
 def get_db_path():
 
@@ -29,14 +37,24 @@ def get_sql_query(query_name):
     return query
 
 
+# Join the list of chat identifiers into a delimited string; in order for the
+# SQL comparison to function properly, this string must also start and end with
+# the delimiter symbol
+def get_chat_identifier_str(chat_identifiers):
+    return '{start}{joined}{end}'.format(
+        start=CHAT_IDENTIFIER_DELIMITER,
+        joined=CHAT_IDENTIFIER_DELIMITER.join(chat_identifiers),
+        end=CHAT_IDENTIFIER_DELIMITER)
+
+
 # Return a pandas dataframe representing all messages in a particular
 # conversation (identified by the given phone number)
-def get_messages_dataframe(connection, phone_number):
+def get_messages_dataframe(connection, chat_identifiers):
 
     return pd.read_sql_query(
         sql=get_sql_query('messages'),
         con=connection,
-        params={'phone_number': phone_number},
+        params={'chat_identifiers': get_chat_identifier_str(chat_identifiers)},
         parse_dates={
             'datetime': {'infer_datetime_format': True}
         })
@@ -44,21 +62,23 @@ def get_messages_dataframe(connection, phone_number):
 
 # Return a pandas dataframe representing all attachments in a particular
 # conversation (identified by the given phone number)
-def get_attachments_dataframe(connection, phone_number):
+def get_attachments_dataframe(connection, chat_identifiers):
 
     return pd.read_sql_query(
         sql=get_sql_query('attachments'),
         con=connection,
-        params={'phone_number': phone_number})
+        params={'chat_identifiers': get_chat_identifier_str(chat_identifiers)})
 
 
 # Return all dataframes for a specific macOS Messages conversation
-def get_dataframes(phone_number):
+def get_dataframes(chat_identifiers):
 
     with sqlite3.connect(get_db_path()) as connection:
         return types.SimpleNamespace(
-            messages=get_messages_dataframe(connection, phone_number),
-            attachments=get_attachments_dataframe(connection, phone_number))
+            messages=get_messages_dataframe(
+                connection, chat_identifiers),
+            attachments=get_attachments_dataframe(
+                connection, chat_identifiers))
 
 
 # Load the given metric file as a Python module, and return the DataFrame
@@ -84,9 +104,9 @@ def prettify_header_names(header_names):
 
 
 # Analyze the macOS Messages conversation with the given recipient phone number
-def analyze_conversation(phone_number, metric_file, format):
+def analyze_conversation(chat_identifiers, metric_file, format):
 
-    dfs = get_dataframes(phone_number)
+    dfs = get_dataframes(chat_identifiers)
 
     # Quit if no messages were found for the specified conversation
     if not len(dfs.messages.index):
