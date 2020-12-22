@@ -72,7 +72,7 @@ Optional; the output format of the result. Omit this argument for a simple
 textual table, or specify `csv` to print output as CSV.
 
 ```sh
-ica -c 'John Doe' -m ica/metrics/message_totals.py
+ica -c 'John Doe' -m ica/metrics/message_totals.py -f csv
 ```
 
 You can also output as CSV and use the `pbcopy` command for easy copy/pasting
