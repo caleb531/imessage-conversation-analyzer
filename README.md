@@ -20,8 +20,8 @@ single other person (i.e. group chats are currently unsupported).
 
 ### 1. Install Python 3
 
-macOS is bundled with Python 2 out of the box. You can install Python 3 with the
-[Homebrew][homebrew] package manager.
+macOS does not include Python 3 out of the box, but you can install Python 3
+with the [Homebrew][homebrew] package manager.
 
 [homebrew]: https://brew.sh/
 
