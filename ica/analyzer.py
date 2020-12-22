@@ -20,11 +20,9 @@ from tabulate import tabulate
 CHAT_IDENTIFIER_DELIMITER = '|'
 
 
-# Retrieve the path to the database file for the macOS Messages application
-def get_db_path():
-
-    return os.path.expanduser(os.path.join(
-        '~', 'Library', 'Messages', 'chat.db'))
+# The path to the database file for the macOS Messages application
+DB_PATH = os.path.expanduser(os.path.join(
+    '~', 'Library', 'Messages', 'chat.db'))
 
 
 # Return the parameterized SQL query that retrieves an entire iMessage
@@ -79,7 +77,7 @@ def get_attachments_dataframe(connection, chat_identifiers):
 # Return all dataframes for a specific macOS Messages conversation
 def get_dataframes(chat_identifiers):
 
-    with sqlite3.connect(get_db_path()) as connection:
+    with sqlite3.connect(DB_PATH) as connection:
         return types.SimpleNamespace(
             messages=get_messages_dataframe(
                 connection, chat_identifiers),
