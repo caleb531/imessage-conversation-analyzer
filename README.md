@@ -48,16 +48,23 @@ pip install -r requirements.txt
 
 ## Usage
 
-#### -p / --phone-number
+#### -c / --contact-name
 
-Required; the phone number of the recipient whose conversation you want to fetch
-(between you and the recipient). The phone number must be digits only; no spaces
-or leading `+`.
+Required; the combined first and last name of the macOS contact whose
+conversation you want to fetch (e.g. `John Doe`).
+
+```sh
+ica -c 'John Doe' -m ica/metrics/message_totals.py
+```
 
 #### -m / --metric-file
 
 Required; a Python file with an `analyze()` function; this file must return a
 pandas `DataFrame`. See the examples in `ica/metrics`.
+
+```sh
+ica -c 'John Doe' -m ica/metrics/most_frequent_emojis.py
+```
 
 #### -f / --format
 
@@ -65,12 +72,12 @@ Optional; the output format of the result. Omit this argument for a simple
 textual table, or specify `csv` to print output as CSV.
 
 ```sh
-ica -p 1234567890 -m ica/metrics/message_totals.py
+ica -c 'John Doe' -m ica/metrics/message_totals.py
 ```
 
 You can also output as CSV and use the `pbcopy` command for easy copy/pasting
 into a spreadsheet program (like Excel or Numbers).
 
 ```sh
-ica -p 1234567890 -m ica/metrics/message_totals.py -f csv | pbcopy
+ica -c 'John Doe' -m ica/metrics/message_totals.py -f csv | pbcopy
 ```

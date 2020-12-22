@@ -3,6 +3,8 @@
 import argparse
 import os
 import os.path
+
+import ica.contact as contact
 import ica.analyzer as analyzer
 
 
@@ -11,9 +13,8 @@ def get_cli_args():
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '--chat-identifiers',
+        '--contact-name',
         '-c',
-        nargs='+',
         required=True)
     parser.add_argument(
         '--metric-file',
@@ -33,8 +34,14 @@ def main():
 
     cli_args = get_cli_args()
 
+    chat_identifiers = contact.get_chat_identifiers(
+        contact_name=cli_args.contact_name)
+
     try:
-        analyzer.analyze_conversation(**vars(cli_args))
+        analyzer.analyze_conversation(
+            chat_identifiers=chat_identifiers,
+            metric_file=cli_args.metric_file,
+            format=cli_args.format)
     except KeyboardInterrupt:
         print('')
 
