@@ -7,6 +7,7 @@ import os.path
 import sqlite3
 import sys
 import types
+from pathlib import Path
 
 import pandas as pd
 from tabulate import tabulate
@@ -25,16 +26,6 @@ DB_PATH = os.path.expanduser(os.path.join(
     '~', 'Library', 'Messages', 'chat.db'))
 
 
-# Return the parameterized SQL query that retrieves an entire iMessage
-# conversation thread
-def get_sql_query(query_name):
-
-    with open(f'ica/queries/{query_name}.sql', 'r') as query_file:
-        query = query_file.read()
-
-    return query
-
-
 # Join the list of chat identifiers into a delimited string; in order for the
 # SQL comparison to function properly, this string must also start and end with
 # the delimiter symbol
@@ -50,7 +41,7 @@ def get_chat_identifier_str(chat_identifiers):
 def get_messages_dataframe(connection, chat_identifiers):
 
     return pd.read_sql_query(
-        sql=get_sql_query('messages'),
+        sql=Path('ica/queries/messages.sql').read_text(),
         con=connection,
         params={
             'chat_identifiers': get_chat_identifier_str(chat_identifiers),
@@ -66,7 +57,7 @@ def get_messages_dataframe(connection, chat_identifiers):
 def get_attachments_dataframe(connection, chat_identifiers):
 
     return pd.read_sql_query(
-        sql=get_sql_query('attachments'),
+        sql=Path('ica/queries/attachments.sql').read_text(),
         con=connection,
         params={
             'chat_identifiers': get_chat_identifier_str(chat_identifiers),
