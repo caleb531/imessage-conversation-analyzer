@@ -5,6 +5,7 @@ import os
 import os.path
 import re
 import sqlite3
+import sys
 from pathlib import Path
 
 import pandas as pd
@@ -60,4 +61,11 @@ def get_chat_identifiers(contact_name):
             chat_identifiers.update(
                 normalize_email_address(email_address)
                 for email_address in rows['ZADDRESS'])
+
+    # Quit if the contact with the specified name could not be found
+    if not len(chat_identifiers):
+        print('No contact found with the name "{}"'.format(contact_name),
+              file=sys.stderr)
+        sys.exit(1)
+
     return list(chat_identifiers)
