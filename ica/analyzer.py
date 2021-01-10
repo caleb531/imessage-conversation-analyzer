@@ -98,22 +98,8 @@ def prettify_header_names(header_names):
     return [prettify_header_name(header_name) for header_name in header_names]
 
 
-# Analyze the macOS Messages conversation with the given recipient phone number
-def analyze_conversation(chat_identifiers, metric_file, format):
-
-    dfs = get_dataframes(chat_identifiers)
-
-    # Quit if no messages were found for the specified conversation
-    if not len(dfs.messages.index):
-        print('No conversations found for the following handlers:\n{}'.format(
-            '\n'.join(chat_identifiers)),
-            file=sys.stderr)
-        sys.exit(1)
-
-    # Load and execute the given Python file as a module to retrieve the
-    # relevant DataFrame
-    metric_df = run_analyzer_for_metric_file(metric_file, dfs)
-
+# Print the given dataframe of metrics data
+def print_metrics(metric_df):
     # Prettify header row (i.e. column names)
     if metric_df.index.name:
         metric_df.index.rename(
@@ -140,3 +126,23 @@ def analyze_conversation(chat_identifiers, metric_file, format):
         print(tabulate(metric_df,
                        showindex=not is_default_index,
                        headers=metric_df.columns))
+
+
+# Analyze the macOS Messages conversation with the given recipient phone number
+def analyze_conversation(chat_identifiers, metric_file, format):
+
+    dfs = get_dataframes(chat_identifiers)
+
+    # Quit if no messages were found for the specified conversation
+    if not len(dfs.messages.index):
+        print('No conversations found for the following handlers:\n{}'.format(
+            '\n'.join(chat_identifiers)),
+            file=sys.stderr)
+        sys.exit(1)
+
+    # Load and execute the given Python file as a module to retrieve the
+    # relevant DataFrame
+    metric_df = run_analyzer_for_metric_file(metric_file, dfs)
+
+    # Print the given metrics
+    print_metrics(metric_df)
