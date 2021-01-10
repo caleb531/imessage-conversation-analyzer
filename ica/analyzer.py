@@ -105,7 +105,9 @@ def analyze_conversation(chat_identifiers, metric_file, format):
 
     # Quit if no messages were found for the specified conversation
     if not len(dfs.messages.index):
-        print('Conversation not found', file=sys.stderr)
+        print('No conversations found for the following handlers:\n{}'.format(
+            '\n'.join(chat_identifiers)),
+            file=sys.stderr)
         sys.exit(1)
 
     # Load and execute the given Python file as a module to retrieve the

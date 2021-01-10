@@ -68,4 +68,4 @@ def get_chat_identifiers(contact_name):
               file=sys.stderr)
         sys.exit(1)
 
-    return list(chat_identifiers)
+    return sorted(chat_identifiers)
