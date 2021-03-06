@@ -90,7 +90,10 @@ def run_analyzer_for_metric_file(metric_file, dfs):
 # Format the given header name to be more human-readable (e.g. "foo_bar" =>
 # "Foo Bar")
 def prettify_header_name(header_name):
-    return header_name.replace('_', ' ').title()
+    if header_name:
+        return header_name.replace('_', ' ').title()
+    else:
+        return None
 
 
 # Format the given sequence of header names
