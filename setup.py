@@ -11,7 +11,7 @@ def get_long_description():
 
 setup(
     name='imessage-conversation-analyzer',
-    version='1.0.0',
+    version='1.0.1',
     description='Analyzes the entire history of a macOS Messages conversation',
     long_description=get_long_description(),
     long_description_content_type='text/markdown',
