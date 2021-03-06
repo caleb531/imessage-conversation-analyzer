@@ -1,6 +1,6 @@
 # iMessage Conversation Analyzer
 
-*Copyright 2020 Caleb Evans*  
+*Copyright 2020-2021 Caleb Evans*  
 *Released under the MIT license*
 
 This macOS CLI program will read the contents of an iMessage conversation via
