@@ -99,7 +99,7 @@ def prettify_header_names(header_names):
 
 
 # Print the given dataframe of metrics data
-def print_metrics(metric_df):
+def print_metrics(metric_df, format):
     # Prettify header row (i.e. column names)
     if metric_df.index.name:
         metric_df.index.rename(
@@ -145,4 +145,4 @@ def analyze_conversation(chat_identifiers, metric_file, format):
     metric_df = run_analyzer_for_metric_file(metric_file, dfs)
 
     # Print the given metrics
-    print_metrics(metric_df)
+    print_metrics(metric_df, format)

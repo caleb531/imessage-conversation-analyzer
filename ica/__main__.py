@@ -24,7 +24,7 @@ def get_cli_args():
     parser.add_argument(
         '--format',
         '-f',
-        choices=('csv'))
+        choices=('csv',))
 
     return parser.parse_args()
 
