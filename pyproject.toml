@@ -1,0 +1,30 @@
+[project]
+name = "imessage-conversation-analyzer"
+version = "1.1.0"
+description = "Analyzes the entire history of a macOS Messages conversation"
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [
+    {name = "Caleb Evans", email = "caleb@calebevans.me"}
+]
+maintainers = [
+    {name = 'Caleb Evans', email = 'caleb@calebevans.me'}
+]
+license = {file = 'LICENSE.txt'}
+keywords = ["apple", "imessage", "macos", "conversation", "chat", "analysis", "pandas"]
+dependencies = [
+    "pandas",
+    "tabulate"
+]
+
+[project.urls]
+homepage = "https://github.com/caleb531/imessage-conversation-analyzer"
+documentation = "https://github.com/caleb531/imessage-conversation-analyzer#readme"
+repository = "https://github.com/caleb531/imessage-conversation-analyzer"
+changelog = "https://github.com/caleb531/imessage-conversation-analyzer/releases"
+
+[project.scripts]
+ica = "ica.__main__:main"
+
+[build-system]
+requires = ["setuptools", "wheel"]

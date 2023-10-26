@@ -18,6 +18,11 @@ def analyze(dfs):
             .drop_duplicates()
             .count()
             .item()),
+        'spotify': (dfs.messages['text'].str.extract(
+            r'(https?://(?:open\.spotify\.com)/(?:.*?)(?:\s|$))')
+            .drop_duplicates()
+            .count()
+            .item()),
         'recorded_videos': (dfs.attachments['mime_type']
                             .eq('video/quicktime').sum())
     }
