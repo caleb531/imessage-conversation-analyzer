@@ -49,7 +49,7 @@ def get_messages_dataframe(connection, chat_identifiers):
             'chat_identifier_delimiter': CHAT_IDENTIFIER_DELIMITER
         },
         parse_dates={
-            'datetime': {'infer_datetime_format': True}
+            'datetime': 'ISO8601'
         })
 
 
