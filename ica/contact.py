@@ -57,10 +57,12 @@ def get_chat_identifiers(contact_name):
             # Combine the results
             chat_identifiers.update(
                 normalize_phone_number(phone_number)
-                for phone_number in rows['ZFULLNUMBER'])
+                for phone_number in rows['ZFULLNUMBER']
+                if phone_number)
             chat_identifiers.update(
                 normalize_email_address(email_address)
-                for email_address in rows['ZADDRESS'])
+                for email_address in rows['ZADDRESS']
+                if email_address)
 
     # Quit if the contact with the specified name could not be found
     if not len(chat_identifiers):
