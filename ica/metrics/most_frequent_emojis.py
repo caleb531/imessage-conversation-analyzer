@@ -21,12 +21,13 @@ def get_emoji_list():
 def analyze(dfs):
 
     emojis = get_emoji_list()
-    most_frequent_emojis = pd.DataFrame({
+    emoji_counts = pd.DataFrame({
         'emoji': emojis,
         'count': [dfs.messages['text'].str.extract('(' + emoji + ')')
                   .count().item() for emoji in emojis]
     })
-    return (most_frequent_emojis
+    return (emoji_counts
+            .sort_index(ascending=True)
             .sort_values(by='count', ascending=False)
             .reset_index(drop=True)
             .head(EMOJI_DISPLAY_COUNT))
