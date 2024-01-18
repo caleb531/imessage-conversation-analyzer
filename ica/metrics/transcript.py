@@ -3,19 +3,18 @@
 import pandas as pd
 
 
+def convert_bool_to_yesno(series):
+    return series.apply(str).replace("True", "Yes").replace("False", "No")
+
+
 # Export the entire conversation
 def analyze(dfs):
     return pd.DataFrame(
         {
             "timestamp": dfs.messages["datetime"],
             # Convert 1/0 to Yes/No
-            "is_from_me": (
-                dfs.messages["is_from_me"]
-                .apply(str)
-                .replace("1", "Yes")
-                .replace("0", "No")
-            ),
-            "is_reaction": dfs.messages["is_reaction"],
+            "is_from_me": convert_bool_to_yesno(dfs.messages["is_from_me"]),
+            "is_reaction": convert_bool_to_yesno(dfs.messages["is_reaction"]),
             # U+FFFC is the object replacement character, which appears as the
             # textual message for every attachment
             "message": dfs.messages["text"].replace(

@@ -73,6 +73,8 @@ def get_messages_dataframe(connection, chat_identifiers):
         r"^(Loved|Liked|Disliked|Laughed at|Emphasized|Questioned)"
         r" (“(.*?)”|an \w+)$"
     )
+    # Convert 'is_from_me' values from integers to proper booleans
+    messages_df["is_from_me"] = messages_df["is_from_me"].apply(bool)
     return messages_df
 
 
