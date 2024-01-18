@@ -44,7 +44,8 @@ def decode_message_attributedbody(data):
     if not data:
         return None
     for event in TypedStreamReader.from_data(data):
-        # The first bytes object is the one we want
+        # The first bytes object is the one we want; it should be safe to
+        # convert back to UTF-8
         if type(event) is bytes:
             return event.decode("utf-8")
 
