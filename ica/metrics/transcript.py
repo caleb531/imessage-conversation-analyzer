@@ -15,12 +15,7 @@ def analyze(dfs):
                 .replace("1", "Yes")
                 .replace("0", "No")
             ),
-            "is_reaction": (
-                dfs.messages["text"].str.match(
-                    r"^(Loved|Liked|Disliked|Laughed at|Emphasized|Questioned)"
-                    r" (“(.*?)”|an \w+)$"
-                )
-            ),
+            "is_reaction": dfs.messages["is_reaction"],
             # U+FFFC is the object replacement character, which appears as the
             # textual message for every attachment
             "message": dfs.messages["text"].replace(

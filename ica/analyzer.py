@@ -68,6 +68,11 @@ def get_messages_dataframe(connection, chat_identifiers):
     messages_df["text"] = messages_df["text"].fillna(
         messages_df["attributedBody"].apply(decode_message_attributedbody)
     )
+    # Use a regex-based heuristic to determine which messages are reactions
+    messages_df["is_reaction"] = messages_df["text"].str.match(
+        r"^(Loved|Liked|Disliked|Laughed at|Emphasized|Questioned)"
+        r" (“(.*?)”|an \w+)$"
+    )
     return messages_df
 
 
