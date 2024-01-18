@@ -14,7 +14,8 @@ license = {file = 'LICENSE.txt'}
 keywords = ["apple", "imessage", "macos", "conversation", "chat", "analysis", "pandas"]
 dependencies = [
     "pandas",
-    "tabulate"
+    "tabulate",
+    "pytypedstream"
 ]
 
 [project.urls]

@@ -11,6 +11,7 @@ import types
 
 import pandas as pd
 from tabulate import tabulate
+from typedstream.stream import TypedStreamReader
 
 # In order to interpolate the user-specified list of chat identifiers into the
 # SQL queries, we must join the list into a string delimited by a common
@@ -35,10 +36,23 @@ def get_chat_identifier_str(chat_identifiers):
     )
 
 
+# The textual contents of some messages are encoded in a special attributedBody
+# column on the message row; this attributedBody value is in Apple's proprietary
+# typedstream format, but can be parsed with the pytypedstream package
+# (<https://pypi.org/project/pytypedstream/>)
+def decode_message_attributedbody(data):
+    if not data:
+        return None
+    for event in TypedStreamReader.from_data(data):
+        # The first bytes object is the one we want
+        if type(event) is bytes:
+            return event.decode("utf-8")
+
+
 # Return a pandas dataframe representing all messages in a particular
 # conversation (identified by the given phone number)
 def get_messages_dataframe(connection, chat_identifiers):
-    return pd.read_sql_query(
+    messages_df = pd.read_sql_query(
         sql=importlib.resources.files(__package__)
         .joinpath("queries/messages.sql")
         .read_text(),
@@ -49,6 +63,10 @@ def get_messages_dataframe(connection, chat_identifiers):
         },
         parse_dates={"datetime": "ISO8601"},
     )
+    messages_df["text"] = messages_df["text"].fillna(
+        messages_df["attributedBody"].apply(decode_message_attributedbody)
+    )
+    return messages_df
 
 
 # Return a pandas dataframe representing all attachments in a particular
