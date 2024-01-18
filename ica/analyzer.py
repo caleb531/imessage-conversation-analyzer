@@ -53,29 +53,34 @@ def decode_message_attributedbody(data):
 # Return a pandas dataframe representing all messages in a particular
 # conversation (identified by the given phone number)
 def get_messages_dataframe(connection, chat_identifiers):
-    messages_df = pd.read_sql_query(
-        sql=importlib.resources.files(__package__)
-        .joinpath("queries/messages.sql")
-        .read_text(),
-        con=connection,
-        params={
-            "chat_identifiers": get_chat_identifier_str(chat_identifiers),
-            "chat_identifier_delimiter": CHAT_IDENTIFIER_DELIMITER,
-        },
-        parse_dates={"datetime": "ISO8601"},
+    return (
+        pd.read_sql_query(
+            sql=importlib.resources.files(__package__)
+            .joinpath("queries/messages.sql")
+            .read_text(),
+            con=connection,
+            params={
+                "chat_identifiers": get_chat_identifier_str(chat_identifiers),
+                "chat_identifier_delimiter": CHAT_IDENTIFIER_DELIMITER,
+            },
+            parse_dates={"datetime": "ISO8601"},
+        )
+        # Decode any attributedBody values and merge them into the 'text' column
+        .assign(
+            text=lambda df: df["text"].fillna(
+                df["attributedBody"].apply(decode_message_attributedbody)
+            )
+        )
+        # Use a regex-based heuristic to determine which messages are reactions
+        .assign(
+            is_reaction=lambda df: df["text"].str.match(
+                r"^(Loved|Liked|Disliked|Laughed at|Emphasized|Questioned)"
+                r" (“(.*?)”|an \w+)$"
+            )
+        )
+        # Convert 'is_from_me' values from integers to proper booleans
+        .assign(is_from_me=lambda df: df["is_from_me"].astype(bool))
     )
-    # Decode any attributedBody values and merge them into the 'text' column
-    messages_df["text"] = messages_df["text"].fillna(
-        messages_df["attributedBody"].apply(decode_message_attributedbody)
-    )
-    # Use a regex-based heuristic to determine which messages are reactions
-    messages_df["is_reaction"] = messages_df["text"].str.match(
-        r"^(Loved|Liked|Disliked|Laughed at|Emphasized|Questioned)"
-        r" (“(.*?)”|an \w+)$"
-    )
-    # Convert 'is_from_me' values from integers to proper booleans
-    messages_df["is_from_me"] = messages_df["is_from_me"].apply(bool)
-    return messages_df
 
 
 # Return a pandas dataframe representing all attachments in a particular
