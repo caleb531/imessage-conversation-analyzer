@@ -32,3 +32,12 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.package-data]
 ica = ["*.json", "queries/*.sql"]
+
+[tool.flake8]
+# Black compatibility
+max-line-length = 88
+extend-ignore = ["E203", "W503"]
+
+# Per <https://black.readthedocs.io/en/stable/guides/using_black_with_other_tools.html#profile>
+[tool.isort]
+profile = "black"
