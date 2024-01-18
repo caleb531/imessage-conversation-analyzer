@@ -63,6 +63,7 @@ def get_messages_dataframe(connection, chat_identifiers):
         },
         parse_dates={"datetime": "ISO8601"},
     )
+    # Decode any attributedBody values and merge them into the 'text' column
     messages_df["text"] = messages_df["text"].fillna(
         messages_df["attributedBody"].apply(decode_message_attributedbody)
     )
