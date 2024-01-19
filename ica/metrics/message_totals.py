@@ -56,19 +56,19 @@ def analyze(dfs):
 
     totals_map = {
         "messages": len(dfs.messages.query("is_reaction == False")),
-        "messages_from_me": dfs.messages.query("is_reaction == False")["is_from_me"]
-        .eq(True)
-        .sum(),
-        "messages_from_them": dfs.messages.query("is_reaction == False")["is_from_me"]
-        .eq(False)
-        .sum(),
+        "messages_from_me": (
+            dfs.messages.query("is_reaction == False")["is_from_me"].eq(True).sum()
+        ),
+        "messages_from_them": (
+            dfs.messages.query("is_reaction == False")["is_from_me"].eq(False).sum()
+        ),
         "reactions": len(dfs.messages.query("is_reaction == True")),
-        "reactions_from_me": dfs.messages.query("is_reaction == True")["is_from_me"]
-        .eq(True)
-        .sum(),
-        "reactions_from_them": dfs.messages.query("is_reaction == True")["is_from_me"]
-        .eq(False)
-        .sum(),
+        "reactions_from_me": (
+            dfs.messages.query("is_reaction == True")["is_from_me"].eq(True).sum()
+        ),
+        "reactions_from_them": (
+            dfs.messages.query("is_reaction == True")["is_from_me"].eq(False).sum()
+        ),
         "days_messaged": len(message_datestrs),
         "days_missed": len(all_datestrs) - len(message_datestrs),
         "days_with_no_reply": get_noreply_count(dfs),
