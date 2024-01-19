@@ -24,7 +24,7 @@ def get_all_message_datestrs(dfs):
     groups_by_day = dfs.messages.resample("D", on="datetime")
     sums_by_day = groups_by_day.count()
     sums_by_day.index = sums_by_day.index.strftime(DATE_FORMAT)
-    return list(sums_by_day.index)
+    return list(sums_by_day)
 
 
 # Get the number of messages with no reply (i.e. only one message sent for that
@@ -55,9 +55,16 @@ def analyze(dfs):
     message_datestrs = get_all_message_datestrs(dfs)
 
     totals_map = {
-        "messages": len(dfs.messages.index),
+        "messages": len(dfs.messages),
         "messages_from_me": dfs.messages["is_from_me"].eq(True).sum(),
         "messages_from_them": dfs.messages["is_from_me"].eq(False).sum(),
+        "reactions": len(dfs.messages.query("is_reaction == True")),
+        "reactions_from_me": dfs.messages.query("is_reaction == True")["is_from_me"]
+        .eq(True)
+        .sum(),
+        "reactions_from_them": dfs.messages.query("is_reaction == True")["is_from_me"]
+        .eq(False)
+        .sum(),
         "days_messaged": len(message_datestrs),
         "days_missed": len(all_datestrs) - len(message_datestrs),
         "days_with_no_reply": get_noreply_count(dfs),
