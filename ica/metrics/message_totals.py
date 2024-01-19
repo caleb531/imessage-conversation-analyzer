@@ -55,9 +55,13 @@ def analyze(dfs):
     message_datestrs = get_all_message_datestrs(dfs)
 
     totals_map = {
-        "messages": len(dfs.messages),
-        "messages_from_me": dfs.messages["is_from_me"].eq(True).sum(),
-        "messages_from_them": dfs.messages["is_from_me"].eq(False).sum(),
+        "messages": len(dfs.messages.query("is_reaction == False")),
+        "messages_from_me": dfs.messages.query("is_reaction == False")["is_from_me"]
+        .eq(True)
+        .sum(),
+        "messages_from_them": dfs.messages.query("is_reaction == False")["is_from_me"]
+        .eq(False)
+        .sum(),
         "reactions": len(dfs.messages.query("is_reaction == True")),
         "reactions_from_me": dfs.messages.query("is_reaction == True")["is_from_me"]
         .eq(True)
