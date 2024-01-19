@@ -65,12 +65,16 @@ def get_messages_dataframe(connection, chat_identifiers):
             },
             parse_dates={"datetime": "ISO8601"},
         )
-        # Decode any attributedBody values and merge them into the 'text' column
+        # Decode any 'attributedBody' values and merge them into the 'text'
+        # column
         .assign(
             text=lambda df: df["text"].fillna(
                 df["attributedBody"].apply(decode_message_attributedbody)
             )
         )
+        # Remove 'attributedBody' column now that it has been merged into the
+        # 'text' column
+        .drop("attributedBody", axis=1)
         # Use a regex-based heuristic to determine which messages are reactions
         .assign(
             is_reaction=lambda df: df["text"].str.match(
