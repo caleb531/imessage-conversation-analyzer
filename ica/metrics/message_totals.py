@@ -29,7 +29,7 @@ def get_all_message_datestrs(dfs: DataFrameNamespace) -> list[str]:
     groups_by_day = dfs.messages.resample("D", on="datetime")
     sums_by_day = groups_by_day.count()
     sums_by_day.index = sums_by_day.index.strftime(DATE_FORMAT)
-    return list(sums_by_day)
+    return list(sums_by_day.index)
 
 
 # Get the number of messages with no reply (i.e. only one message sent for that
