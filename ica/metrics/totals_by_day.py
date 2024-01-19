@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-
-
 import pandas as pd
+
+from ica.analyzer import DataFrameNamespace
 
 # The format to use for all date strings
 DATE_FORMAT = "%Y-%m-%d"
 
 
-def analyze(dfs):
+def analyze(dfs: DataFrameNamespace) -> pd.DataFrame:
     # Count all "text" column values by converting them to integers (always 1),
     # because resampling the DataFrame will remove all non-numeric columns
     dfs.messages["text"] = (

@@ -34,6 +34,19 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools.package-data]
 ica = ["*.json", "queries/*.sql"]
 
+[tool.mypy]
+exclude = ["build"]
+disallow_untyped_defs = true
+
+[[tool.mypy.overrides]]
+module = [
+    "setuptools.*",
+    "pandas.*",
+    "tabulate.*",
+    "typedstream.*"
+]
+ignore_missing_imports = true
+
 [tool.flake8]
 # Black compatibility
 max-line-length = 88

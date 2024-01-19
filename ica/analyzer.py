@@ -7,7 +7,8 @@ import os
 import os.path
 import sqlite3
 import sys
-import types
+from dataclasses import dataclass
+from typing import Optional
 
 import pandas as pd
 from tabulate import tabulate
@@ -25,10 +26,16 @@ CHAT_IDENTIFIER_DELIMITER = "|"
 DB_PATH = os.path.expanduser(os.path.join("~", "Library", "Messages", "chat.db"))
 
 
+@dataclass
+class DataFrameNamespace:
+    messages: pd.DataFrame
+    attachments: pd.DataFrame
+
+
 # Join the list of chat identifiers into a delimited string; in order for the
 # SQL comparison to function properly, this string must also start and end with
 # the delimiter symbol
-def get_chat_identifier_str(chat_identifiers):
+def get_chat_identifier_str(chat_identifiers: list[str]) -> str:
     return "{start}{joined}{end}".format(
         start=CHAT_IDENTIFIER_DELIMITER,
         joined=CHAT_IDENTIFIER_DELIMITER.join(chat_identifiers),
@@ -40,19 +47,21 @@ def get_chat_identifier_str(chat_identifiers):
 # column on the message row; this attributedBody value is in Apple's proprietary
 # typedstream format, but can be parsed with the pytypedstream package
 # (<https://pypi.org/project/pytypedstream/>)
-def decode_message_attributedbody(data):
-    if not data:
-        return None
-    for event in TypedStreamReader.from_data(data):
-        # The first bytes object is the one we want; it should be safe to
-        # convert back to UTF-8
-        if type(event) is bytes:
-            return event.decode("utf-8")
+def decode_message_attributedbody(data: bytes) -> str:
+    if data:
+        for event in TypedStreamReader.from_data(data):
+            # The first bytes object is the one we want; it should be safe to
+            # convert back to UTF-8
+            if type(event) is bytes:
+                return event.decode("utf-8")
+    return ""
 
 
 # Return a pandas dataframe representing all messages in a particular
 # conversation (identified by the given phone number)
-def get_messages_dataframe(connection, chat_identifiers):
+def get_messages_dataframe(
+    connection: sqlite3.Connection, chat_identifiers: list[str]
+) -> pd.DataFrame:
     return (
         pd.read_sql_query(
             sql=importlib.resources.files(__package__)
@@ -89,7 +98,9 @@ def get_messages_dataframe(connection, chat_identifiers):
 
 # Return a pandas dataframe representing all attachments in a particular
 # conversation (identified by the given phone number)
-def get_attachments_dataframe(connection, chat_identifiers):
+def get_attachments_dataframe(
+    connection: sqlite3.Connection, chat_identifiers: list[str]
+) -> pd.DataFrame:
     return pd.read_sql_query(
         sql=importlib.resources.files(__package__)
         .joinpath("queries/attachments.sql")
@@ -103,9 +114,9 @@ def get_attachments_dataframe(connection, chat_identifiers):
 
 
 # Return all dataframes for a specific macOS Messages conversation
-def get_dataframes(chat_identifiers):
+def get_dataframes(chat_identifiers: list[str]) -> DataFrameNamespace:
     with sqlite3.connect(DB_PATH) as connection:
-        return types.SimpleNamespace(
+        return DataFrameNamespace(
             messages=get_messages_dataframe(connection, chat_identifiers),
             attachments=get_attachments_dataframe(connection, chat_identifiers),
         )
@@ -113,33 +124,38 @@ def get_dataframes(chat_identifiers):
 
 # Load the given metric file as a Python module, and return the DataFrame
 # provided by its analyze() function
-def run_analyzer_for_metric_file(metric_file, dfs):
+def run_analyzer_for_metric_file(
+    metric_file: str, dfs: DataFrameNamespace
+) -> Optional[pd.DataFrame]:
     loader = importlib.machinery.SourceFileLoader("metric_file", metric_file)
     spec = importlib.util.spec_from_loader(loader.name, loader)
-    module = importlib.util.module_from_spec(spec)
-    # Expose package information to dynamically-imported module
-    module.__package__ = __package__
-    loader.exec_module(module)
-    metric_df = module.analyze(dfs)
-    return metric_df
-
-
-# Format the given header name to be more human-readable (e.g. "foo_bar" =>
-# "Foo Bar")
-def prettify_header_name(header_name):
-    if header_name:
-        return header_name.replace("_", " ").title()
+    if spec:
+        module = importlib.util.module_from_spec(spec)
+        # Expose package information to dynamically-imported module
+        module.__package__ = __package__
+        loader.exec_module(module)
+        metric_df = module.analyze(dfs)
+        return metric_df
     else:
         return None
 
 
+# Format the given header name to be more human-readable (e.g. "foo_bar" =>
+# "Foo Bar")
+def prettify_header_name(header_name: str) -> str:
+    if header_name:
+        return header_name.replace("_", " ").title()
+    else:
+        return ""
+
+
 # Format the given sequence of header names
-def prettify_header_names(header_names):
+def prettify_header_names(header_names: list[str]) -> list[str]:
     return [prettify_header_name(header_name) for header_name in header_names]
 
 
 # Print the given dataframe of metrics data
-def print_metrics(metric_df, format):
+def print_metrics(metric_df: pd.DataFrame, format: str) -> None:
     # Prettify header row (i.e. column names)
     if metric_df.index.name:
         metric_df.index = metric_df.index.rename(
@@ -171,7 +187,9 @@ def print_metrics(metric_df, format):
 
 
 # Analyze the macOS Messages conversation with the given recipient phone number
-def analyze_conversation(chat_identifiers, metric_file, format):
+def analyze_conversation(
+    chat_identifiers: list[str], metric_file: str, format: str
+) -> None:
     dfs = get_dataframes(chat_identifiers)
 
     # Quit if no messages were found for the specified conversation

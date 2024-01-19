@@ -9,7 +9,7 @@ import ica.contact as contact
 
 
 # Parse user arguments from the command line
-def get_cli_args():
+def get_cli_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--contact-name", "-c", required=True)
     parser.add_argument("--metric-file", "-m", type=os.path.expanduser, required=True)
@@ -19,7 +19,7 @@ def get_cli_args():
 
 
 # Program entry point
-def main():
+def main() -> None:
     cli_args = get_cli_args()
 
     chat_identifiers = contact.get_chat_identifiers(contact_name=cli_args.contact_name)

@@ -5,6 +5,8 @@ import json
 
 import pandas as pd
 
+from ica.analyzer import DataFrameNamespace
+
 # The maximum number of most frequent emojis to output in the table
 EMOJI_DISPLAY_COUNT = 10
 
@@ -18,7 +20,7 @@ def get_emoji_list():
 
 
 # Output the occurrences of specific emojis
-def analyze(dfs):
+def analyze(dfs: DataFrameNamespace) -> pd.DataFrame:
     return (
         pd.DataFrame({"emoji": get_emoji_list(), "count": 0})
         .assign(

@@ -20,7 +20,7 @@ DB_GLOB = os.path.expanduser(
 
 # Normalize the given phone number to the format required for searching in the
 # iMessage database
-def normalize_phone_number(phone_number):
+def normalize_phone_number(phone_number: str) -> str:
     # Strip all non-digits
     normalized_phone_number = re.sub("[^0-9]", "", phone_number)
     # Phone number must have area code
@@ -35,14 +35,14 @@ def normalize_phone_number(phone_number):
 
 # Normalize the given email address to the format required for searching in the
 # iMessage database
-def normalize_email_address(email_address):
+def normalize_email_address(email_address: str) -> str:
     normalized_email_address = email_address.strip()
     return normalized_email_address
 
 
 # Fetch the sequence of chat identifiers for the contact with the given name
-def get_chat_identifiers(contact_name):
-    chat_identifiers = set()
+def get_chat_identifiers(contact_name: str) -> list[str]:
+    chat_identifiers: set[str] = set()
     # There is a separate AddressBook database file for each "source" of
     # contacts (e.g. On My Mac, iCloud, etc.); we must query each of these
     # databases and combine the separate results into a single result set

@@ -2,13 +2,15 @@
 
 import pandas as pd
 
+from ica.analyzer import DataFrameNamespace
 
-def convert_bool_to_yesno(series):
+
+def convert_bool_to_yesno(series: pd.Series) -> pd.Series:
     return series.apply(str).replace("True", "Yes").replace("False", "No")
 
 
 # Export the entire conversation
-def analyze(dfs):
+def analyze(dfs: DataFrameNamespace) -> pd.DataFrame:
     return pd.DataFrame(
         {
             "timestamp": dfs.messages["datetime"],

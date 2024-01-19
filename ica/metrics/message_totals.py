@@ -1,26 +1,31 @@
 #!/usr/bin/env python3
 
 import datetime
+from typing import Union
 
 import pandas as pd
+
+from ica.analyzer import DataFrameNamespace
 
 # The format to use for all date strings
 DATE_FORMAT = "%Y-%m-%d"
 
 
 # Retrieve the date of the very first message sent in the conversation
-def get_first_message_date(dfs):
+def get_first_message_date(dfs: DataFrameNamespace) -> datetime.datetime:
     datestr = str(dfs.messages["datetime"].min().strftime(DATE_FORMAT))
     return datetime.datetime.strptime(datestr, DATE_FORMAT)
 
 
 # Get all dates between (and including) the given two dates
-def get_dates_between(start_date, end_date):
+def get_dates_between(
+    start_date: Union[str, datetime.datetime], end_date: Union[str, datetime.datetime]
+) -> list[datetime.datetime]:
     return list(pd.date_range(start_date, end_date).strftime(DATE_FORMAT))
 
 
 # Get all dates sent
-def get_all_message_datestrs(dfs):
+def get_all_message_datestrs(dfs: DataFrameNamespace) -> list[str]:
     groups_by_day = dfs.messages.resample("D", on="datetime")
     sums_by_day = groups_by_day.count()
     sums_by_day.index = sums_by_day.index.strftime(DATE_FORMAT)
@@ -29,7 +34,7 @@ def get_all_message_datestrs(dfs):
 
 # Get the number of messages with no reply (i.e. only one message sent for that
 # day)
-def get_noreply_count(dfs):
+def get_noreply_count(dfs: DataFrameNamespace) -> int:
     # Count all "text" column values by converting them to integers (always 1),
     # because resampling the DataFrame will remove all non-numeric columns
     dfs.messages["text"] = (
@@ -44,11 +49,13 @@ def get_noreply_count(dfs):
 
 
 # Return a list of all dates in Date List B which are not in Date List A
-def get_missing_datestrs(date_list_a, date_list_b):
+def get_missing_datestrs(
+    date_list_a: list[datetime.datetime], date_list_b: list[datetime.datetime]
+) -> list[datetime.datetime]:
     return sorted(set(date_list_a) - set(date_list_b))
 
 
-def analyze(dfs):
+def analyze(dfs: DataFrameNamespace) -> pd.DataFrame:
     all_datestrs = get_dates_between(
         get_first_message_date(dfs), str(datetime.date.today())
     )

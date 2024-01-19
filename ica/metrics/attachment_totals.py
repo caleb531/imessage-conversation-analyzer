@@ -3,8 +3,10 @@
 
 import pandas as pd
 
+from ica.analyzer import DataFrameNamespace
 
-def analyze(dfs):
+
+def analyze(dfs: DataFrameNamespace) -> pd.DataFrame:
     totals_map = {
         "gifs": dfs.attachments["mime_type"].eq("image/gif").sum(),
         "youtube_videos": (
