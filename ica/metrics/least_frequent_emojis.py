@@ -25,7 +25,8 @@ def analyze(dfs: DataFrameNamespace) -> pd.DataFrame:
         pd.DataFrame({"emoji": get_emoji_list(), "count": 0})
         .assign(
             count=lambda df: df["emoji"].apply(
-                lambda emoji: dfs.messages["text"]
+                lambda emoji: dfs.messages.query("is_reaction == False")
+                .get("text")
                 .str.extract(f"({emoji})")
                 .count()
                 .item()
