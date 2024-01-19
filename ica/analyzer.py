@@ -138,7 +138,9 @@ def prettify_header_names(header_names):
 def print_metrics(metric_df, format):
     # Prettify header row (i.e. column names)
     if metric_df.index.name:
-        metric_df.index.rename(prettify_header_name(metric_df.index.name), inplace=True)
+        metric_df.index = metric_df.index.rename(
+            prettify_header_name(metric_df.index.name)
+        )
     metric_df.columns = prettify_header_names(metric_df.columns)
     # Prettify header column (i.e. textual values in first column)
     first_column_name = metric_df.columns[0]

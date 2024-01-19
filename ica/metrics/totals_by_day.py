@@ -17,6 +17,6 @@ def analyze(dfs):
     sums_by_day = groups_by_day.sum()
     # Remove 00:00:00 from date index
     sums_by_day.index = sums_by_day.index.strftime(DATE_FORMAT)
-    sums_by_day.index.rename("date", inplace=True)
+    sums_by_day.index = sums_by_day.index.rename("date")
     sums_by_day["is_from_them"] = sums_by_day["text"] - sums_by_day["is_from_me"]
     return sums_by_day
