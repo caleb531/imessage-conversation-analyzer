@@ -19,19 +19,17 @@ def get_emoji_list():
 
 # Output the occurrences of specific emojis
 def analyze(dfs):
-    emojis = get_emoji_list()
-    emoji_counts = pd.DataFrame(
-        {
-            "emoji": emojis,
-            "count": [
-                dfs.messages["text"].str.extract("(" + emoji + ")").count().item()
-                for emoji in emojis
-            ],
-        }
-    )
     return (
-        emoji_counts[emoji_counts["count"] > 0]
-        .sort_index(ascending=False)
+        pd.DataFrame({"emoji": get_emoji_list(), "count": 0})
+        .assign(
+            count=lambda df: df["emoji"].apply(
+                lambda emoji: dfs.messages["text"]
+                .str.extract(f"({emoji})")
+                .count()
+                .item()
+            )
+        )
+        .query("count > 0")
         .sort_values(by="count", ascending=True)
         .reset_index(drop=True)
         .head(EMOJI_DISPLAY_COUNT)
