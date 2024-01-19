@@ -169,7 +169,7 @@ def analyze_conversation(chat_identifiers, metric_file, format):
     dfs = get_dataframes(chat_identifiers)
 
     # Quit if no messages were found for the specified conversation
-    if not len(dfs.messages.index):
+    if not len(dfs.messages):
         print(
             "No conversations found for the following handlers:\n{}".format(
                 "\n".join(chat_identifiers)
