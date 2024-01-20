@@ -75,6 +75,10 @@ textual table, or specify `csv` to print output as CSV.
 ica -c 'John Doe' -m ica/metrics/message_totals.py -f csv
 ```
 
+```sh
+ica -c 'John Doe' -m ica/metrics/message_totals.py -f csv > myfile.csv
+```
+
 You can also output as CSV and use the `pbcopy` command for easy copy/pasting
 into a spreadsheet program (like Excel or Numbers).
 
