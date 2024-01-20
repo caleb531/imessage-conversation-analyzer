@@ -27,9 +27,8 @@ def analyze(dfs: DataFrameNamespace) -> pd.DataFrame:
             count=lambda df: df["emoji"].apply(
                 lambda emoji: dfs.messages.query("is_reaction == False")
                 .get("text")
-                .str.extract(f"({emoji})")
-                .count()
-                .item()
+                .str.count(emoji)
+                .sum()
             )
         )
         .query("count > 0")
