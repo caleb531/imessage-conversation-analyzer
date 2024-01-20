@@ -14,7 +14,7 @@ EMOJI_DISPLAY_COUNT = 10
 
 # Fetch a list of the most popular emoji on the Web to use as a basis for
 # computing this metric
-def get_emoji_list():
+def get_emoji_list() -> list[str]:
     return json.loads(
         importlib.resources.files(__package__).joinpath("emojis.json").read_text()
     )
