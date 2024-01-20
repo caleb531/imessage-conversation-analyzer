@@ -2,6 +2,7 @@
 
 import importlib.resources
 import json
+import re
 
 import pandas as pd
 
@@ -27,7 +28,11 @@ def analyze(dfs: DataFrameNamespace) -> pd.DataFrame:
             count=lambda df: df["emoji"].apply(
                 lambda emoji: dfs.messages.query("is_reaction == False")
                 .get("text")
-                .str.count(emoji)
+                # A few emoji, like *️⃣, are regex special characters with
+                # combining characters added to make them emoji; however,
+                # because they are fundamentally regex special characters, they
+                # will break the regex syntax unless escaped
+                .str.count(re.escape(emoji))
                 .sum()
             )
         )
