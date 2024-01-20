@@ -31,4 +31,4 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.package-data]
-ica = ["*.json"]
+ica = ["*.json", "queries/*.sql"]
