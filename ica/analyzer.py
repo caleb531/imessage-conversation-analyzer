@@ -2,12 +2,12 @@
 
 import importlib.machinery
 import importlib.util
+import importlib.resources
 import os
 import os.path
 import sqlite3
 import sys
 import types
-from pathlib import Path
 
 import pandas as pd
 from tabulate import tabulate
@@ -36,12 +36,18 @@ def get_chat_identifier_str(chat_identifiers):
         end=CHAT_IDENTIFIER_DELIMITER)
 
 
+# Read the contents of the given SQL file within this package
+def read_sql_file(sql_path):
+    return importlib.resources.files(
+        __package__).joinpath(sql_path).read_text()
+
+
 # Return a pandas dataframe representing all messages in a particular
 # conversation (identified by the given phone number)
 def get_messages_dataframe(connection, chat_identifiers):
 
     return pd.read_sql_query(
-        sql=Path('ica/queries/messages.sql').read_text(),
+        sql=read_sql_file('queries/messages.sql'),
         con=connection,
         params={
             'chat_identifiers': get_chat_identifier_str(chat_identifiers),
@@ -57,7 +63,7 @@ def get_messages_dataframe(connection, chat_identifiers):
 def get_attachments_dataframe(connection, chat_identifiers):
 
     return pd.read_sql_query(
-        sql=Path('ica/queries/attachments.sql').read_text(),
+        sql=read_sql_file('queries/attachments.sql'),
         con=connection,
         params={
             'chat_identifiers': get_chat_identifier_str(chat_identifiers),
