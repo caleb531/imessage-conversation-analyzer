@@ -28,7 +28,7 @@ changelog = "https://github.com/caleb531/imessage-conversation-analyzer/releases
 ica = "ica.__main__:main"
 
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.package-data]
