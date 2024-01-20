@@ -36,18 +36,13 @@ def get_chat_identifier_str(chat_identifiers):
         end=CHAT_IDENTIFIER_DELIMITER)
 
 
-# Read the contents of the given SQL file within this package
-def read_sql_file(sql_path):
-    return importlib.resources.files(
-        __package__).joinpath(sql_path).read_text()
-
-
 # Return a pandas dataframe representing all messages in a particular
 # conversation (identified by the given phone number)
 def get_messages_dataframe(connection, chat_identifiers):
 
     return pd.read_sql_query(
-        sql=read_sql_file('queries/messages.sql'),
+        sql=importlib.resources.files(
+            __package__).joinpath('queries/messages.sql').read_text(),
         con=connection,
         params={
             'chat_identifiers': get_chat_identifier_str(chat_identifiers),
@@ -63,7 +58,8 @@ def get_messages_dataframe(connection, chat_identifiers):
 def get_attachments_dataframe(connection, chat_identifiers):
 
     return pd.read_sql_query(
-        sql=read_sql_file('queries/attachments.sql'),
+        sql=importlib.resources.files(
+            __package__).joinpath('queries/attachments.sql').read_text(),
         con=connection,
         params={
             'chat_identifiers': get_chat_identifier_str(chat_identifiers),
@@ -88,6 +84,8 @@ def run_analyzer_for_metric_file(metric_file, dfs):
     loader = importlib.machinery.SourceFileLoader('metric_file', metric_file)
     spec = importlib.util.spec_from_loader(loader.name, loader)
     module = importlib.util.module_from_spec(spec)
+    # Expose package information to dynamically-imported module
+    module.__package__ = __package__
     loader.exec_module(module)
     metric_df = module.analyze(dfs)
     return metric_df

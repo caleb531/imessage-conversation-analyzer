@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import json
+import importlib.resources
 
 import pandas as pd
 
@@ -13,8 +14,8 @@ EMOJI_DISPLAY_COUNT = 20
 # computing this metric
 def get_emoji_list():
 
-    with open('ica/emojis.json', 'r') as emojis_file:
-        return json.load(emojis_file)
+    return json.loads(importlib.resources.files(__package__)
+                      .joinpath('emojis.json').read_text())
 
 
 # Output the occurrences of specific emojis

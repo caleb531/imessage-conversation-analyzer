@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
+import importlib.resources
 import glob
 import os
 import os.path
 import re
 import sqlite3
 import sys
-from pathlib import Path
 
 import pandas as pd
 
@@ -51,7 +51,8 @@ def get_chat_identifiers(contact_name):
     for db_path in glob.iglob(DB_GLOB):
         with sqlite3.connect(db_path) as connection:
             rows = pd.read_sql_query(
-                sql=Path('ica/queries/contact.sql').read_text(),
+                sql=importlib.resources.files(
+                    __package__).joinpath('queries/contact.sql').read_text(),
                 con=connection,
                 params={'contact_name': contact_name})
             # Combine the results
