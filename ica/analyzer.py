@@ -149,11 +149,6 @@ def prettify_header_name(header_name: str) -> str:
         return ""
 
 
-# Format the given sequence of header names
-def prettify_header_names(header_names: list[str]) -> list[str]:
-    return [prettify_header_name(header_name) for header_name in header_names]
-
-
 # Print the given dataframe of metrics data
 def print_metrics(metric_df: pd.DataFrame, format: str) -> None:
     # Prettify header row (i.e. column names)
@@ -161,7 +156,12 @@ def print_metrics(metric_df: pd.DataFrame, format: str) -> None:
         metric_df.index = metric_df.index.rename(
             prettify_header_name(metric_df.index.name)
         )
-    metric_df.columns = prettify_header_names(metric_df.columns)
+    metric_df = metric_df.rename(
+        {
+            column_name: prettify_header_name(column_name)
+            for column_name in metric_df.columns
+        }
+    )
     # Prettify header column (i.e. textual values in first column)
     first_column_name = metric_df.columns[0]
     if metric_df[first_column_name].dtypes == object:
