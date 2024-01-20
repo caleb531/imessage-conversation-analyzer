@@ -4,8 +4,8 @@ import argparse
 import os
 import os.path
 
-import ica.analyzer as analyzer
 import ica.contact as contact
+import ica.core as core
 
 
 # Parse user arguments from the command line
@@ -25,7 +25,7 @@ def main() -> None:
     chat_identifiers = contact.get_chat_identifiers(contact_name=cli_args.contact_name)
 
     try:
-        analyzer.analyze_conversation(
+        core.analyze_conversation(
             chat_identifiers=chat_identifiers,
             metric_file=cli_args.metric_file,
             format=cli_args.format,

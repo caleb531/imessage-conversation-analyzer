@@ -2,7 +2,7 @@
 
 import pandas as pd
 
-from ica.analyzer import DataFrameNamespace
+from ica.core import DataFrameNamespace
 
 
 def convert_bool_to_yesno(series: pd.Series) -> pd.Series:

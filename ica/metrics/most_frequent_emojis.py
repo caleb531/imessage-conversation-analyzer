@@ -6,7 +6,7 @@ import re
 
 import pandas as pd
 
-from ica.analyzer import DataFrameNamespace
+from ica.core import DataFrameNamespace
 
 # The maximum number of most frequent emojis to output in the table
 EMOJI_DISPLAY_COUNT = 10

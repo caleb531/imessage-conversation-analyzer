@@ -5,7 +5,7 @@ from typing import Union
 
 import pandas as pd
 
-from ica.analyzer import DataFrameNamespace
+from ica.core import DataFrameNamespace
 
 # The format to use for all date strings
 DATE_FORMAT = "%Y-%m-%d"

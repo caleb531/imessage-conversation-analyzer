@@ -3,7 +3,7 @@
 
 import pandas as pd
 
-from ica.analyzer import DataFrameNamespace
+from ica.core import DataFrameNamespace
 
 
 def analyze(dfs: DataFrameNamespace) -> pd.DataFrame:
