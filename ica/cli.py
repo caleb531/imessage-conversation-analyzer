@@ -8,17 +8,22 @@ import importlib.util
 import os
 import os.path
 
+# A module-level flag that is set to True if the
+in_cli_mode = False
+
 
 # Parse user arguments from the command line
 def get_cli_args() -> argparse.Namespace:
+    global in_cli_mode
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "analyzer",
-        metavar="analyzer",
-        type=os.path.expanduser,
-        help="the name of a built-in analyzer, or a path to an analyzer file",
-        nargs="?",
-    )
+    # Only accept an analyzer parameter if the CLI has been invoked directly
+    if in_cli_mode:
+        parser.add_argument(
+            "analyzer",
+            metavar="analyzer",
+            type=os.path.expanduser,
+            help="the name of a built-in analyzer, or a path to an analyzer file",
+        )
     parser.add_argument(
         "--contact-name",
         "-c",
@@ -61,6 +66,10 @@ def run_analyzer(analyzer: str) -> None:
 
 # Program entry point
 def main() -> None:
+    global in_cli_mode
+    if not in_cli_mode:
+        in_cli_mode = True
+
     cli_args = get_cli_args()
 
     try:
