@@ -3,10 +3,12 @@
 
 import pandas as pd
 
-from ica.core import DataFrameNamespace
+import ica
 
 
-def analyze(dfs: DataFrameNamespace) -> pd.DataFrame:
+def main() -> None:
+    cli_args = ica.get_cli_args()
+    dfs = ica.get_dataframes(contact_name=cli_args.contact_name)
     totals_map = {
         "gifs": dfs.attachments["mime_type"].eq("image/gif").sum(),
         "youtube_videos": (
@@ -37,6 +39,13 @@ def analyze(dfs: DataFrameNamespace) -> pd.DataFrame:
     attachment_totals = pd.DataFrame(
         {"type": totals_map.keys(), "total": totals_map.values()}
     )
-    return attachment_totals.sort_values(by="total", ascending=False).reset_index(
-        drop=True
+    ica.output_results(
+        attachment_totals.sort_values(by="total", ascending=False).reset_index(
+            drop=True
+        ),
+        format=cli_args.format,
     )
+
+
+if __name__ == "__main__":
+    main()

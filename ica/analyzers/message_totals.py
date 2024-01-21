@@ -5,14 +5,14 @@ from typing import Union
 
 import pandas as pd
 
-from ica.core import DataFrameNamespace
+import ica
 
 # The format to use for all date strings
 DATE_FORMAT = "%Y-%m-%d"
 
 
 # Retrieve the date of the very first message sent in the conversation
-def get_first_message_date(dfs: DataFrameNamespace) -> datetime.datetime:
+def get_first_message_date(dfs: ica.DataFrameNamespace) -> datetime.datetime:
     datestr = str(dfs.messages["datetime"].min().strftime(DATE_FORMAT))
     return datetime.datetime.strptime(datestr, DATE_FORMAT)
 
@@ -25,7 +25,7 @@ def get_dates_between(
 
 
 # Get all dates sent
-def get_all_message_datestrs(dfs: DataFrameNamespace) -> list[str]:
+def get_all_message_datestrs(dfs: ica.DataFrameNamespace) -> list[str]:
     groups_by_day = dfs.messages.resample("D", on="datetime")
     sums_by_day = groups_by_day.count()
     sums_by_day.index = sums_by_day.index.strftime(DATE_FORMAT)
@@ -34,7 +34,7 @@ def get_all_message_datestrs(dfs: DataFrameNamespace) -> list[str]:
 
 # Get the number of messages with no reply (i.e. only one message sent for that
 # day)
-def get_noreply_count(dfs: DataFrameNamespace) -> int:
+def get_noreply_count(dfs: ica.DataFrameNamespace) -> int:
     # Count all "text" column values by converting them to integers (always 1),
     # because resampling the DataFrame will remove all non-numeric columns
     dfs.messages["text"] = (
@@ -55,7 +55,10 @@ def get_missing_datestrs(
     return sorted(set(date_list_a) - set(date_list_b))
 
 
-def analyze(dfs: DataFrameNamespace) -> pd.DataFrame:
+def main() -> None:
+    cli_args = ica.get_cli_args()
+    dfs = ica.get_dataframes(contact_name=cli_args.contact_name)
+
     all_datestrs = get_dates_between(
         get_first_message_date(dfs), str(datetime.date.today())
     )
@@ -80,6 +83,13 @@ def analyze(dfs: DataFrameNamespace) -> pd.DataFrame:
         "days_missed": len(all_datestrs) - len(message_datestrs),
         "days_with_no_reply": get_noreply_count(dfs),
     }
-    return pd.DataFrame(
-        {"metric": tuple(totals_map.keys()), "total": tuple(totals_map.values())}
+    ica.output_results(
+        pd.DataFrame(
+            {"metric": tuple(totals_map.keys()), "total": tuple(totals_map.values())}
+        ),
+        format=cli_args.format,
     )
+
+
+if __name__ == "__main__":
+    main()

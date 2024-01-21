@@ -6,13 +6,13 @@ import importlib.util
 import os
 import os.path
 import sqlite3
-import sys
 from dataclasses import dataclass
-from typing import Optional
 
 import pandas as pd
 from tabulate import tabulate
 from typedstream.stream import TypedStreamReader
+
+import ica.contact as contact
 
 # In order to interpolate the user-specified list of chat identifiers into the
 # SQL queries, we must join the list into a string delimited by a common
@@ -114,30 +114,14 @@ def get_attachments_dataframe(
 
 
 # Return all dataframes for a specific macOS Messages conversation
-def get_dataframes(chat_identifiers: list[str]) -> DataFrameNamespace:
+def get_dataframes(contact_name: str) -> DataFrameNamespace:
+    chat_identifiers = contact.get_chat_identifiers(contact_name)
+
     with sqlite3.connect(DB_PATH) as connection:
         return DataFrameNamespace(
             messages=get_messages_dataframe(connection, chat_identifiers),
             attachments=get_attachments_dataframe(connection, chat_identifiers),
         )
-
-
-# Load the given metric file as a Python module, and return the DataFrame
-# provided by its analyze() function
-def run_analyzer_for_metric_file(
-    metric_file: str, dfs: DataFrameNamespace
-) -> Optional[pd.DataFrame]:
-    loader = importlib.machinery.SourceFileLoader("metric_file", metric_file)
-    spec = importlib.util.spec_from_loader(loader.name, loader)
-    if spec:
-        module = importlib.util.module_from_spec(spec)
-        # Expose package information to dynamically-imported module
-        module.__package__ = __package__
-        loader.exec_module(module)
-        metric_df = module.analyze(dfs)
-        return metric_df
-    else:
-        return None
 
 
 # Format the given header name to be more human-readable (e.g. "foo_bar" =>
@@ -150,61 +134,39 @@ def prettify_header_name(header_name: str) -> str:
 
 
 # Print the given dataframe of metrics data
-def print_metrics(metric_df: pd.DataFrame, format: str) -> None:
+def output_results(analyzer_df: pd.DataFrame, format: str) -> None:
     # Prettify header row (i.e. column names)
-    if metric_df.index.name:
-        metric_df.index = metric_df.index.rename(
-            prettify_header_name(metric_df.index.name)
+    if analyzer_df.index.name:
+        analyzer_df.index = analyzer_df.index.rename(
+            prettify_header_name(analyzer_df.index.name)
         )
-    metric_df = metric_df.rename(
+    analyzer_df = analyzer_df.rename(
         {
             column_name: prettify_header_name(column_name)
-            for column_name in metric_df.columns
+            for column_name in analyzer_df.columns
         }
     )
     # Prettify header column (i.e. textual values in first column)
-    first_column_name = metric_df.columns[0]
-    if metric_df[first_column_name].dtypes == object:
-        metric_df[first_column_name] = metric_df[first_column_name].apply(
+    first_column_name = analyzer_df.columns[0]
+    if analyzer_df[first_column_name].dtypes == object:
+        analyzer_df[first_column_name] = analyzer_df[first_column_name].apply(
             prettify_header_name
         )
 
     # Make all indices start from 1 instead of 0, but only if the index is the
     # default (rather than a custom column)
-    is_default_index = not metric_df.index.name
+    is_default_index = not analyzer_df.index.name
     if is_default_index:
-        metric_df.index += 1
+        analyzer_df.index += 1
 
     # Output executed DataFrame to correct format
     if format == "csv":
-        print(metric_df.to_csv(index=not is_default_index, header=metric_df.columns))
+        print(
+            analyzer_df.to_csv(index=not is_default_index, header=analyzer_df.columns)
+        )
     else:
         print(
             tabulate(
-                metric_df, showindex=not is_default_index, headers=metric_df.columns
+                analyzer_df, showindex=not is_default_index, headers=analyzer_df.columns
             )
         )
-
-
-# Analyze the macOS Messages conversation with the given recipient phone number
-def analyze_conversation(
-    chat_identifiers: list[str], metric_file: str, format: str
-) -> None:
-    dfs = get_dataframes(chat_identifiers)
-
-    # Quit if no messages were found for the specified conversation
-    if not len(dfs.messages):
-        print(
-            "No conversations found for the following handlers:\n{}".format(
-                "\n".join(chat_identifiers)
-            ),
-            file=sys.stderr,
-        )
-        sys.exit(1)
-
-    # Load and execute the given Python file as a module to retrieve the
-    # relevant DataFrame
-    metric_df = run_analyzer_for_metric_file(metric_file, dfs)
-
-    # Print the given metrics
-    print_metrics(metric_df, format)

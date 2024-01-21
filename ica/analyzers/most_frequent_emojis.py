@@ -6,7 +6,7 @@ import re
 
 import pandas as pd
 
-from ica.core import DataFrameNamespace
+import ica
 
 # The maximum number of most frequent emojis to output in the table
 EMOJI_DISPLAY_COUNT = 10
@@ -21,8 +21,10 @@ def get_emoji_list() -> list[str]:
 
 
 # Output the occurrences of specific emojis
-def analyze(dfs: DataFrameNamespace) -> pd.DataFrame:
-    return (
+def main() -> None:
+    cli_args = ica.get_cli_args()
+    dfs = ica.get_dataframes(contact_name=cli_args.contact_name)
+    ica.output_results(
         pd.DataFrame({"emoji": get_emoji_list(), "count": 0})
         .assign(
             count=lambda df: df["emoji"].apply(
@@ -39,5 +41,10 @@ def analyze(dfs: DataFrameNamespace) -> pd.DataFrame:
         .query("count > 0")
         .sort_values(by="count", ascending=False)
         .reset_index(drop=True)
-        .head(EMOJI_DISPLAY_COUNT)
+        .head(EMOJI_DISPLAY_COUNT),
+        format=cli_args.format,
     )
+
+
+if __name__ == "__main__":
+    main()
