@@ -20,7 +20,6 @@ def get_cli_args() -> argparse.Namespace:
     if in_cli_mode:
         parser.add_argument(
             "analyzer",
-            metavar="analyzer",
             type=os.path.expanduser,
             help="the name of a built-in analyzer, or a path to an analyzer file",
         )
