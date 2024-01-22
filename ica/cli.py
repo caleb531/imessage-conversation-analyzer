@@ -8,16 +8,22 @@ import importlib.util
 import os
 import os.path
 
-# A module-level flag that is set to True if the
-in_cli_mode = False
+# A module-level flag that is set to True if the user invokes the CLI via the
+# `ica` command, meaning that an `analyzer` argument will need to be specified
+# as a required CLI argument; otherwise, if the user executes an analyzer file
+# directly (via `python`, `python -m`, or as an executable), then there is no
+# need for the additional CLI argument because it's intrinsically represented by
+# the file being executed
+did_user_invoke_cli_directly = False
 
 
 # Parse user arguments from the command line
 def get_cli_args() -> argparse.Namespace:
-    global in_cli_mode
+    global did_user_invoke_cli_directly
     parser = argparse.ArgumentParser()
-    # Only accept an analyzer parameter if the CLI has been invoked directly
-    if in_cli_mode:
+    # Only accept an analyzer parameter if the user is interacting with the CLI
+    # through the `ica` command
+    if did_user_invoke_cli_directly:
         parser.add_argument(
             "analyzer",
             type=os.path.expanduser,
@@ -65,9 +71,11 @@ def run_analyzer(analyzer: str) -> None:
 
 # Program entry point
 def main() -> None:
-    global in_cli_mode
-    if not in_cli_mode:
-        in_cli_mode = True
+    # Keep track of whether the user invokes the CLI directly via the `ica`
+    # command
+    global did_user_invoke_cli_directly
+    if not did_user_invoke_cli_directly:
+        did_user_invoke_cli_directly = True
 
     cli_args = get_cli_args()
 
