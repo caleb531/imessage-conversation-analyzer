@@ -1,26 +1,62 @@
 [
   {
-    "text": "Hello this is John",
+    "text": "Hey Jane, how's your day going? 😊",
     "attributedBody": "",
-    "datetime": 727593081352000000,
+    "datetime": 727993081352000000,
+    "is_from_me": true
+  },
+  {
+    "text": "Hey John, it's been great so far! 😀 Just finished a productive meeting. What about you?",
+    "attributedBody": "",
+    "datetime": 728093081352000000,
     "is_from_me": false
   },
   {
-    "text": "Hey John! How's it going? 😊",
+    "text": "Sounds good! I'm just taking a quick break before diving into some coding. 👨‍💻",
     "attributedBody": "",
-    "datetime": 727593081352000000,
+    "datetime": 728193081352000000,
+    "is_from_me": true
+  },
+  {
+    "text": "That sounds exciting! 😀 What are you working on?",
+    "attributedBody": "",
+    "datetime": 728293081352000000,
     "is_from_me": false
   },
   {
-    "text": "It's going great! 😀 How are you?",
+    "text": "Building a new feature for our app. It should make things a lot easier for users. 🙌",
     "attributedBody": "",
-    "datetime": 727593081352000000,
+    "datetime": 728393081352000000,
+    "is_from_me": true
+  },
+  {
+    "text": "That's awesome! 😀😀😀 I can't wait to see it. 😊 In the meantime, I'm gonna grab some lunch.",
+    "attributedBody": "",
+    "datetime": 728493081352000000,
     "is_from_me": false
   },
   {
-    "text": "I've been fantastic 😊",
+    "text": "Sounds like a good plan! 🍎 Enjoy your lunch!",
     "attributedBody": "",
-    "datetime": 727593081352000000,
+    "datetime": 728593081352000000,
+    "is_from_me": true
+  },
+  {
+    "text": "Thanks! I will. Talk to you later! ☺️",
+    "attributedBody": "",
+    "datetime": 728693081352000000,
+    "is_from_me": false
+  },
+  {
+    "text": "Sure, have a great rest of your day!",
+    "attributedBody": "",
+    "datetime": 728793081352000000,
+    "is_from_me": true
+  },
+  {
+    "text": "You too, John!",
+    "attributedBody": "",
+    "datetime": 728893081352000000,
     "is_from_me": false
   }
 ]
