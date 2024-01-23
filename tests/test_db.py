@@ -6,7 +6,7 @@ import unittest
 from nose2.tools.decorators import with_setup, with_teardown
 
 import ica.core
-from tests import get_db_mock_data_for_table, mock_database, set_up, tear_down
+from tests import get_mock_db_data_for_table, mock_database, set_up, tear_down
 
 case = unittest.TestCase()
 
@@ -26,5 +26,5 @@ def test_message_row_count() -> None:
         cursor = connection.cursor()
         case.assertEquals(
             len(cursor.execute("SELECT * FROM message").fetchall()),
-            len(get_db_mock_data_for_table("message")),
+            len(get_mock_db_data_for_table("message")),
         )

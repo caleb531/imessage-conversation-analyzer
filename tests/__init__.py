@@ -34,7 +34,7 @@ def tear_down() -> None:
     db_path_patcher.stop()
 
 
-def get_db_mock_data_for_table(table_name: str) -> list[dict]:
+def get_mock_db_data_for_table(table_name: str) -> list[dict]:
     """Retrieve the JSON mock data for the DB table with the given name"""
     with open(f"tests/data/{table_name}.json", "r") as data_file:
         return json.load(data_file)
@@ -43,7 +43,7 @@ def get_db_mock_data_for_table(table_name: str) -> list[dict]:
 @contextlib.contextmanager
 def mock_database() -> Generator[sqlite3.Connection, Any, Any]:
     """Create and populate a mock messages database"""
-    messages = get_db_mock_data_for_table("message")
+    messages = get_mock_db_data_for_table("message")
     with sqlite3.connect(mock_db_path) as connection:
         cursor = connection.cursor()
         cursor.execute(f"CREATE TABLE message({', '.join(messages[0].keys())})")
