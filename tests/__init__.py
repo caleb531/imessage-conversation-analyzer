@@ -41,7 +41,7 @@ def get_db_mock_data_for_table(table_name: str) -> list[dict]:
 
 
 @contextlib.contextmanager
-def mock_database() -> Generator[Any, Any, Any]:
+def mock_database() -> Generator[sqlite3.Connection, Any, Any]:
     """Create and populate a mock messages database"""
     messages = get_db_mock_data_for_table("message")
     with sqlite3.connect(mock_db_path) as connection:
@@ -51,4 +51,4 @@ def mock_database() -> Generator[Any, Any, Any]:
         key_placeholders = ", ".join(f":{key}" for key in messages[0].keys())
         cursor.executemany(f"INSERT INTO message VALUES({key_placeholders})", messages)
         connection.commit()
-        yield
+        yield connection
