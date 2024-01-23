@@ -3,9 +3,9 @@
 *Copyright 2020-2024 Caleb Evans*  
 *Released under the MIT license*
 
-This macOS CLI program will read the contents of an iMessage conversation via
-the Messages app's database on your Mac. You can then gather various metrics of
-interest on the messages and attachments collected.
+iMessage Conversation Analyzer (ICA) is a fully-typed Python program that will
+read the contents of an iMessage conversation via the Messages app's database on
+macOS. You can then gather various metrics of interest on the messages.
 
 Much of this program was inspired by and built using findings from [this blog post by Yorgos Askalidis][blog-post].
 
@@ -16,18 +16,22 @@ Much of this program was inspired by and built using findings from [this blog po
 Please note that currently, you can only query conversations between you and a
 single other person (i.e. group chats are currently unsupported).
 
+It should also be clarified that this program only supports macOS, since the
+presence of the chat.db file in your user Library directory is essential for the
+program to function.
+
 ## Installation
 
 ### 1. Install Python 3
 
-macOS does not include Python 3 out of the box, but you can install Python 3
-with the [Homebrew][homebrew] package manager.
-
-[homebrew]: https://brew.sh/
+To install Python 3, you'll need to install the Apple Command Line Tools, which
+you can install by running:
 
 ```sh
-brew install python@3
+xcode-select --install
 ```
+
+Don't worry if you see a long download time; it will shorten rather quickly.
 
 ### 2. Set up virtualenv
 
@@ -48,40 +52,93 @@ pip install -r requirements.txt
 
 ## Usage
 
-#### -c / --contact-name
+The package includes both a Command Line API for simplicity/convenience, as well
+as a Python API for maximum flexibility.
 
-Required; the combined first and last name of the macOS contact whose
-conversation you want to fetch (e.g. `John Doe`).
+### Command Line API
 
-```sh
-ica -c 'John Doe' -m ica/metrics/message_totals.py
-```
+To use ICA from the command line, simply invoke the `ica` command. The minimum required arguments are:
 
-#### -m / --metric-file
+1. A path to an analyzer file to run, or the name of a built-in analyzer
+2. The first and last name of the contact, via the `-c`/`--contact` flag
+   1. If the contact has no last name on record, you can just pass the first
+      name
 
-Required; a Python file with an `analyze()` function; this file must return a
-pandas `DataFrame`. See the examples in `ica/metrics`.
-
-```sh
-ica -c 'John Doe' -m ica/metrics/most_frequent_emojis.py
-```
-
-#### -f / --format
-
-Optional; the output format of the result. Omit this argument for a simple
-textual table, or specify `csv` to print output as CSV.
+You can optionally pass the `-f`/`--format` flag to output to a specific format
+like CSV (currently, only `csv` is supported).
 
 ```sh
-ica -c 'John Doe' -m ica/metrics/message_totals.py -f csv
+ica message_totals -c 'John Doe'
 ```
 
 ```sh
-ica -c 'John Doe' -m ica/metrics/message_totals.py -f csv > myfile.csv
+ica ./my_custom_analyzer.py -c 'John Doe'
 ```
-
-You can also output as CSV and use the `pbcopy` command for easy copy/pasting
-into a spreadsheet program (like Excel or Numbers).
 
 ```sh
-ica -c 'John Doe' -m ica/metrics/message_totals.py -f csv | pbcopy
+ica transcript -c 'John Doe' -f csv > ./my_transcript.csv
 ```
+
+### Python API
+
+The Python API is much more powerful, allowing you to integrate ICA into any
+type of Python project that can run on macOS. All of the built-in analyzers
+themselves (under the `ica/analyzers` directory) actually use this API.
+
+```python
+# get_my_transcript.py
+
+import pandas as pd
+
+import ica
+
+
+# Export a transcript of the entire conversation
+def main() -> None:
+    # Allow your program to accept all the same CLI arguments as the `ica`
+    # command; you can skip calling this if have other means of specifying the contact name and output format
+    cli_args = ica.get_cli_args()
+    # Retrieve the dataframes corresponding to the massaged contents of the database; dataframes include `message` and `attachment`
+    dfs = ica.get_dataframes(contact_name=cli_args.contact_name)
+    # Send the results to stdout in the given format
+    ica.output_results(
+        pd.DataFrame(
+            {
+                "timestamp": dfs.messages["datetime"],
+                "is_from_me": dfs.messages["is_from_me"],
+                "is_reaction": dfs.messages["is_reaction"],
+                # U+FFFC is the object replacement character, which appears as
+                # the textual message for every attachment
+                "message": dfs.messages["text"].replace(
+                    r"\ufffc", "(attachment)", regex=True
+                ),
+            }
+        ),
+        # The default format (None) is the pandas default dataframe table format
+        format=cli_args.format,
+    )
+
+
+if __name__ == "__main__":
+    main()
+```
+
+You can run the above program using the `ica` command, or execute it directly
+like any other Python program.
+
+```sh
+ica ./get_my_transcript.py -c 'John Doe'
+```
+
+```sh
+python ./get_my_transcript.py -c 'John Doe'
+```
+
+```sh
+python -m get_my_transcript -c 'John Doe'
+```
+
+You're not limited to writing a command line program, though! The
+`ica.get_dataframes()` function is the only function you will need in any
+analyzer program. But beyond that, feel free to import other modules, send your
+results to other processes, or whatever you need to do!
