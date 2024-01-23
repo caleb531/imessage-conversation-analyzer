@@ -8,7 +8,8 @@ import os.path
 import shutil
 import sqlite3
 import tempfile
-import typing
+from collections.abc import Generator
+from typing import Any
 from unittest.mock import patch
 
 # When running tests, point to mock sqlite3 database instead of the default
@@ -39,25 +40,15 @@ def get_db_mock_data_for_table(table_name: str) -> list[dict]:
         return json.load(data_file)
 
 
-def format_value_for_db(value: str) -> str:
-    """Format the given value for storage in the mock messages database"""
-    if type(value) is bool:
-        return str(int(value))
-    else:
-        return f"'{value}'"
-
-
 @contextlib.contextmanager
-def mock_database() -> typing.Generator:
+def mock_database() -> Generator[Any, Any, Any]:
     """Create and populate a mock messages database"""
     messages = get_db_mock_data_for_table("message")
     with sqlite3.connect(mock_db_path) as connection:
         cursor = connection.cursor()
         cursor.execute(f"CREATE TABLE message({', '.join(messages[0].keys())})")
-        values = ", ".join(
-            ", ".join(format_value_for_db(value) for value in message.values())
-            for message in messages
-        )
-        cursor.execute(f"INSERT INTO message VALUES({values})")
+
+        key_placeholders = ", ".join(f":{key}" for key in messages[0].keys())
+        cursor.executemany(f"INSERT INTO message VALUES({key_placeholders})", messages)
         connection.commit()
         yield
