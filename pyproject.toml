@@ -43,7 +43,8 @@ module = [
     "setuptools.*",
     "pandas.*",
     "tabulate.*",
-    "typedstream.*"
+    "typedstream.*",
+    "nose2.*"
 ]
 ignore_missing_imports = true
 
@@ -55,3 +56,21 @@ extend-ignore = ["E203", "W503"]
 # Per <https://black.readthedocs.io/en/stable/guides/using_black_with_other_tools.html#profile>
 [tool.isort]
 profile = "black"
+
+# Configuration for coverage.py (https://pypi.python.org/pypi/coverage)
+
+[tool.coverage.run]
+# Enable branch coverage
+branch = true
+
+[tool.coverage.report]
+# Regexes for lines to exclude from consideration
+exclude_lines = [
+    "pragma: no cover",
+    # Ignore non-runnable code
+    "if __name__ == .__main__.:",
+    "pass",
+]
+
+# Only check coverage for source files
+include = ["ica/**/*.py"]

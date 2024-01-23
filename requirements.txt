@@ -1,6 +1,7 @@
 black==23.12.1
 build==1.0.3
 click==8.1.7
+coverage==7.4.0
 flake8==7.0.0
 flake8-black==0.3.6
 flake8-isort==6.1.1
@@ -8,6 +9,7 @@ isort==5.13.2
 mccabe==0.7.0
 mypy==1.8.0
 mypy-extensions==1.0.0
+nose2==0.14.0
 numpy==1.26.3
 packaging==23.2
 pandas==2.1.4
