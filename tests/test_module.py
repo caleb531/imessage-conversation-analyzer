@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+"""test characteristics of the ica module"""
 import unittest
 
 import ica

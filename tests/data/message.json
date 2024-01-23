@@ -1,0 +1,26 @@
+[
+  {
+    "text": "Hello this is John",
+    "attributedBody": "",
+    "datetime": 727593081352000000,
+    "is_from_me": false
+  },
+  {
+    "text": "Hey John! How's it going? 😊",
+    "attributedBody": "",
+    "datetime": 727593081352000000,
+    "is_from_me": false
+  },
+  {
+    "text": "It's going great! 😀 How are you?",
+    "attributedBody": "",
+    "datetime": 727593081352000000,
+    "is_from_me": false
+  },
+  {
+    "text": "I've been fantastic 😊",
+    "attributedBody": "",
+    "datetime": 727593081352000000,
+    "is_from_me": false
+  }
+]
