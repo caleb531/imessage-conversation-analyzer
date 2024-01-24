@@ -60,7 +60,7 @@ def get_mock_data_for_db(
 
 def create_mock_db(db_name: MockDatabaseName, db_path: str) -> None:
     """Create and populate a mock database with the given name and path"""
-    with sqlite3.connect(mock_chats_db_path) as con:
+    with sqlite3.connect(db_path) as con:
         for table_name, records in get_mock_data_for_db(db_name):
             cur = con.cursor()
             cur.execute(f"CREATE TABLE {table_name}({', '.join(records[0].keys())})")

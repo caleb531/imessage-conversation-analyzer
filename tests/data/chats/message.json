@@ -3,84 +3,84 @@
     "ROWID": "5ab162b0-e4c7-4e77-9623-c2396bb81d73",
     "text": "Hey Jane, how's your day going? 😊",
     "attributedBody": "",
-    "datetime": 727993081352000000,
+    "date": 727993081352000000,
     "is_from_me": true
   },
   {
     "ROWID": "ef073cec-fcd5-4fdb-b400-c2f54a7cb974",
     "text": "Hey John, it's been great so far! 😀 Just finished a productive meeting. What about you?",
     "attributedBody": "",
-    "datetime": 728093081352000000,
+    "date": 728093081352000000,
     "is_from_me": false
   },
   {
     "ROWID": "a8221838-fc7e-4096-94af-a71282081449",
     "text": "Sounds good! I'm just taking a quick break before diving into some coding. 👨‍💻",
     "attributedBody": "",
-    "datetime": 728193081352000000,
+    "date": 728193081352000000,
     "is_from_me": true
   },
   {
     "ROWID": "90b09b75-b098-4ff7-9271-c27f6b1efc75",
     "text": "That sounds exciting! 😀 What are you working on?",
     "attributedBody": "",
-    "datetime": 728293081352000000,
+    "date": 728293081352000000,
     "is_from_me": false
   },
   {
     "ROWID": "a872294d-5758-4e51-a25a-3c6cac425081",
     "text": "Building a new feature for our app. It should make things a lot easier for users. 🙌",
     "attributedBody": "",
-    "datetime": 728393081352000000,
+    "date": 728393081352000000,
     "is_from_me": true
   },
   {
     "ROWID": "bc033640-98c1-4a8f-b09f-9d0a8c4c71cb",
     "text": "Hey John! What's up? 👊",
     "attributedBody": "",
-    "datetime": 728493081352000000,
+    "date": 728493081352000000,
     "is_from_me": false
   },
   {
     "ROWID": "3bdbefe4-2d18-47da-93a4-524593cc8fec",
     "text": "Hey James! Not much, just chatting with Jane. ☺️ What's going on with you?",
     "attributedBody": "",
-    "datetime": 728593081352000000,
+    "date": 728593081352000000,
     "is_from_me": true
   },
   {
     "ROWID": "db50d4a8-638c-44e4-ba5b-f6675e1b4aa9",
     "text": "That's awesome! 😀😀😀 I can't wait to see it. 😊 In the meantime, I'm gonna grab some lunch.",
     "attributedBody": "",
-    "datetime": 728693081352000000,
+    "date": 728693081352000000,
     "is_from_me": false
   },
   {
     "ROWID": "1c745f90-5cab-4e25-a65a-c6b6209fb6f3",
     "text": "Just finished up a coding session myself. Feeling a bit brain-fried, but also kind of accomplished. 😎",
     "attributedBody": "",
-    "datetime": 728793081352000000,
+    "date": 728793081352000000,
     "is_from_me": false
   },
   {
     "ROWID": "7560b9f5-4b09-484b-a485-c81b39c9e41a",
     "text": "Sounds like a good plan! 🍎 Enjoy your lunch!",
     "attributedBody": "",
-    "datetime": 728893081352000000,
+    "date": 728893081352000000,
     "is_from_me": true
   },
   {
     "ROWID": "eb95d508-cc5d-4f5d-9fa7-bee604bd0dd1",
     "text": "Thanks! I will. Talk to you later! ☺️",
     "attributedBody": "",
-    "datetime": 728693081352000000,
+    "date": 728693081352000000,
     "is_from_me": false
   },
   {
     "ROWID": "855c1f22-2ac0-46e2-ae76-e4c164d4236e",
     "text": "Yeah, I definitely needed a break. 😌 What are you working on these days?",
     "attributedBody": "",
-    "datetime": 728993081352000000,
+    "date": 728993081352000000,
     "is_from_me": false
   }
 ]
