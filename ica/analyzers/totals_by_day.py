@@ -20,7 +20,7 @@ def main() -> None:
     # Remove 00:00:00 from date index
     sums_by_day.index = sums_by_day.index.strftime(DATE_FORMAT).rename("date")
     sums_by_day["is_from_them"] = sums_by_day["text"] - sums_by_day["is_from_me"]
-    return sums_by_day
+    ica.output_results(sums_by_day, format=cli_args.format)
 
 
 if __name__ == "__main__":
