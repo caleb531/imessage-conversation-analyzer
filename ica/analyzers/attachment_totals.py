@@ -38,11 +38,9 @@ def main() -> None:
     }
     attachment_totals = pd.DataFrame(
         {"type": totals_map.keys(), "total": totals_map.values()}
-    )
+    ).set_index("type")
     ica.output_results(
-        attachment_totals.sort_values(by="total", ascending=False).reset_index(
-            drop=True
-        ),
+        attachment_totals.sort_values(by="total", ascending=False),
         format=cli_args.format,
     )
 

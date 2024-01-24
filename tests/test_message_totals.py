@@ -16,24 +16,36 @@ case = unittest.TestCase()
 @with_teardown(tear_down)
 @patch("ica.output_results")
 @patch("sys.argv", [message_totals.__file__, "-c", "Jane Doe"])
-def test_message_count(output_results: MagicMock) -> None:
+def test_message_counts(output_results: MagicMock) -> None:
+    """should count the number of messages according to various criteria"""
     message_totals.main()
     df = output_results.call_args[0][0]
-    # Messages
-    case.assertEqual(df.iloc[0]["total"], 9)
-    # Messages From Me
-    case.assertEqual(df.iloc[1]["total"], 5)
-    # Messages From Them
-    case.assertEqual(df.iloc[2]["total"], 4)
-    # Reactions
-    case.assertEqual(df.iloc[3]["total"], 0)
-    # Reactions From Me
-    case.assertEqual(df.iloc[4]["total"], 0)
-    # Reactions From Them
-    case.assertEqual(df.iloc[5]["total"], 0)
-    # Days Messaged
-    case.assertEqual(df.iloc[6]["total"], 11)
-    # Days Missed
-    case.assertEqual(df.iloc[7]["total"], -11)
-    # Days With No Reply
-    case.assertEqual(df.iloc[8]["total"], 14)
+    case.assertEqual(df.loc["messages"]["total"], 9)
+    case.assertEqual(df.loc["messages_from_me"]["total"], 5)
+    case.assertEqual(df.loc["messages_from_them"]["total"], 4)
+
+
+@with_setup(set_up)
+@with_teardown(tear_down)
+@patch("ica.output_results")
+@patch("sys.argv", [message_totals.__file__, "-c", "Jane Doe"])
+def test_reaction_counts(output_results: MagicMock) -> None:
+    """should count the number of reactions according to various criteria"""
+    message_totals.main()
+    df = output_results.call_args[0][0]
+    case.assertEqual(df.loc["reactions"]["total"], 0)
+    case.assertEqual(df.loc["reactions_from_me"]["total"], 0)
+    case.assertEqual(df.loc["reactions_from_them"]["total"], 0)
+
+
+@with_setup(set_up)
+@with_teardown(tear_down)
+@patch("ica.output_results")
+@patch("sys.argv", [message_totals.__file__, "-c", "Jane Doe"])
+def test_day_counts(output_results: MagicMock) -> None:
+    """should count the number of days according to various criteria"""
+    message_totals.main()
+    df = output_results.call_args[0][0]
+    case.assertEqual(df.loc["days_messaged"]["total"], 11)
+    case.assertEqual(df.loc["days_missed"]["total"], -11)
+    case.assertEqual(df.loc["days_with_no_reply"]["total"], 14)

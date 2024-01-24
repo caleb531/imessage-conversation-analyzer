@@ -7,6 +7,7 @@ import os
 import os.path
 import sqlite3
 from dataclasses import dataclass
+from typing import Union
 
 import pandas as pd
 from tabulate import tabulate
@@ -126,32 +127,27 @@ def get_dataframes(contact_name: str) -> DataFrameNamespace:
 
 # Format the given header name to be more human-readable (e.g. "foo_bar" =>
 # "Foo Bar")
-def prettify_header_name(header_name: str) -> str:
-    if header_name:
+def prettify_header_name(header_name: Union[str, int]) -> Union[str, int]:
+    if header_name and type(header_name) is str:
         return header_name.replace("_", " ").title()
     else:
-        return ""
+        return header_name
 
 
 # Print the given dataframe of metrics data
 def output_results(analyzer_df: pd.DataFrame, format: str) -> None:
-    # Prettify header row (i.e. column names)
-    if analyzer_df.index.name:
-        analyzer_df.index = analyzer_df.index.rename(
-            prettify_header_name(analyzer_df.index.name)
-        )
     analyzer_df = analyzer_df.rename(
-        {
+        # Prettify header column (i.e. textual values in first column)
+        index=prettify_header_name,
+        # Prettify header row (i.e. column names)
+        columns={
             column_name: prettify_header_name(column_name)
             for column_name in analyzer_df.columns
-        }
+        },
     )
-    # Prettify header column (i.e. textual values in first column)
-    first_column_name = analyzer_df.columns[0]
-    if analyzer_df[first_column_name].dtypes == object:
-        analyzer_df[first_column_name] = analyzer_df[first_column_name].apply(
-            prettify_header_name
-        )
+
+    # Prettify index column name
+    analyzer_df.index.name = prettify_header_name(analyzer_df.index.name)
 
     # Make all indices start from 1 instead of 0, but only if the index is the
     # default (rather than a custom column)
@@ -167,6 +163,8 @@ def output_results(analyzer_df: pd.DataFrame, format: str) -> None:
     else:
         print(
             tabulate(
-                analyzer_df, showindex=not is_default_index, headers=analyzer_df.columns
+                analyzer_df,
+                headers=([analyzer_df.index.name] if analyzer_df.index.name else [])
+                + list(analyzer_df.columns),
             )
         )

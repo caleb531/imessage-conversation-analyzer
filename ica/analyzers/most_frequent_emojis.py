@@ -24,7 +24,7 @@ def get_emoji_list() -> list[str]:
 def main() -> None:
     cli_args = ica.get_cli_args()
     dfs = ica.get_dataframes(contact_name=cli_args.contact_name)
-    ica.output_results(
+    df = (
         pd.DataFrame({"emoji": get_emoji_list(), "count": 0})
         .assign(
             count=lambda df: df["emoji"].apply(
@@ -41,7 +41,11 @@ def main() -> None:
         .query("count > 0")
         .sort_values(by="count", ascending=False)
         .reset_index(drop=True)
-        .head(EMOJI_DISPLAY_COUNT),
+        .set_index("emoji")
+        .head(EMOJI_DISPLAY_COUNT)
+    )
+    ica.output_results(
+        df,
         format=cli_args.format,
     )
 

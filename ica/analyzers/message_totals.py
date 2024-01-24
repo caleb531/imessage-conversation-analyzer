@@ -85,8 +85,8 @@ def main() -> None:
     }
     ica.output_results(
         pd.DataFrame(
-            {"metric": tuple(totals_map.keys()), "total": tuple(totals_map.values())}
-        ),
+            {"metric": tuple(totals_map.keys()), "total": tuple(totals_map.values())},
+        ).set_index("metric"),
         format=cli_args.format,
     )
 
