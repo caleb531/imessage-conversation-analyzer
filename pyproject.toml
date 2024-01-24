@@ -71,6 +71,5 @@ exclude_lines = [
     "if __name__ == .__main__.:",
     "pass",
 ]
-
 # Only check coverage for source files
 include = ["ica/**/*.py"]
