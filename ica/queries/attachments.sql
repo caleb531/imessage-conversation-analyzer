@@ -1,4 +1,3 @@
--- Get all attachments (GIFs, images, links, etc.)
 SELECT "mime_type"
 FROM "attachment"
 INNER JOIN "message_attachment_join"
