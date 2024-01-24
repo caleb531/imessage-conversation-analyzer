@@ -31,6 +31,7 @@ chats_db_path_patcher = patch("ica.core.DB_PATH", mock_chats_db_path)
 
 def set_up() -> None:
     """global setup fixture for all tests"""
+    tear_down()  # in case something prevents tear_down() from running normally
     contacts_db_glob_patcher.start()
     chats_db_path_patcher.start()
     with contextlib.suppress(OSError):
