@@ -47,7 +47,5 @@ def test_day_counts(output_results: MagicMock) -> None:
     message_totals.main()
     df = output_results.call_args[0][0]
     case.assertEqual(df.loc["days_messaged"]["total"], 8)
-    # TODO: fix the calculations for these metrics; there's no way they can be
-    # correct
     case.assertEqual(df.loc["days_missed"]["total"], 10)
     case.assertEqual(df.loc["days_with_no_reply"]["total"], 0)
