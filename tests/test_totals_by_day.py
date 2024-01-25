@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """test the totals_by_day built-in analyzer"""
 
+import json
 import unittest
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pandas as pd
@@ -24,78 +26,5 @@ def test_totals_by_day(output_results: MagicMock) -> None:
     case.assertEqual(len(df.index), 12)
     case.assertEqual(
         df.to_dict("index"),
-        {
-            "2024-01-07": {
-                "text": 1,
-                "is_from_me": 1,
-                "is_reaction": 0,
-                "is_from_them": 0,
-            },
-            "2024-01-08": {
-                "text": 1,
-                "is_from_me": 0,
-                "is_reaction": 0,
-                "is_from_them": 1,
-            },
-            "2024-01-09": {
-                "text": 2,
-                "is_from_me": 1,
-                "is_reaction": 0,
-                "is_from_them": 1,
-            },
-            "2024-01-10": {
-                "text": 0,
-                "is_from_me": 0,
-                "is_reaction": 0,
-                "is_from_them": 0,
-            },
-            "2024-01-11": {
-                "text": 2,
-                "is_from_me": 1,
-                "is_reaction": 1,
-                "is_from_them": 1,
-            },
-            "2024-01-12": {
-                "text": 0,
-                "is_from_me": 0,
-                "is_reaction": 0,
-                "is_from_them": 0,
-            },
-            "2024-01-13": {
-                "text": 0,
-                "is_from_me": 0,
-                "is_reaction": 0,
-                "is_from_them": 0,
-            },
-            "2024-01-14": {
-                "text": 1,
-                "is_from_me": 0,
-                "is_reaction": 0,
-                "is_from_them": 1,
-            },
-            "2024-01-15": {
-                "text": 0,
-                "is_from_me": 0,
-                "is_reaction": 0,
-                "is_from_them": 0,
-            },
-            "2024-01-16": {
-                "text": 1,
-                "is_from_me": 1,
-                "is_reaction": 0,
-                "is_from_them": 0,
-            },
-            "2024-01-17": {
-                "text": 1,
-                "is_from_me": 0,
-                "is_reaction": 0,
-                "is_from_them": 1,
-            },
-            "2024-01-18": {
-                "text": 1,
-                "is_from_me": 1,
-                "is_reaction": 0,
-                "is_from_them": 0,
-            },
-        },
+        json.loads(Path("tests/data/totals_by_day.json").read_text()),
     )

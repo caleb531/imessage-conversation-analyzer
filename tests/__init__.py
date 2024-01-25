@@ -54,7 +54,7 @@ def get_mock_data_for_db(
     db_name: MockDatabaseName,
 ) -> Generator[tuple[str, list[dict]], Any, Any]:
     """Retrieve the JSON mock data for the DB table with the given name"""
-    for data_path in glob.iglob(f"tests/data/{db_name}/*.json"):
+    for data_path in glob.iglob(f"tests/data/dbs/{db_name}/*.json"):
         table_name = os.path.splitext(os.path.basename(data_path))[0]
         with open(data_path, "r") as data_file:
             records = json.load(data_file)
