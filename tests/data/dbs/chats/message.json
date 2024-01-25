@@ -103,5 +103,54 @@
     "attributedBody": "",
     "date": 726769943348052736,
     "is_from_me": false
+  },
+  {
+    "ROWID": "968e4e64-bb66-42fa-9bc3-379ec1dbdb87",
+    "text": "I'm building a new feature for our app at work! It's been a challenge, but https://open.spotify.com/playlist/37i9dQZF1DWWQRwui0ExPn has been helping 🎧",
+    "attributedBody": "",
+    "date": 726777291571192064,
+    "is_from_me": true
+  },
+  {
+    "ROWID": "f0b4da10-4f43-4cc8-b131-b29a8df9d0ed",
+    "text": "Liked “I'm building a new feature for our app at work! It's been a challenge, but https://open.spotify.com/playlist/37i9dQZF1DWWQRwui0ExPn has been helping 🎧”",
+    "attributedBody": "",
+    "date": 726777298531000192,
+    "is_from_me": false
+  },
+  {
+    "ROWID": "09942383-4155-4cb4-9360-8b54e0b643c9",
+    "text": "That's so cool! And great playlist. It reminds me of https://www.youtube.com/watch?v=3yx2G8GMT9I and https://www.youtube.com/watch?v=jfKfPfyJRdk",
+    "attributedBody": "",
+    "date": 726777306887309056,
+    "is_from_me": false
+  },
+  {
+    "ROWID": "409279d7-5efc-482f-b8eb-feed621431c9",
+    "text": "Loved “That's so cool! And great playlist. It reminds me of https://www.youtube.com/watch?v=3yx2G8GMT9I and https://www.youtube.com/watch?v=jfKfPfyJRdk”",
+    "attributedBody": "",
+    "date": 726777405792999936,
+    "is_from_me": true
+  },
+  {
+    "ROWID": "53e399eb-b1f6-4a2a-93ea-a77d30cc8fbc",
+    "text": "Oh wow! I haven't listened to these before! These are great!",
+    "attributedBody": "",
+    "date": 726777405792999936,
+    "is_from_me": true
+  },
+  {
+    "ROWID": "53e399eb-b1f6-4a2a-93ea-a77d30cc8fbc",
+    "text": "Kinda reminds me of:",
+    "attributedBody": "",
+    "date": 726777446593999872,
+    "is_from_me": true
+  },
+  {
+    "ROWID": "71a4a961-1695-4605-bbc6-367b5edccd15",
+    "text": "https://music.apple.com/us/station/lo-fi-station/ra.1569482000",
+    "attributedBody": "",
+    "date": 726784720391002368,
+    "is_from_me": true
   }
 ]
