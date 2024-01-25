@@ -24,17 +24,7 @@ def get_dates_between(
     return list(pd.date_range(start_date, end_date).strftime(DATE_FORMAT))
 
 
-# Get all dates sent
-def get_all_message_datestrs(dfs: ica.DataFrameNamespace) -> list[str]:
-    groups_by_day = dfs.messages.resample("D", on="datetime")
-    sums_by_day = groups_by_day.count()
-    sums_by_day.index = sums_by_day.index.strftime(DATE_FORMAT)
-    return list(sums_by_day.index)
-
-
-# Get the number of messages with no reply (i.e. only one message sent for that
-# day)
-def get_noreply_count(dfs: ica.DataFrameNamespace) -> int:
+def get_sums_by_day(dfs: ica.DataFrameNamespace) -> pd.DataFrame:
     # Count all "text" column values by converting them to integers (always 1),
     # because resampling the DataFrame will remove all non-numeric columns
     dfs.messages["text"] = (
@@ -42,9 +32,27 @@ def get_noreply_count(dfs: ica.DataFrameNamespace) -> int:
     )
     groups_by_day = dfs.messages.resample("D", on="datetime")
     sums_by_day = groups_by_day.sum()
-    sums_by_day["is_from_them"] = sums_by_day["text"] - sums_by_day["is_from_me"]
-    return (
-        sums_by_day["is_from_them"].eq(0).sum() + sums_by_day["is_from_me"].eq(0).sum()
+    # Remove 00:00:00 from date index
+    sums_by_day.index = sums_by_day.index.strftime(DATE_FORMAT).rename("date")
+    sums_by_day["is_from_them"] = abs(sums_by_day["text"] - sums_by_day["is_from_me"])
+    return sums_by_day
+
+
+# Get all dates sent
+def get_all_message_datestrs(dfs: ica.DataFrameNamespace) -> list[str]:
+    sums_by_day = get_sums_by_day(dfs)
+    return list(sums_by_day.query("text > 0").index)
+
+
+# Get the number of messages with no reply (i.e. only one message sent for that
+# day)
+def get_noreply_count(dfs: ica.DataFrameNamespace) -> int:
+    sums_by_day = get_sums_by_day(dfs)
+    return len(
+        sums_by_day.query(
+            "(is_from_me == 0 and is_from_them > 0) or "
+            "(is_from_me > 0 and is_from_them == 0)"
+        )
     )
 
 
