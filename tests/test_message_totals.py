@@ -4,6 +4,7 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
+import pandas as pd
 from freezegun import freeze_time
 from nose2.tools.decorators import with_setup, with_teardown
 
@@ -20,7 +21,7 @@ case = unittest.TestCase()
 def test_message_counts(output_results: MagicMock) -> None:
     """should count the number of messages according to various criteria"""
     message_totals.main()
-    df = output_results.call_args[0][0]
+    df: pd.DataFrame = output_results.call_args[0][0]
     case.assertEqual(df.loc["messages"]["total"], 9)
     case.assertEqual(df.loc["messages_from_me"]["total"], 5)
     case.assertEqual(df.loc["messages_from_them"]["total"], 4)
@@ -33,7 +34,7 @@ def test_message_counts(output_results: MagicMock) -> None:
 def test_reaction_counts(output_results: MagicMock) -> None:
     """should count the number of reactions according to various criteria"""
     message_totals.main()
-    df = output_results.call_args[0][0]
+    df: pd.DataFrame = output_results.call_args[0][0]
     case.assertEqual(df.loc["reactions"]["total"], 1)
     case.assertEqual(df.loc["reactions_from_me"]["total"], 0)
     case.assertEqual(df.loc["reactions_from_them"]["total"], 1)
@@ -47,7 +48,7 @@ def test_reaction_counts(output_results: MagicMock) -> None:
 def test_day_counts(output_results: MagicMock) -> None:
     """should count the number of days according to various criteria"""
     message_totals.main()
-    df = output_results.call_args[0][0]
+    df: pd.DataFrame = output_results.call_args[0][0]
     case.assertEqual(df.loc["days_messaged"]["total"], 8)
     case.assertEqual(df.loc["days_missed"]["total"], 12)
     case.assertEqual(df.loc["days_with_no_reply"]["total"], 6)
