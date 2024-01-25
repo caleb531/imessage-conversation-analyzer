@@ -34,9 +34,9 @@ def test_reaction_counts(output_results: MagicMock) -> None:
     """should count the number of reactions according to various criteria"""
     message_totals.main()
     df = output_results.call_args[0][0]
-    case.assertEqual(df.loc["reactions"]["total"], 0)
+    case.assertEqual(df.loc["reactions"]["total"], 1)
     case.assertEqual(df.loc["reactions_from_me"]["total"], 0)
-    case.assertEqual(df.loc["reactions_from_them"]["total"], 0)
+    case.assertEqual(df.loc["reactions_from_them"]["total"], 1)
 
 
 @with_setup(set_up)
