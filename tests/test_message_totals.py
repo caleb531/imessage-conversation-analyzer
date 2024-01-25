@@ -50,4 +50,4 @@ def test_day_counts(output_results: MagicMock) -> None:
     df = output_results.call_args[0][0]
     case.assertEqual(df.loc["days_messaged"]["total"], 8)
     case.assertEqual(df.loc["days_missed"]["total"], 12)
-    case.assertEqual(df.loc["days_with_no_reply"]["total"], 0)
+    case.assertEqual(df.loc["days_with_no_reply"]["total"], 6)
