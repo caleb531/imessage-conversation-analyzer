@@ -23,7 +23,6 @@ def test_totals_by_day(output_results: MagicMock) -> None:
     """should count the total number of days"""
     totals_by_day.main()
     df: pd.DataFrame = output_results.call_args[0][0]
-    case.assertEqual(len(df.index), 12)
     case.assertEqual(
         df.to_dict("index"),
         json.loads(Path("tests/data/totals_by_day.json").read_text()),
