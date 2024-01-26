@@ -16,7 +16,8 @@ dependencies = [
     "pandas",
     "tabulate",
     "pytypedstream",
-    "phonenumbers"
+    "phonenumbers",
+    "tzlocal"
 ]
 
 [project.urls]

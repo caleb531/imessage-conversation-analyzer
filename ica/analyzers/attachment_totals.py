@@ -8,7 +8,9 @@ import ica
 
 def main() -> None:
     cli_args = ica.get_cli_args()
-    dfs = ica.get_dataframes(contact_name=cli_args.contact_name)
+    dfs = ica.get_dataframes(
+        contact_name=cli_args.contact_name, timezone=cli_args.timezone
+    )
     totals_map = {
         "gifs": dfs.attachments["mime_type"].eq("image/gif").sum(),
         "youtube_videos": (

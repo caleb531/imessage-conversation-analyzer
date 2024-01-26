@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from typing import Union
 
 import pandas as pd
+import tzlocal
 from tabulate import tabulate
 from typedstream.stream import TypedStreamReader
 
@@ -61,8 +62,14 @@ def decode_message_attributedbody(data: bytes) -> str:
 # Return a pandas dataframe representing all messages in a particular
 # conversation (identified by the given phone number)
 def get_messages_dataframe(
-    connection: sqlite3.Connection, chat_identifiers: list[str]
+    connection: sqlite3.Connection,
+    timezone: Union[str, None],
+    chat_identifiers: list[str],
 ) -> pd.DataFrame:
+    # If no IANA timezone name is specified, default to the name of the system's
+    # local timezone
+    if not timezone:
+        timezone = tzlocal.get_localzone().key
     return (
         pd.read_sql_query(
             sql=importlib.resources.files(__package__)
@@ -74,6 +81,15 @@ def get_messages_dataframe(
                 "chat_identifier_delimiter": CHAT_IDENTIFIER_DELIMITER,
             },
             parse_dates={"datetime": "ISO8601"},
+        )
+        # SQL provides each date/time as a Unix timestamp (which is implicitly
+        # UTC), but the timestamp is timezone-naive when parsed by pandas; so
+        # first, we must add the missing timezone information, then we must
+        # convert the datetime to the specified timezone
+        .assign(
+            datetime=lambda df: df["datetime"]
+            .dt.tz_localize("UTC")
+            .dt.tz_convert(timezone)
         )
         # Decode any 'attributedBody' values and merge them into the 'text'
         # column
@@ -100,7 +116,9 @@ def get_messages_dataframe(
 # Return a pandas dataframe representing all attachments in a particular
 # conversation (identified by the given phone number)
 def get_attachments_dataframe(
-    connection: sqlite3.Connection, chat_identifiers: list[str]
+    connection: sqlite3.Connection,
+    timezone: Union[str, None],
+    chat_identifiers: list[str],
 ) -> pd.DataFrame:
     return pd.read_sql_query(
         sql=importlib.resources.files(__package__)
@@ -115,13 +133,17 @@ def get_attachments_dataframe(
 
 
 # Return all dataframes for a specific macOS Messages conversation
-def get_dataframes(contact_name: str) -> DataFrameNamespace:
+def get_dataframes(
+    contact_name: str, timezone: Union[str, None] = None
+) -> DataFrameNamespace:
     chat_identifiers = contact.get_chat_identifiers(contact_name)
 
     with sqlite3.connect(DB_PATH) as connection:
         return DataFrameNamespace(
-            messages=get_messages_dataframe(connection, chat_identifiers),
-            attachments=get_attachments_dataframe(connection, chat_identifiers),
+            messages=get_messages_dataframe(connection, timezone, chat_identifiers),
+            attachments=get_attachments_dataframe(
+                connection, timezone, chat_identifiers
+            ),
         )
 
 

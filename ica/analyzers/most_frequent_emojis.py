@@ -23,7 +23,9 @@ def get_emoji_list() -> list[str]:
 # Output the occurrences of specific emojis
 def main() -> None:
     cli_args = ica.get_cli_args()
-    dfs = ica.get_dataframes(contact_name=cli_args.contact_name)
+    dfs = ica.get_dataframes(
+        contact_name=cli_args.contact_name, timezone=cli_args.timezone
+    )
     df = (
         pd.DataFrame({"emoji": get_emoji_list(), "count": 0})
         .assign(

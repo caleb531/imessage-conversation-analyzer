@@ -1,71 +1,77 @@
 {
-  "2024-01-07": {
+  "2024-01-07T00:00:00.000": {
     "text": 1,
     "is_from_me": 1,
     "is_reaction": 0,
     "is_from_them": 0
   },
-  "2024-01-08": {
+  "2024-01-08T00:00:00.000": {
     "text": 1,
     "is_from_me": 0,
     "is_reaction": 0,
     "is_from_them": 1
   },
-  "2024-01-09": {
+  "2024-01-09T00:00:00.000": {
     "text": 2,
     "is_from_me": 1,
     "is_reaction": 0,
     "is_from_them": 1
   },
-  "2024-01-10": {
+  "2024-01-10T00:00:00.000": {
     "text": 0,
     "is_from_me": 0,
     "is_reaction": 0,
     "is_from_them": 0
   },
-  "2024-01-11": {
+  "2024-01-11T00:00:00.000": {
     "text": 2,
     "is_from_me": 1,
     "is_reaction": 1,
     "is_from_them": 1
   },
-  "2024-01-12": {
+  "2024-01-12T00:00:00.000": {
     "text": 0,
     "is_from_me": 0,
     "is_reaction": 0,
     "is_from_them": 0
   },
-  "2024-01-13": {
+  "2024-01-13T00:00:00.000": {
     "text": 0,
     "is_from_me": 0,
     "is_reaction": 0,
     "is_from_them": 0
   },
-  "2024-01-14": {
+  "2024-01-14T00:00:00.000": {
     "text": 1,
     "is_from_me": 0,
     "is_reaction": 0,
     "is_from_them": 1
   },
-  "2024-01-15": {
+  "2024-01-15T00:00:00.000": {
     "text": 0,
     "is_from_me": 0,
     "is_reaction": 0,
     "is_from_them": 0
   },
-  "2024-01-16": {
+  "2024-01-16T00:00:00.000": {
     "text": 1,
     "is_from_me": 1,
     "is_reaction": 0,
     "is_from_them": 0
   },
-  "2024-01-17": {
+  "2024-01-17T00:00:00.000": {
     "text": 1,
     "is_from_me": 0,
     "is_reaction": 0,
     "is_from_them": 1
   },
-  "2024-01-18": {
+  "2024-01-18T00:00:00.000": {
+    "text": 0,
+    "is_from_me": 0,
+    "is_reaction": 0,
+    "is_from_them": 0
+  },
+  "2024-01-19T00:00:00.000": {
     "text": 1,
     "is_from_me": 1,
     "is_reaction": 0,

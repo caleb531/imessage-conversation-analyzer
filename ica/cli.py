@@ -39,6 +39,12 @@ def get_cli_args() -> argparse.Namespace:
         help="the full name of a macOS contact whose conversation you want to analyze",
     )
     parser.add_argument(
+        "--timezone",
+        "-t",
+        help="the IANA time zone name to use for dates; "
+        "defaults to the system's local time zone",
+    )
+    parser.add_argument(
         "--format",
         "-f",
         choices=("csv",),

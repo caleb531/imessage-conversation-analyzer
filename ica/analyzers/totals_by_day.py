@@ -9,7 +9,9 @@ DATE_FORMAT = "%Y-%m-%d"
 
 def main() -> None:
     cli_args = ica.get_cli_args()
-    dfs = ica.get_dataframes(contact_name=cli_args.contact_name)
+    dfs = ica.get_dataframes(
+        contact_name=cli_args.contact_name, timezone=cli_args.timezone
+    )
     ica.output_results(
         (
             dfs.messages

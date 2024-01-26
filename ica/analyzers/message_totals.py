@@ -61,7 +61,9 @@ def get_noreply_count(dfs: ica.DataFrameNamespace) -> int:
 
 def main() -> None:
     cli_args = ica.get_cli_args()
-    dfs = ica.get_dataframes(contact_name=cli_args.contact_name)
+    dfs = ica.get_dataframes(
+        contact_name=cli_args.contact_name, timezone=cli_args.timezone
+    )
 
     all_datestrs = get_dates_between(
         get_first_message_date(dfs), str(datetime.date.today())
