@@ -6,9 +6,10 @@ import os
 import os.path
 import re
 import sqlite3
-import sys
 
 import pandas as pd
+
+from ica.exceptions import ContactNotFoundError, InvalidPhoneNumberError
 
 # The glob pattern matching all AddressBook SQL databases to read from
 DB_GLOB = os.path.expanduser(
@@ -25,7 +26,7 @@ def normalize_phone_number(phone_number: str) -> str:
     normalized_phone_number = re.sub("[^0-9]", "", phone_number)
     # Phone number must have area code
     if len(normalized_phone_number) < 10:
-        raise RuntimeError(f"Phone number {phone_number} missing area code")
+        raise InvalidPhoneNumberError(f"Phone number {phone_number} missing area code")
     # Add US country code if missing
     if len(normalized_phone_number) == 10:
         normalized_phone_number = "1" + normalized_phone_number
@@ -69,9 +70,6 @@ def get_chat_identifiers(contact_name: str) -> list[str]:
 
     # Quit if the contact with the specified name could not be found
     if not len(chat_identifiers):
-        print(
-            'No contact found with the name "{}"'.format(contact_name), file=sys.stderr
-        )
-        sys.exit(1)
+        raise ContactNotFoundError(f'No contact found with the name "{contact_name}"')
 
     return sorted(chat_identifiers)
