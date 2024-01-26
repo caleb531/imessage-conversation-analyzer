@@ -59,13 +59,6 @@ def get_noreply_count(dfs: ica.DataFrameNamespace) -> int:
     )
 
 
-# Return a list of all dates in Date List B which are not in Date List A
-def get_missing_datestrs(
-    date_list_a: list[datetime.datetime], date_list_b: list[datetime.datetime]
-) -> list[datetime.datetime]:
-    return sorted(set(date_list_a) - set(date_list_b))
-
-
 def main() -> None:
     cli_args = ica.get_cli_args()
     dfs = ica.get_dataframes(contact_name=cli_args.contact_name)
