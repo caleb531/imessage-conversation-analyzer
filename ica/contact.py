@@ -4,12 +4,12 @@ import glob
 import importlib.resources
 import os
 import os.path
-import re
 import sqlite3
 
 import pandas as pd
+import phonenumbers
 
-from ica.exceptions import ContactNotFoundError, InvalidPhoneNumberError
+from ica.exceptions import ContactNotFoundError
 
 # The glob pattern matching all AddressBook SQL databases to read from
 DB_GLOB = os.path.expanduser(
@@ -19,19 +19,17 @@ DB_GLOB = os.path.expanduser(
 )
 
 
+# The default region for all phone numbers
+DEFAULT_PHONE_NUMBER_REGION = "US"
+
+
 # Normalize the given phone number to the format required for searching in the
 # iMessage database
 def normalize_phone_number(phone_number: str) -> str:
-    # Strip all non-digits
-    normalized_phone_number = re.sub("[^0-9]", "", phone_number)
-    # Phone number must have area code
-    if len(normalized_phone_number) < 10:
-        raise InvalidPhoneNumberError(f"Phone number {phone_number} missing area code")
-    # Add US country code if missing
-    if len(normalized_phone_number) == 10:
-        normalized_phone_number = "1" + normalized_phone_number
-    normalized_phone_number = "+" + normalized_phone_number
-    return normalized_phone_number
+    return phonenumbers.format_number(
+        phonenumbers.parse(phone_number, region=DEFAULT_PHONE_NUMBER_REGION),
+        phonenumbers.PhoneNumberFormat.E164,
+    )
 
 
 # Normalize the given email address to the format required for searching in the

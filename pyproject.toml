@@ -15,7 +15,8 @@ keywords = ["apple", "imessage", "macos", "conversation", "chat", "analysis", "p
 dependencies = [
     "pandas",
     "tabulate",
-    "pytypedstream"
+    "pytypedstream",
+    "phonenumbers"
 ]
 
 [project.urls]

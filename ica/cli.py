@@ -9,7 +9,7 @@ import os
 import os.path
 import sys
 
-from ica.exceptions import ContactNotFoundError, InvalidPhoneNumberError
+from ica.exceptions import ContactNotFoundError
 
 # A module-level flag that is set to True if the user invokes the CLI via the
 # `ica` command, meaning that an `analyzer` argument will need to be specified
@@ -84,7 +84,7 @@ def main() -> None:
 
     try:
         run_analyzer(cli_args.analyzer)
-    except (InvalidPhoneNumberError, ContactNotFoundError) as error:
+    except ContactNotFoundError as error:
         # Print the error message without the traceback
         print(error, file=sys.stderr)
         sys.exit(1)
