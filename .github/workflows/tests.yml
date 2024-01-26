@@ -21,26 +21,6 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-
-    - name: Check sqlite3 version (pre-upgrade)
-      run: sqlite3 --version
-
-    # The ubuntu-latest runner for GitHub Actions (currently 22.04) uses a
-    # version of sqlite3 which lacks support for FULL OUTER JOIN, a feature
-    # required by one of my SQL queries. In an attempt to fix this, we will try
-    # upgrading sqlite3 as part of the action (prior to running tests). For more
-    # details, see:
-    # <https://github.com/actions/runner-images/issues/9033#issuecomment-1857780470>
-    - name: Upgrade sqlite3
-      run: |
-        download_link="https://www.sqlite.org/2023/sqlite-tools-linux-x64-3440200.zip"
-        wget "$download_link" -P /tmp
-        unzip "/tmp/$(basename "$download_link")" -d /tmp
-        sudo install /tmp/sqlite3 /usr/local/bin/
-
-    - name: Check sqlite3 version (post-upgrade)
-      run: sqlite3 --version
-
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
       with:
