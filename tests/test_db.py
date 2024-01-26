@@ -6,7 +6,7 @@ import unittest
 from nose2.tools.decorators import with_setup, with_teardown
 
 import ica.core
-from tests import set_up, tear_down
+from tests import mock_chats_db_path, set_up, tear_down
 
 case = unittest.TestCase()
 
@@ -15,4 +15,4 @@ case = unittest.TestCase()
 @with_teardown(tear_down)
 def test_db_path() -> None:
     """should mock path to database"""
-    case.assertIn("/var/", ica.core.DB_PATH)
+    case.assertEqual(ica.core.DB_PATH, mock_chats_db_path)
