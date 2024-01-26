@@ -183,6 +183,10 @@ def output_results(analyzer_df: pd.DataFrame, format: str) -> None:
         print(
             tabulate(
                 output_df,
+                # pandas treats the index name separately from the other column
+                # names, whereas tabulate represents all header row names as a
+                # single list; therefore, we must include the index name if this
+                # list if the index has a name
                 headers=([output_df.index.name] if output_df.index.name else [])
                 + list(output_df.columns),
             )
