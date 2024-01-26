@@ -158,35 +158,32 @@ def prettify_header_name(header_name: Union[str, int]) -> Union[str, int]:
 
 # Print the given dataframe of metrics data
 def output_results(analyzer_df: pd.DataFrame, format: str) -> None:
-    analyzer_df = analyzer_df.rename(
-        # Prettify header column (i.e. textual values in first column)
-        index=prettify_header_name,
-        # Prettify header row (i.e. column names)
-        columns={
-            column_name: prettify_header_name(column_name)
-            for column_name in analyzer_df.columns
-        },
-    )
-
-    # Prettify index column name
-    analyzer_df.index.name = prettify_header_name(analyzer_df.index.name)
-
-    # Make all indices start from 1 instead of 0, but only if the index is the
-    # default (rather than a custom column)
     is_default_index = not analyzer_df.index.name
-    if is_default_index:
-        analyzer_df.index += 1
+    output_df = (
+        analyzer_df.rename(
+            # Prettify header column (i.e. textual values in first column)
+            index=prettify_header_name,
+            # Prettify header row (i.e. column names)
+            columns={
+                column_name: prettify_header_name(column_name)
+                for column_name in analyzer_df.columns
+            },
+        )
+        # Prettify index column name
+        .rename_axis(prettify_header_name(analyzer_df.index.name), axis=0)
+        # Make all indices start from 1 instead of 0, but only if the index is
+        # the default (rather than a custom column)
+        .pipe(lambda df: df.set_index(df.index + 1 if not df.index.name else df.index))
+    )
 
     # Output executed DataFrame to correct format
     if format == "csv":
-        print(
-            analyzer_df.to_csv(index=not is_default_index, header=analyzer_df.columns)
-        )
+        print(output_df.to_csv(index=not is_default_index, header=output_df.columns))
     else:
         print(
             tabulate(
-                analyzer_df,
-                headers=([analyzer_df.index.name] if analyzer_df.index.name else [])
-                + list(analyzer_df.columns),
+                output_df,
+                headers=([output_df.index.name] if output_df.index.name else [])
+                + list(output_df.columns),
             )
         )
