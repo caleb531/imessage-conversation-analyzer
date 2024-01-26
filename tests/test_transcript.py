@@ -20,7 +20,7 @@ case = unittest.TestCase()
 @patch("ica.output_results")
 @patch("sys.argv", [transcript.__file__, "-c", "Jane Doe"])
 def test_transcript(output_results: MagicMock) -> None:
-    """should count the total number of days"""
+    """should generate a transcript of an entire conversation"""
     transcript.main()
     df: pd.DataFrame = output_results.call_args[0][0]
     case.assertListEqual(
