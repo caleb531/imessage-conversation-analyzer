@@ -14,7 +14,12 @@ from collections.abc import Generator
 from functools import wraps
 from io import StringIO
 from typing import Any, Callable, Literal, Union
+from unittest import TestCase
 from unittest.mock import patch
+
+# Disable maximum length of test diff output for all tests (source:
+# <https://stackoverflow.com/a/23617918/560642>)
+TestCase.maxDiff = None
 
 MockDatabaseName = Union[Literal["chats"], Literal["contacts"]]
 
