@@ -36,11 +36,10 @@ def main() -> None:
         ),
         "recorded_videos": (dfs.attachments["mime_type"].eq("video/quicktime").sum()),
     }
-    attachment_totals = pd.DataFrame(
-        {"type": totals_map.keys(), "total": totals_map.values()}
-    ).set_index("type")
     ica.output_results(
-        attachment_totals.sort_values(by="total", ascending=False),
+        pd.DataFrame({"type": totals_map.keys(), "total": totals_map.values()})
+        .set_index("type")
+        .sort_values(by="total", ascending=False),
         format=cli_args.format,
     )
 
