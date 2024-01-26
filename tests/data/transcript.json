@@ -1,62 +1,62 @@
 [
-    {
-        "timestamp": "2024-01-07T08:49:39.000",
-        "is_from_me": "Yes",
-        "is_reaction": "No",
-        "message": "Hey Jane, how's your day going? 😊"
-    },
-    {
-        "timestamp": "2024-01-08T13:33:27.000",
-        "is_from_me": "No",
-        "is_reaction": "No",
-        "message": "Hey John, it's been great so far! 😀 Just finished a productive meeting. What about you?"
-    },
-    {
-        "timestamp": "2024-01-09T11:54:28.000",
-        "is_from_me": "Yes",
-        "is_reaction": "No",
-        "message": "Sounds good! I'm just taking a quick break before diving into some coding. 👨‍💻"
-    },
-    {
-        "timestamp": "2024-01-09T11:55:00.000",
-        "is_from_me": "No",
-        "is_reaction": "No",
-        "message": "That sounds exciting! 😀 What are you working on?"
-    },
-    {
-        "timestamp": "2024-01-11T10:18:36.000",
-        "is_from_me": "Yes",
-        "is_reaction": "No",
-        "message": "Building a new feature for our app. It should make things a lot easier for users. 🙌"
-    },
-    {
-        "timestamp": "2024-01-11T10:19:15.000",
-        "is_from_me": "No",
-        "is_reaction": "Yes",
-        "message": "Emphasized “Building a new feature for our app. It should make things a lot easier for users. 🙌”"
-    },
-    {
-        "timestamp": "2024-01-14T10:42:15.000",
-        "is_from_me": "No",
-        "is_reaction": "No",
-        "message": "That's awesome! 😀😀😀 I can't wait to see it. 😊 In the meantime, I'm gonna grab some lunch."
-    },
-    {
-        "timestamp": "2024-01-16T09:25:24.000",
-        "is_from_me": "Yes",
-        "is_reaction": "No",
-        "message": "Sounds like a good plan! 🍎 Enjoy your lunch!"
-    },
-    {
-        "timestamp": "2024-01-17T13:06:11.000",
-        "is_from_me": "No",
-        "is_reaction": "No",
-        "message": "Thanks! I will. Talk to you later! ☺️"
-    },
-    {
-        "timestamp": "2024-01-18T16:43:41.000",
-        "is_from_me": "Yes",
-        "is_reaction": "No",
-        "message": "(attachment)"
-    }
+  {
+    "timestamp": "2024-01-07T08:49:39.000",
+    "is_from_me": "Yes",
+    "is_reaction": "No",
+    "message": "Hey Jane, how's your day going? 😊"
+  },
+  {
+    "timestamp": "2024-01-08T13:33:27.000",
+    "is_from_me": "No",
+    "is_reaction": "No",
+    "message": "Hey John, it's been great so far! 😀 Just finished a productive meeting. What about you?"
+  },
+  {
+    "timestamp": "2024-01-09T11:54:28.000",
+    "is_from_me": "Yes",
+    "is_reaction": "No",
+    "message": "Sounds good! I'm just taking a quick break before diving into some coding. 👨‍💻"
+  },
+  {
+    "timestamp": "2024-01-09T11:55:00.000",
+    "is_from_me": "No",
+    "is_reaction": "No",
+    "message": "That sounds exciting! 😀 What are you working on?"
+  },
+  {
+    "timestamp": "2024-01-11T10:18:36.000",
+    "is_from_me": "Yes",
+    "is_reaction": "No",
+    "message": "Building a new feature for our app. It should make things a lot easier for users. 🙌"
+  },
+  {
+    "timestamp": "2024-01-11T10:19:15.000",
+    "is_from_me": "No",
+    "is_reaction": "Yes",
+    "message": "Emphasized “Building a new feature for our app. It should make things a lot easier for users. 🙌”"
+  },
+  {
+    "timestamp": "2024-01-14T10:42:15.000",
+    "is_from_me": "No",
+    "is_reaction": "No",
+    "message": "That's awesome! 😀😀😀 I can't wait to see it. 😊 In the meantime, I'm gonna grab some lunch."
+  },
+  {
+    "timestamp": "2024-01-16T09:25:24.000",
+    "is_from_me": "Yes",
+    "is_reaction": "No",
+    "message": "Sounds like a good plan! 🍎 Enjoy your lunch!"
+  },
+  {
+    "timestamp": "2024-01-17T13:06:11.000",
+    "is_from_me": "No",
+    "is_reaction": "No",
+    "message": "Thanks! I will. Talk to you later! ☺️"
+  },
+  {
+    "timestamp": "2024-01-18T16:43:41.000",
+    "is_from_me": "Yes",
+    "is_reaction": "No",
+    "message": "(attachment)"
+  }
 ]
