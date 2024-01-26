@@ -5,8 +5,9 @@ import pandas as pd
 import ica
 
 
-def convert_bool_to_yesno(series: pd.Series) -> pd.Series:
-    return series.apply(str).replace("True", "Yes").replace("False", "No")
+# Convert a boolean value to "Yes"/"No"
+def convert_bool_to_yesno(value: bool) -> str:
+    return str(value).replace("True", "Yes").replace("False", "No")
 
 
 # Export the entire conversation
@@ -20,8 +21,8 @@ def main() -> None:
             {
                 "timestamp": dfs.messages["datetime"],
                 # Convert 1/0 to Yes/No
-                "is_from_me": convert_bool_to_yesno(dfs.messages["is_from_me"]),
-                "is_reaction": convert_bool_to_yesno(dfs.messages["is_reaction"]),
+                "is_from_me": dfs.messages["is_from_me"].apply(convert_bool_to_yesno),
+                "is_reaction": dfs.messages["is_reaction"].apply(convert_bool_to_yesno),
                 # U+FFFC is the object replacement character, which appears as the
                 # textual message for every attachment
                 "message": dfs.messages["text"].replace(
