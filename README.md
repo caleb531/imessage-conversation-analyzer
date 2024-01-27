@@ -82,6 +82,29 @@ ica ./my_custom_analyzer.py -c 'John Doe'
 ica transcript -c 'John Doe' -f csv > ./my_transcript.csv
 ```
 
+#### Built-in analyzers
+
+The library includes several built-in analyzers so that you can use ICA out of
+the box:
+
+1. `message_totals`: a summary of message and reaction counts, by person and in
+   total, as well as other insightful metrics
+2. `attachment_totals`: lists count data by attachment type, including
+   number of Spotify links shared, YouTube videos, Apple Music, etc.
+3. `most_frequent_emojis`: count data for the top 10 most frequently used emojis
+   across the entire conversation
+4. `totals_by_day`: a comprehensive breakdown of message totals for every day
+   you and the other person have been messaging in the conversation
+5. `transcript`: a full, unedited transcript of every message, including
+   reactions, between you and the other person (attachment files not included)
+
+Again, to call one of these built-in analyzers, just pass it as the first
+argument to the `ica` command:
+
+```sh
+ica most_frequent_emojis -c 'John Doe'
+```
+
 ### Python API
 
 The Python API is much more powerful, allowing you to integrate ICA into any
@@ -148,6 +171,9 @@ You're not limited to writing a command line program, though! The
 `ica.get_dataframes()` function is the only function you will need in any
 analyzer program. But beyond that, feel free to import other modules, send your
 results to other processes, or whatever you need to do!
+
+You can also import any built-in analyzer (for your own post-processing) via the
+`ica.analyzers` namespace.
 
 #### A note about timezones
 
