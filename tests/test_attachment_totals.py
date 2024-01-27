@@ -32,7 +32,7 @@ def test_youtube_video_count(output_results: MagicMock) -> None:
     """should count the number of YouTube videos for a conversation"""
     attachment_totals.main()
     df: pd.DataFrame = output_results.call_args[0][0]
-    case.assertEqual(df.loc["youtube_videos"]["total"], 1)
+    case.assertEqual(df.loc["youtube_videos"]["total"], 2)
 
 
 @with_setup(set_up)
