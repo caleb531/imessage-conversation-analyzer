@@ -15,9 +15,9 @@ def main() -> None:
     ica.output_results(
         (
             dfs.messages
-            # Count all "text" column values by converting them to integers (always
-            # 1), because resampling the DataFrame will remove all non-numeric
-            # columns
+            # Count all "text" column values by converting them to integers
+            # (always 1), because resampling the DataFrame will remove all
+            # non-numeric columns
             .assign(
                 text=lambda df: df["text"].apply(pd.to_numeric, errors="coerce").isna()
             )
