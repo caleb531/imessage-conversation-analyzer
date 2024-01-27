@@ -29,7 +29,7 @@ def test_db_paths() -> None:
     case.assertIn(
         mock_contacts_db_path,
         glob.glob(mock_contacts_db_glob),
-        "glob for mock contacts database does not correctly resolve to database path",
+        "glob for mock contact database does not correctly resolve to database path",
     )
 
 
@@ -49,3 +49,27 @@ def test_chat_db_foreign_keys() -> None:
             ).fetchall()
         )
         case.assertEqual(joined_message_ids, message_ids)
+
+
+@with_setup(set_up)
+@with_teardown(tear_down)
+def test_contact_db_foreign_keys() -> None:
+    """foreign key associations for mock contact database should be correct"""
+    with sqlite3.connect(mock_contacts_db_path) as con:
+        cur = con.cursor()
+        contact_ids = set(
+            row[0] for row in cur.execute("SELECT Z_PK FROM ZABCDRECORD").fetchall()
+        )
+        phone_contact_ids = set(
+            row[0]
+            for row in cur.execute("SELECT ZOWNER FROM ZABCDPHONENUMBER").fetchall()
+        )
+        # Every contact must have at least one phone number on file for this
+        # program to look up the conversation
+        case.assertGreaterEqual(contact_ids, phone_contact_ids)
+        email_contact_ids = set(
+            row[0]
+            for row in cur.execute("SELECT ZOWNER FROM ZABCDEMAILADDRESS").fetchall()
+        )
+        # However, not every contact needs to have an email address on file
+        case.assertLessEqual(email_contact_ids, contact_ids)
