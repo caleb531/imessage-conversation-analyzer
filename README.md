@@ -162,3 +162,10 @@ ica message_totals -c 'John Doe' -t UTC
 ```sh
 ica message_totals -c 'John Doe' -t America/New_York
 ```
+
+The equivalent option for the Python API is the `timezone` parameter to
+`ica.get_dataframes`:
+
+```python
+dfs = ica.get_dataframes(contact_name=my_contact_name, timezone='UTC')
+```
