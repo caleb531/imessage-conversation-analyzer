@@ -63,8 +63,8 @@ def decode_message_attributedbody(data: bytes) -> str:
 # conversation (identified by the given phone number)
 def get_messages_dataframe(
     connection: sqlite3.Connection,
-    timezone: Union[str, None],
     chat_identifiers: list[str],
+    timezone: Union[str, None] = None,
 ) -> pd.DataFrame:
     # If no IANA timezone name is specified, default to the name of the system's
     # local timezone
@@ -117,8 +117,8 @@ def get_messages_dataframe(
 # conversation (identified by the given phone number)
 def get_attachments_dataframe(
     connection: sqlite3.Connection,
-    timezone: Union[str, None],
     chat_identifiers: list[str],
+    timezone: Union[str, None] = None,
 ) -> pd.DataFrame:
     return pd.read_sql_query(
         sql=importlib.resources.files(__package__)
@@ -140,9 +140,9 @@ def get_dataframes(
 
     with sqlite3.connect(DB_PATH) as connection:
         return DataFrameNamespace(
-            messages=get_messages_dataframe(connection, timezone, chat_identifiers),
+            messages=get_messages_dataframe(connection, chat_identifiers, timezone),
             attachments=get_attachments_dataframe(
-                connection, timezone, chat_identifiers
+                connection, chat_identifiers, timezone
             ),
         )
 
