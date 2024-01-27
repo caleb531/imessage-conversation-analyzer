@@ -3,6 +3,9 @@
 *Copyright 2020-2024 Caleb Evans*  
 *Released under the MIT license*
 
+[![tests](https://github.com/caleb531/imessage-conversation-analyzer/actions/workflows/tests.yml/badge.svg)](https://github.com/caleb531/imessage-conversation-analyzer/actions/workflows/tests.yml)
+[![Coverage Status](https://coveralls.io/repos/caleb531/imessage-conversation-analyzer/badge.svg?branch=main)](https://coveralls.io/r/caleb531/imessage-conversation-analyzer?branch=main)
+
 iMessage Conversation Analyzer (ICA) is a fully-typed Python program that will
 read the contents of an iMessage conversation via the Messages app's database on
 macOS. You can then gather various metrics of interest on the messages.
