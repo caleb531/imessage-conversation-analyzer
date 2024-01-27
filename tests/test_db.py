@@ -42,13 +42,20 @@ def test_chat_db_foreign_keys() -> None:
         message_ids = set(
             row[0] for row in cur.execute("SELECT ROWID FROM message").fetchall()
         )
-        joined_message_ids = set(
+        chat_message_ids = set(
             row[0]
             for row in cur.execute(
                 "SELECT message_id FROM chat_message_join"
             ).fetchall()
         )
-        case.assertEqual(joined_message_ids, message_ids)
+        case.assertEqual(chat_message_ids, message_ids)
+        attachment_message_ids = set(
+            row[0]
+            for row in cur.execute(
+                "SELECT message_id FROM message_attachment_join"
+            ).fetchall()
+        )
+        case.assertLessEqual(attachment_message_ids, message_ids)
 
 
 @with_setup(set_up)
