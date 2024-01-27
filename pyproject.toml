@@ -54,7 +54,7 @@ ignore_missing_imports = true
 # Black compatibility
 max-line-length = 88
 extend-ignore = ["E203", "W503"]
-exclude = [".git", "build", "__pycache__", ".eggs", "*.egg-info", ".virtualenv"]
+exclude = [".git", "build", "__pycache__", "*.egg-info", ".virtualenv"]
 
 # Per <https://black.readthedocs.io/en/stable/guides/using_black_with_other_tools.html#profile>
 [tool.isort]
