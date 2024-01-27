@@ -25,20 +25,17 @@ def get_dates_between(
 
 
 def get_sums_by_day(dfs: ica.DataFrameNamespace) -> pd.DataFrame:
-    groups_by_day = (
+    return (
         dfs.messages
         # Count all "text" column values by converting them to integers (always
         # 1), because resampling the DataFrame will remove all non-numeric
         # columns
-        .assign(
-            text=lambda df: df["text"].apply(pd.to_numeric, errors="coerce").isna()
-        ).resample("D", on="datetime")
+        .assign(text=lambda df: df["text"].apply(pd.to_numeric, errors="coerce").isna())
+        .resample("D", on="datetime")
+        .sum()
+        .pipe(lambda df: df.rename_axis("date", axis=0))
+        .assign(is_from_them=lambda df: df["text"] - df["is_from_me"])
     )
-    sums_by_day = groups_by_day.sum()
-    # Remove 00:00:00 from date index
-    sums_by_day.index = sums_by_day.index.strftime(DATE_FORMAT).rename("date")
-    sums_by_day["is_from_them"] = sums_by_day["text"] - sums_by_day["is_from_me"]
-    return sums_by_day
 
 
 # Get all dates sent
