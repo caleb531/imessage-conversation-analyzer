@@ -25,8 +25,8 @@ MockDatabaseName = Union[Literal["chats"], Literal["contacts"]]
 temp_dir = tempfile.gettempdir()
 temp_db_dir = os.path.join(temp_dir, "ica")
 
-mock_contacts_db_path = os.path.join(temp_db_dir, "addressbook.abcddb")
 mock_contacts_db_glob = os.path.join(temp_db_dir, "*.abcddb")
+mock_contacts_db_path = mock_contacts_db_glob.replace("*", "addressbook")
 contacts_db_glob_patcher = patch("ica.contact.DB_GLOB", mock_contacts_db_glob)
 
 mock_chats_db_path = os.path.join(temp_db_dir, "chat.db")
