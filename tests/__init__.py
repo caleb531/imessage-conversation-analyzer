@@ -8,12 +8,9 @@ import os
 import os.path
 import shutil
 import sqlite3
-import sys
 import tempfile
 from collections.abc import Generator
-from functools import wraps
-from io import StringIO
-from typing import Any, Callable, Literal, Union
+from typing import Any, Literal, Union
 from unittest import TestCase
 from unittest.mock import patch
 
@@ -79,19 +76,3 @@ def create_mock_db(db_name: MockDatabaseName, db_path: str) -> None:
                 f"INSERT INTO {table_name} VALUES({key_placeholders})", records
             )
             con.commit()
-
-
-def redirect_stdout(func: Callable) -> Callable:
-    """temporarily redirect stdout to new output stream"""
-
-    @wraps(func)
-    def wrapper(*args: tuple, **kwargs: dict) -> Any:
-        original_stdout = sys.stdout
-        out = StringIO()
-        try:
-            sys.stdout = out
-            return func(out, *args, **kwargs)
-        finally:
-            sys.stdout = original_stdout
-
-    return wrapper
