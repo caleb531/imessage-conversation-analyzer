@@ -26,28 +26,27 @@ def main() -> None:
     dfs = ica.get_dataframes(
         contact_name=cli_args.contact_name, timezone=cli_args.timezone
     )
-    df = (
-        pd.DataFrame({"emoji": get_emoji_list(), "count": 0})
-        .assign(
-            count=lambda df: df["emoji"].apply(
-                lambda emoji: dfs.messages.query("is_reaction == False")
-                .get("text")
-                # A few emoji, like *️⃣, are regex special characters with
-                # combining characters added to make them emoji; however,
-                # because they are fundamentally regex special characters, they
-                # will break the regex syntax unless escaped
-                .str.count(re.escape(emoji))
-                .sum()
-            )
-        )
-        .query("count > 0")
-        .sort_values(by="count", ascending=False)
-        .reset_index(drop=True)
-        .set_index("emoji")
-        .head(EMOJI_DISPLAY_COUNT)
-    )
     ica.output_results(
-        df,
+        (
+            pd.DataFrame({"emoji": get_emoji_list(), "count": 0})
+            .assign(
+                count=lambda df: df["emoji"].apply(
+                    lambda emoji: dfs.messages.query("is_reaction == False")
+                    .get("text")
+                    # A few emoji, like *️⃣, are regex special characters with
+                    # combining characters added to make them emoji; however,
+                    # because they are fundamentally regex special characters,
+                    # they will break the regex syntax unless escaped
+                    .str.count(re.escape(emoji))
+                    .sum()
+                )
+            )
+            .query("count > 0")
+            .sort_values(by="count", ascending=False)
+            .reset_index(drop=True)
+            .set_index("emoji")
+            .head(EMOJI_DISPLAY_COUNT)
+        ),
         format=cli_args.format,
     )
 
