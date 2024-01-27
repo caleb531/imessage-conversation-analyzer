@@ -145,3 +145,17 @@ You're not limited to writing a command line program, though! The
 `ica.get_dataframes()` function is the only function you will need in any
 analyzer program. But beyond that, feel free to import other modules, send your
 results to other processes, or whatever you need to do!
+
+#### A note about timezones
+
+By default, all dates and times are in the local timezone of the system on which
+ICA is run. If you'd like to change this, you can pass the `--timezone` / `-t`
+option to the CLI with an IANA timezone name.
+
+```sh
+ica message_totals -c 'John Doe' -t UTC
+```
+
+```sh
+ica message_totals -c 'John Doe' -t America/New_York
+```
