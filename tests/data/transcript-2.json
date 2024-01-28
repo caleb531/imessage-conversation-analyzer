@@ -127,8 +127,14 @@
   },
   {
     "timestamp": "2024-01-12T21:19:51.000Z",
-    "is_from_me": "Yes",
+    "is_from_me": "No",
     "is_reaction": "No",
     "message": "Same here! 🤣 Catch you later!"
+  },
+  {
+    "timestamp": "2024-01-12T21:21:00.000Z",
+    "is_from_me": "No",
+    "is_reaction": "Yes",
+    "message": "Loved “Same here! 🤣 Catch you later!”"
   }
 ]

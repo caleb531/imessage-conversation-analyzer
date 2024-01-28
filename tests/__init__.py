@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """global test fixtures and helper methods"""
 
+import base64
 import contextlib
 import glob
 import json
@@ -33,6 +34,11 @@ mock_chats_db_path = os.path.join(temp_db_dir, "chat.db")
 chats_db_path_patcher = patch("ica.core.DB_PATH", mock_chats_db_path)
 
 
+# A string prefix that can be placed at the beginning of any JSON string within
+# the mock data to indicate that the rest of the string is base64
+BASE64_PREFIX = "base64:"
+
+
 def set_up() -> None:
     """global setup fixture for all tests"""
     tear_down()  # in case something prevents tear_down() from running normally
@@ -52,6 +58,20 @@ def tear_down() -> None:
     contacts_db_glob_patcher.stop()
 
 
+def format_record_value(
+    value: Union[str, int, float, bool]  # JSON strings are always UTF-8
+) -> Union[str, bytes, int, float, bool]:
+    """
+    Format the value of a mock database record, including decoding it if it's
+    base64
+    """
+    if type(value) is str and str(value).startswith(BASE64_PREFIX):
+        d = base64.standard_b64decode(value.removeprefix(BASE64_PREFIX).encode("utf-8"))
+        return d
+    else:
+        return value
+
+
 def get_mock_data_for_db(
     db_name: MockDatabaseName,
 ) -> Generator[tuple[str, list[dict]], Any, Any]:
@@ -60,7 +80,10 @@ def get_mock_data_for_db(
         table_name = os.path.splitext(os.path.basename(data_path))[0]
         with open(data_path, "r") as data_file:
             records = json.load(data_file)
-            yield table_name, records
+            yield table_name, [
+                {key: format_record_value(value) for key, value in record.items()}
+                for record in records
+            ]
 
 
 def create_mock_db(db_name: MockDatabaseName, db_path: str) -> None:

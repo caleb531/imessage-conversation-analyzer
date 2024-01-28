@@ -221,6 +221,13 @@
     "text": "Same here! 🤣 Catch you later!",
     "attributedBody": "",
     "date": 726787191071867648,
-    "is_from_me": true
+    "is_from_me": false
+  },
+  {
+    "ROWID": "9368cfd3-ad0c-4110-8658-0b81b08e71eb",
+    "text": null,
+    "attributedBody": "base64:BAtzdHJlYW10eXBlZIHoA4QBQISEhBlOU011dGFibGVBdHRyaWJ1dGVkU3RyaW5nAISEEk5TQXR0cmlidXRlZFN0cmluZwCEhAhOU09iamVjdACFkoSEhA9OU011dGFibGVTdHJpbmcBhIQITlNTdHJpbmcBlYQBKyxMb3ZlZCDigJxTYW1lIGhlcmUhIPCfpKMgQ2F0Y2ggeW91IGxhdGVyIeKAnYaEAmlJASaShISEDE5TRGljdGlvbmFyeQCVhAFpAZKEmJgdX19rSU1NZXNzYWdlUGFydEF0dHJpYnV0ZU5hbWWGkoSEhAhOU051bWJlcgCEhAdOU1ZhbHVlAJWEASqEm5sAhoaG",
+    "date": 726787260392262912,
+    "is_from_me": false
   }
 ]
