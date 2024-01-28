@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """test the mocking of the database"""
 
+import collections
 import glob
 import sqlite3
 import unittest
+from collections.abc import Generator
+from typing import Any, Sequence, Union
 
 from nose2.tools.decorators import with_setup, with_teardown
 
@@ -20,6 +23,11 @@ from tests import (
 case = unittest.TestCase()
 
 
+def get_duplicates(items: Union[Sequence[Any], Generator[Any, Any, Any]]) -> list[Any]:
+    """return a list of duplicates in the given sequence of items"""
+    return [item for item, count in collections.Counter(items).items() if count > 1]
+
+
 @with_setup(set_up)
 @with_teardown(tear_down)
 def test_db_paths() -> None:
@@ -31,6 +39,57 @@ def test_db_paths() -> None:
         glob.glob(mock_contacts_db_glob),
         "glob for mock contact database does not correctly resolve to database path",
     )
+
+
+@with_setup(set_up)
+@with_teardown(tear_down)
+def test_message_id_uniqueness() -> None:
+    """IDs should be unique across all tables in the chat database"""
+    with sqlite3.connect(mock_chats_db_path) as con:
+        cur = con.cursor()
+        case.assertFalse(
+            get_duplicates(row[0] for row in cur.execute("SELECT ROWID FROM message")),
+            "there are duplicate IDs in the message table",
+        )
+        case.assertFalse(
+            get_duplicates(
+                row[0] for row in cur.execute("SELECT ROWID FROM chat_message_join")
+            ),
+            "there are duplicate IDs in the chat_message_join table",
+        )
+        case.assertFalse(
+            get_duplicates(
+                row[0]
+                for row in cur.execute("SELECT ROWID FROM message_attachment_join")
+            ),
+            "there are duplicate IDs in the attachment_message_join table",
+        )
+
+
+@with_setup(set_up)
+@with_teardown(tear_down)
+def test_contact_id_uniqueness() -> None:
+    """IDs should be unique across all tables in the contact database"""
+    with sqlite3.connect(mock_contacts_db_path) as con:
+        cur = con.cursor()
+        case.assertFalse(
+            get_duplicates(
+                row[0] for row in cur.execute("SELECT Z_PK FROM ZABCDRECORD")
+            ),
+            "there are duplicate IDs in the ZABCDRECORD table",
+        )
+        case.assertFalse(
+            get_duplicates(
+                row[0] for row in cur.execute("SELECT ZOWNER FROM ZABCDPHONENUMBER")
+            ),
+            "there are duplicate IDs in the ZABCDPHONENUMBER table",
+        )
+        case.assertFalse(
+            get_duplicates(
+                row[0] for row in cur.execute("SELECT ZOWNER FROM ZABCDEMAILADDRESS")
+            ),
+            "there are duplicate IDs in the ZABCDEMAILADDRESS table",
+        )
 
 
 @with_setup(set_up)
