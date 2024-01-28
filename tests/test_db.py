@@ -43,6 +43,18 @@ def test_db_paths() -> None:
 
 @with_setup(set_up)
 @with_teardown(tear_down)
+def test_message_timestamp_uniqueness() -> None:
+    """timestamps should be unique across all tables in the chat database"""
+    with sqlite3.connect(mock_chats_db_path) as con:
+        cur = con.cursor()
+        case.assertFalse(
+            get_duplicates(row[0] for row in cur.execute("SELECT date FROM message")),
+            "there are duplicate timestamps in the message table",
+        )
+
+
+@with_setup(set_up)
+@with_teardown(tear_down)
 def test_message_id_uniqueness() -> None:
     """IDs should be unique across all tables in the chat database"""
     with sqlite3.connect(mock_chats_db_path) as con:
