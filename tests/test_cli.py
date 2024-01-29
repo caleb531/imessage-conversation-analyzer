@@ -71,6 +71,23 @@ def test_cli_run_built_in_analyzer() -> None:
 
 @with_setup(set_up_cli)
 @with_teardown(tear_down_cli)
+def test_cli_run_analyzer_via_path() -> None:
+    """should run analyzer via file path"""
+    cli_arg_list = ["-c", "Jane Doe"]
+    with patch(
+        "sys.argv", [cli.__file__, "ica/analyzers/message_totals.py", *cli_arg_list]
+    ):
+        with redirect_stdout(StringIO()) as actual_out:
+            cli.main()
+            cli.did_user_invoke_cli_directly = False
+    with patch("sys.argv", [cli.__file__, *cli_arg_list]):
+        with redirect_stdout(StringIO()) as expected_out:
+            message_totals.main()
+    case.assertEqual(actual_out.getvalue(), expected_out.getvalue())
+
+
+@with_setup(set_up_cli)
+@with_teardown(tear_down_cli)
 @patch("sys.argv", [cli.__file__, "message_totals", "-c", "Imaginary Person"])
 def test_cli_contact_not_found() -> None:
     """should print an error message if contact was not found"""
