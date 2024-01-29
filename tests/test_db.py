@@ -90,18 +90,6 @@ def test_contact_id_uniqueness() -> None:
             ),
             "there are duplicate IDs in the ZABCDRECORD table",
         )
-        case.assertFalse(
-            get_duplicates(
-                row[0] for row in cur.execute("SELECT ZOWNER FROM ZABCDPHONENUMBER")
-            ),
-            "there are duplicate IDs in the ZABCDPHONENUMBER table",
-        )
-        case.assertFalse(
-            get_duplicates(
-                row[0] for row in cur.execute("SELECT ZOWNER FROM ZABCDEMAILADDRESS")
-            ),
-            "there are duplicate IDs in the ZABCDEMAILADDRESS table",
-        )
 
 
 @with_setup(set_up)

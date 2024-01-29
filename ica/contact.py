@@ -5,6 +5,7 @@ import importlib.resources
 import os
 import os.path
 import sqlite3
+from typing import Union
 
 import pandas as pd
 import phonenumbers
@@ -25,7 +26,9 @@ DEFAULT_PHONE_NUMBER_REGION = "US"
 
 # Normalize the given phone number to the format required for searching in the
 # iMessage database
-def normalize_phone_number(phone_number: str) -> str:
+def normalize_phone_number(phone_number: str) -> Union[str, None]:
+    if not phone_number:
+        return None
     return phonenumbers.format_number(
         phonenumbers.parse(phone_number, region=DEFAULT_PHONE_NUMBER_REGION),
         phonenumbers.PhoneNumberFormat.E164,
@@ -34,7 +37,9 @@ def normalize_phone_number(phone_number: str) -> str:
 
 # Normalize the given email address to the format required for searching in the
 # iMessage database
-def normalize_email_address(email_address: str) -> str:
+def normalize_email_address(email_address: str) -> Union[str, None]:
+    if not email_address:
+        return None
     normalized_email_address = email_address.strip()
     return normalized_email_address
 
@@ -56,14 +61,16 @@ def get_chat_identifiers(contact_name: str) -> list[str]:
             )
             # Combine the results
             chat_identifiers.update(
-                normalize_phone_number(phone_number)
-                for phone_number in rows["ZFULLNUMBER"]
-                if phone_number
+                rows["ZFULLNUMBER"].apply(normalize_phone_number)
+                # The normalization function will convert empty strings to None
+                # so that we can filter them out with dropna()
+                .dropna()
             )
             chat_identifiers.update(
-                normalize_email_address(email_address)
-                for email_address in rows["ZADDRESS"]
-                if email_address
+                rows["ZADDRESS"].apply(normalize_email_address)
+                # The normalization function will convert empty strings to None
+                # so that we can filter them out with dropna()
+                .dropna()
             )
 
     # Quit if the contact with the specified name could not be found
