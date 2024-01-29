@@ -59,11 +59,11 @@ def test_cli_analyzer_but_no_contact() -> None:
 def test_cli_run_built_in_analyzer() -> None:
     """should run built-in analyzer by name"""
     cli_arg_list = ["-c", "Jane Doe"]
-    with patch("sys.argv", [__file__, "message_totals", *cli_arg_list]):
+    with patch("sys.argv", [cli.__file__, "message_totals", *cli_arg_list]):
         with redirect_stdout(StringIO()) as actual_out:
             cli.main()
             cli.did_user_invoke_cli_directly = False
-    with patch("sys.argv", [__file__, *cli_arg_list]):
+    with patch("sys.argv", [cli.__file__, *cli_arg_list]):
         with redirect_stdout(StringIO()) as expected_out:
             message_totals.main()
     case.assertEqual(actual_out.getvalue(), expected_out.getvalue())
