@@ -63,7 +63,7 @@ def run_analyzer(analyzer: str) -> None:
         if importlib.util.find_spec(f"ica.analyzers.{analyzer}"):
             analyzer = str(
                 importlib.resources.files(__package__).joinpath(
-                    f"analyzers/{analyzer}.py"
+                    os.path.join("analyzers", f"{analyzer}.py")
                 )
             )
     loader = importlib.machinery.SourceFileLoader("analyzer", analyzer)

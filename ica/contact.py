@@ -49,7 +49,7 @@ def get_chat_identifiers(contact_name: str) -> list[str]:
         with sqlite3.connect(db_path) as connection:
             rows = pd.read_sql_query(
                 sql=importlib.resources.files(__package__)
-                .joinpath("queries/contact.sql")
+                .joinpath(os.path.join("queries", "contact.sql"))
                 .read_text(),
                 con=connection,
                 params={"contact_name": contact_name},

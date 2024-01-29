@@ -73,7 +73,7 @@ def get_messages_dataframe(
     return (
         pd.read_sql_query(
             sql=importlib.resources.files(__package__)
-            .joinpath("queries/messages.sql")
+            .joinpath(os.path.join("queries", "messages.sql"))
             .read_text(),
             con=connection,
             params={
@@ -122,7 +122,7 @@ def get_attachments_dataframe(
 ) -> pd.DataFrame:
     return pd.read_sql_query(
         sql=importlib.resources.files(__package__)
-        .joinpath("queries/attachments.sql")
+        .joinpath(os.path.join("queries", "attachments.sql"))
         .read_text(),
         con=connection,
         params={
