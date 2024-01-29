@@ -7,13 +7,15 @@ from io import StringIO
 from pathlib import Path
 
 import pandas as pd
+from nose2.tools import params
 
 import ica
 
 case = unittest.TestCase()
 
 
-def test_output_results_default_index() -> None:
+@params("default", "csv")
+def test_output_results_default_index(format: str) -> None:
     """should output a DataFrame with a default index"""
     with redirect_stdout(StringIO()) as out:
         ica.output_results(
@@ -22,15 +24,19 @@ def test_output_results_default_index() -> None:
                     "first": ["Steven", "Wes", "Martin"],
                     "last": ["Spielberg", "Anderson", "Scorsese"],
                 }
-            )
+            ),
+            format=format,
         )
     case.assertEqual(
-        out.getvalue(),
-        Path("tests/data/output/output_results_default_index.txt").read_text(),
+        out.getvalue().rstrip(),
+        Path(f"tests/data/output/{format}/output_results_default_index.txt")
+        .read_text()
+        .rstrip(),
     )
 
 
-def test_output_results_labels_in_index() -> None:
+@params("default", "csv")
+def test_output_results_labels_in_index(format: str) -> None:
     """should output a DataFrame with a default index"""
     with redirect_stdout(StringIO()) as out:
         ica.output_results(
@@ -39,15 +45,19 @@ def test_output_results_labels_in_index() -> None:
                     "metric": ["Messages", "Reactions", "Attachments"],
                     "total": [987, 654, 321],
                 },
-            ).pipe(lambda df: df.set_index("metric"))
+            ).pipe(lambda df: df.set_index("metric")),
+            format=format,
         )
     case.assertEqual(
-        out.getvalue(),
-        Path("tests/data/output/output_results_labels_in_index.txt").read_text(),
+        out.getvalue().rstrip(),
+        Path(f"tests/data/output/{format}/output_results_labels_in_index.txt")
+        .read_text()
+        .rstrip(),
     )
 
 
-def test_output_results_date_index() -> None:
+@params("default", "csv")
+def test_output_results_date_index(format: str) -> None:
     """should output a DataFrame with a default index"""
     with redirect_stdout(StringIO()) as out:
         ica.output_results(
@@ -58,9 +68,12 @@ def test_output_results_date_index() -> None:
                 },
             )
             .assign(date=lambda df: pd.to_datetime(df["date"]))
-            .pipe(lambda df: df.set_index("date"))
+            .pipe(lambda df: df.set_index("date")),
+            format=format,
         )
     case.assertEqual(
-        out.getvalue(),
-        Path("tests/data/output/output_results_date_index.txt").read_text(),
+        out.getvalue().rstrip(),
+        Path(f"tests/data/output/{format}/output_results_date_index.txt")
+        .read_text()
+        .rstrip(),
     )

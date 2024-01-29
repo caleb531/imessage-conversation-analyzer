@@ -157,7 +157,9 @@ def prettify_header_name(header_name: Union[str, int]) -> Union[str, int]:
 
 
 # Print the given dataframe of metrics data
-def output_results(analyzer_df: pd.DataFrame, format: Union[str, None] = None) -> None:
+def output_results(
+    analyzer_df: pd.DataFrame, format: Union[str, None] = "default"
+) -> None:
     is_default_index = not analyzer_df.index.name
     output_df = (
         analyzer_df.rename(
