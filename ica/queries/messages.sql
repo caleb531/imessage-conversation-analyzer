@@ -1,8 +1,8 @@
 SELECT
     "text",
     "attributedBody",
-    "is_from_me",
-    datetime("message"."date" / 1000000000 + strftime("%s", "2001-01-01") ,"unixepoch") as "datetime"
+    datetime("message"."date" / 1000000000 + strftime("%s", "2001-01-01") ,"unixepoch") as "datetime",
+    "is_from_me"
 FROM "message"
 WHERE "message"."ROWID" IN (
     -- Get all messages tied to chat
