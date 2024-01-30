@@ -18,7 +18,7 @@ case = unittest.TestCase()
 @with_setup(set_up)
 @with_teardown(tear_down)
 @patch("ica.output_results")
-@patch("sys.argv", [most_frequent_emojis.__file__, "-c", "Jane Doe"])
+@patch("sys.argv", [most_frequent_emojis.__file__, "-c", "Jane Fernbrook"])
 def test_most_frequent_emojis(output_results: MagicMock) -> None:
     """should compute the most frequently-used emojis"""
     most_frequent_emojis.__package__ = "ica"

@@ -16,7 +16,7 @@ case = unittest.TestCase()
 @with_setup(set_up)
 @with_teardown(tear_down)
 @patch("ica.output_results")
-@patch("sys.argv", [attachment_totals.__file__, "-c", "Jane Doe"])
+@patch("sys.argv", [attachment_totals.__file__, "-c", "Jane Fernbrook"])
 def test_gif_count(output_results: MagicMock) -> None:
     """should count the number of GIFs for a conversation"""
     attachment_totals.main()
@@ -27,7 +27,7 @@ def test_gif_count(output_results: MagicMock) -> None:
 @with_setup(set_up)
 @with_teardown(tear_down)
 @patch("ica.output_results")
-@patch("sys.argv", [attachment_totals.__file__, "-c", "James Doe"])
+@patch("sys.argv", [attachment_totals.__file__, "-c", "Thomas Riverstone"])
 def test_youtube_video_count(output_results: MagicMock) -> None:
     """should count the number of YouTube videos for a conversation"""
     attachment_totals.main()
@@ -38,7 +38,7 @@ def test_youtube_video_count(output_results: MagicMock) -> None:
 @with_setup(set_up)
 @with_teardown(tear_down)
 @patch("ica.output_results")
-@patch("sys.argv", [attachment_totals.__file__, "-c", "James Doe"])
+@patch("sys.argv", [attachment_totals.__file__, "-c", "Thomas Riverstone"])
 def test_apple_music_count(output_results: MagicMock) -> None:
     """should count the number of Apple Music links for a conversation"""
     attachment_totals.main()
@@ -49,7 +49,7 @@ def test_apple_music_count(output_results: MagicMock) -> None:
 @with_setup(set_up)
 @with_teardown(tear_down)
 @patch("ica.output_results")
-@patch("sys.argv", [attachment_totals.__file__, "-c", "James Doe"])
+@patch("sys.argv", [attachment_totals.__file__, "-c", "Thomas Riverstone"])
 def test_spotify_count(output_results: MagicMock) -> None:
     """should count the number of Spotify links for a conversation"""
     attachment_totals.main()

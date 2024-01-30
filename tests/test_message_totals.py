@@ -17,7 +17,7 @@ case = unittest.TestCase()
 @with_setup(set_up)
 @with_teardown(tear_down)
 @patch("ica.output_results")
-@patch("sys.argv", [message_totals.__file__, "-c", "Jane Doe"])
+@patch("sys.argv", [message_totals.__file__, "-c", "Jane Fernbrook"])
 def test_message_counts(output_results: MagicMock) -> None:
     """should count the number of messages according to various criteria"""
     message_totals.main()
@@ -30,7 +30,7 @@ def test_message_counts(output_results: MagicMock) -> None:
 @with_setup(set_up)
 @with_teardown(tear_down)
 @patch("ica.output_results")
-@patch("sys.argv", [message_totals.__file__, "-c", "Jane Doe"])
+@patch("sys.argv", [message_totals.__file__, "-c", "Jane Fernbrook"])
 def test_reaction_counts(output_results: MagicMock) -> None:
     """should count the number of reactions according to various criteria"""
     message_totals.main()
@@ -43,7 +43,7 @@ def test_reaction_counts(output_results: MagicMock) -> None:
 @with_setup(set_up)
 @with_teardown(tear_down)
 @patch("ica.output_results")
-@patch("sys.argv", [message_totals.__file__, "-c", "Jane Doe"])
+@patch("sys.argv", [message_totals.__file__, "-c", "Jane Fernbrook"])
 @freeze_time("2024-01-26 9:00:00")
 def test_day_counts(output_results: MagicMock) -> None:
     """should count the number of days according to various criteria"""

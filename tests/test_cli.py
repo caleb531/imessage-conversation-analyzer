@@ -38,7 +38,7 @@ def test_cli_no_args() -> None:
 
 @with_setup(set_up_cli)
 @with_teardown(tear_down_cli)
-@patch("sys.argv", [cli.__file__, "-c", "Jane Doe"])
+@patch("sys.argv", [cli.__file__, "-c", "Jane Fernbrook"])
 def test_cli_contact_but_no_analyzer() -> None:
     """should raise an exception if contact is supplied but no analyzer"""
     with redirect_stderr(StringIO()), case.assertRaises(SystemExit):
@@ -58,7 +58,7 @@ def test_cli_analyzer_but_no_contact() -> None:
 @with_teardown(tear_down_cli)
 def test_cli_run_built_in_analyzer() -> None:
     """should run built-in analyzer by name"""
-    cli_arg_list = ["-c", "Jane Doe"]
+    cli_arg_list = ["-c", "Jane Fernbrook"]
     with patch("sys.argv", [cli.__file__, "message_totals", *cli_arg_list]):
         with redirect_stdout(StringIO()) as actual_out:
             cli.main()
@@ -73,7 +73,7 @@ def test_cli_run_built_in_analyzer() -> None:
 @with_teardown(tear_down_cli)
 def test_cli_run_analyzer_via_path() -> None:
     """should run analyzer via file path"""
-    cli_arg_list = ["-c", "Jane Doe"]
+    cli_arg_list = ["-c", "Jane Fernbrook"]
     with patch(
         "sys.argv", [cli.__file__, "ica/analyzers/message_totals.py", *cli_arg_list]
     ):
@@ -101,7 +101,7 @@ def test_cli_contact_not_found() -> None:
 @with_setup(set_up_cli)
 @with_teardown(tear_down_cli)
 @patch("importlib.util.spec_from_loader", side_effect=KeyboardInterrupt())
-@patch("sys.argv", [cli.__file__, "message_totals", "-c", "Jane Doe"])
+@patch("sys.argv", [cli.__file__, "message_totals", "-c", "Jane Fernbrook"])
 def test_keyboardinterrupt(spec_from_loader: MagicMock) -> None:
     """should print a newline when user presses control-C"""
     with redirect_stdout(StringIO()) as out:

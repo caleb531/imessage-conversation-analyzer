@@ -19,7 +19,7 @@ def test_missing_phone_number() -> None:
     number on record
     """
     with case.assertRaises(ica.ContactNotFoundError):
-        ica.get_dataframes(contact_name="Jackson Doe")
+        ica.get_dataframes(contact_name="Matthew Whisperton")
 
 
 @with_setup(set_up)

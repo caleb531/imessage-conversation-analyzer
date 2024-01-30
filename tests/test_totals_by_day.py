@@ -16,7 +16,7 @@ case = unittest.TestCase()
 @with_setup(set_up)
 @with_teardown(tear_down)
 @patch("ica.output_results")
-@patch("sys.argv", [totals_by_day.__file__, "-c", "Jane Doe", "-t", "UTC"])
+@patch("sys.argv", [totals_by_day.__file__, "-c", "Jane Fernbrook", "-t", "UTC"])
 def test_totals_by_day(output_results: MagicMock) -> None:
     """should count the total number of days"""
     totals_by_day.main()

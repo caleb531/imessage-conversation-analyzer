@@ -15,7 +15,7 @@ case = unittest.TestCase()
 @with_teardown(tear_down)
 def test_decode_attributedbody() -> None:
     """should properly decode message contents encoded in attributedBody"""
-    dfs = ica.get_dataframes(contact_name="James Doe")
+    dfs = ica.get_dataframes(contact_name="Thomas Riverstone")
     case.assertEqual(
         dfs.messages.iloc[-1]["text"], "Loved “Same here! 🤣 Catch you later!”"
     )

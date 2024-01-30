@@ -15,7 +15,7 @@ from tests import set_up, tear_down
 case = unittest.TestCase()
 
 
-@params((1, "Jane Doe"), (2, "James Doe"))
+@params((1, "Jane Fernbrook"), (2, "Thomas Riverstone"))
 @with_setup(set_up)
 @with_teardown(tear_down)
 @patch("ica.output_results")
