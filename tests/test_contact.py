@@ -24,6 +24,16 @@ def test_has_conversation_via_email_address_only() -> None:
 
 @with_setup(set_up)
 @with_teardown(tear_down)
+def test_has_contact_info_but_no_conversation() -> None:
+    """
+    should not error if contact has phone number but no conversation
+    """
+    dfs = ica.get_dataframes(contact_name="Evelyn Oakhaven")
+    case.assertEqual(len(dfs.messages), 0)
+
+
+@with_setup(set_up)
+@with_teardown(tear_down)
 def test_missing_contact_info() -> None:
     """
     should raise a ContactNotFoundError if contact exists but has no phone
