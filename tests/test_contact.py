@@ -13,10 +13,10 @@ case = unittest.TestCase()
 
 @with_setup(set_up)
 @with_teardown(tear_down)
-def test_missing_phone_number() -> None:
+def test_missing_contact_info() -> None:
     """
     should raise a ContactNotFoundError if contact exists but has no phone
-    number on record
+    number or email address on record
     """
     with case.assertRaises(ica.ContactNotFoundError):
         ica.get_dataframes(contact_name="Matthew Whisperton")
