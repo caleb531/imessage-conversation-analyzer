@@ -59,7 +59,9 @@ def tear_down() -> None:
 
 
 def format_record_value(
-    value: Union[str, int, float, bool]  # JSON strings are always UTF-8
+    # JSON strings are always UTF-8, so a `bytes` string would never be passed
+    # as one of the JSON values to format
+    value: Union[str, int, float, bool]
 ) -> Union[str, bytes, int, float, bool]:
     """
     Format the value of a mock database record, including decoding it if it's
