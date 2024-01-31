@@ -148,7 +148,7 @@ def get_dataframes(
         )
         if dfs.messages.empty:
             raise ConversationNotFoundError(
-                f'No conversation was found for the contact "{contact_name}"'
+                f'No conversation found for the contact "{contact_name}"'
             )
         return dfs
 
