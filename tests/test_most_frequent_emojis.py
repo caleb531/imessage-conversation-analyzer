@@ -28,3 +28,15 @@ def test_most_frequent_emojis(output_results: MagicMock) -> None:
         df.to_dict("index"),
         json.loads(Path("tests/data/most_frequent_emojis.json").read_text()),
     )
+
+
+@with_setup(set_up)
+@with_teardown(tear_down)
+@patch("ica.output_results")
+@patch("sys.argv", [most_frequent_emojis.__file__, "-c", "Daniel Brightingale"])
+def test_skin_tones(output_results: MagicMock) -> None:
+    """should disregard skin tones when counting emojis"""
+    most_frequent_emojis.__package__ = "ica"
+    most_frequent_emojis.main()
+    df: pd.DataFrame = output_results.call_args[0][0]
+    case.assertEqual(df.loc["👍"]["count"], 6)

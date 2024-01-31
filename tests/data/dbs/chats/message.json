@@ -3,15 +3,22 @@
     "ROWID": "67d1d980-4db8-4005-b644-cd269402dd29",
     "text": "Hey Daniel, I just wanted to confirm what date the party was! 🎉",
     "attributedBody": "",
-    "date": 727379249287274624,
+    "date": 727379229507062144,
     "is_from_me": true
   },
   {
     "ROWID": "17f5642d-68df-4604-9c1c-43fd63a54f2e",
     "text": "Oh hey, John! Sure, the party is on the 30th! 🎊",
     "attributedBody": "",
-    "date": 727379298702376320,
+    "date": 727379249287274624,
     "is_from_me": false
+  },
+  {
+    "ROWID": "7fc5ac48-a5d4-4f8a-a749-f085bf246c1a",
+    "text": "Perfect, thanks man! 👍👍🏻👍🏼👍🏽👍🏾👍🏿",
+    "attributedBody": "",
+    "date": 727379298702376320,
+    "is_from_me": true
   },
   {
     "ROWID": "5ab162b0-e4c7-4e77-9623-c2396bb81d73",
