@@ -25,6 +25,16 @@ def main() -> None:
             .sum()
             .pipe(lambda df: df.rename_axis("date", axis=0))
             .assign(is_from_them=lambda df: df["text"] - df["is_from_me"])
+            # Do not include reaction data for brevity
+            .drop(columns=["is_reaction"])
+            # Rename columns to be more intuitive
+            .rename(
+                columns={
+                    "text": "#_sent",
+                    "is_from_me": "#_sent_by_me",
+                    "is_from_them": "#_sent_by_them",
+                }
+            )
         ),
         format=cli_args.format,
     )
