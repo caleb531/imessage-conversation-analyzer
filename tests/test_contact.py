@@ -35,10 +35,11 @@ def test_find_conversation_via_email_address_only() -> None:
 @with_teardown(tear_down)
 def test_has_contact_info_but_no_conversation() -> None:
     """
-    should return an empty dataframe if contact has info but no conversation
+    should raise a ConversationNotFoundError if contact has info but no
+    conversation
     """
-    dfs = ica.get_dataframes(contact_name="Evelyn Oakhaven")
-    case.assertEqual(len(dfs.messages), 0)
+    with case.assertRaises(ica.ConversationNotFoundError):
+        ica.get_dataframes(contact_name="Evelyn Oakhaven")
 
 
 @with_setup(set_up)

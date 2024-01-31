@@ -15,6 +15,7 @@ from tabulate import tabulate
 from typedstream.stream import TypedStreamReader
 
 import ica.contact as contact
+from ica.exceptions import ConversationNotFoundError
 
 # In order to interpolate the user-specified list of chat identifiers into the
 # SQL queries, we must join the list into a string delimited by a common
@@ -139,12 +140,17 @@ def get_dataframes(
     chat_identifiers = contact.get_chat_identifiers(contact_name)
 
     with sqlite3.connect(DB_PATH) as connection:
-        return DataFrameNamespace(
+        dfs = DataFrameNamespace(
             messages=get_messages_dataframe(connection, chat_identifiers, timezone),
             attachments=get_attachments_dataframe(
                 connection, chat_identifiers, timezone
             ),
         )
+        if dfs.messages.empty:
+            raise ConversationNotFoundError(
+                f'No conversation was found for the contact "{contact_name}"'
+            )
+        return dfs
 
 
 # Format the given header name to be more human-readable (e.g. "foo_bar" =>

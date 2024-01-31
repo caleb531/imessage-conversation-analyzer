@@ -13,3 +13,11 @@ class ContactNotFoundError(BaseAnalyzerException):
     """
 
     pass
+
+
+class ConversationNotFoundError(BaseAnalyzerException):
+    """
+    Raised when no conversation was found for the specified contact
+    """
+
+    pass
