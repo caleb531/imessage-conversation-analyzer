@@ -66,8 +66,9 @@ def format_record_value(
     base64
     """
     if type(value) is str and str(value).startswith(BASE64_PREFIX):
-        d = base64.standard_b64decode(value.removeprefix(BASE64_PREFIX).encode("utf-8"))
-        return d
+        return base64.standard_b64decode(
+            value.removeprefix(BASE64_PREFIX).encode("utf-8")
+        )
     else:
         return value
 
