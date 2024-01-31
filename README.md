@@ -175,6 +175,14 @@ results to other processes, or whatever you need to do!
 You can also import any built-in analyzer (for your own post-processing) via the
 `ica.analyzers` namespace.
 
+### Errors and exceptions
+
+- `BaseAnalyzerException`: the base exception class for all library-related
+  errors and exceptions
+- `ContactNotFoundError`: raised if the specified contact was not found
+- `ConversationNotFoundError`: raised if the specified conversation was not
+  found
+
 #### A note about timezones
 
 By default, all dates and times are in the local timezone of the system on which
