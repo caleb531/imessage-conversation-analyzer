@@ -11,6 +11,7 @@ import shutil
 import sqlite3
 import tempfile
 from collections.abc import Generator
+from pathlib import Path
 from typing import Any, Literal, Union
 from unittest import TestCase
 from unittest.mock import patch
@@ -81,12 +82,11 @@ def get_mock_data_for_db(
     """Retrieve the JSON mock data for the DB table with the given name"""
     for data_path in glob.iglob(f"tests/data/dbs/{db_name}/*.json"):
         table_name = os.path.splitext(os.path.basename(data_path))[0]
-        with open(data_path, "r") as data_file:
-            records = json.load(data_file)
-            yield table_name, [
-                {key: parse_record_value(value) for key, value in record.items()}
-                for record in records
-            ]
+        records = json.loads(Path(data_path).read_text())
+        yield table_name, [
+            {key: parse_record_value(value) for key, value in record.items()}
+            for record in records
+        ]
 
 
 def create_mock_db(db_name: MockDatabaseName, db_path: str) -> None:
