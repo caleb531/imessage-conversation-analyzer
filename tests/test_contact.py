@@ -13,10 +13,9 @@ case = unittest.TestCase()
 
 @with_setup(set_up)
 @with_teardown(tear_down)
-def test_has_conversation_via_phone_number_only() -> None:
+def test_find_conversation_via_phone_number_only() -> None:
     """
-    should not error if contact with conversation is missing email address but
-    has a phone number
+    should find conversation for contact with phone number only
     """
     dfs = ica.get_dataframes(contact_name="Daniel Brightingale")
     case.assertGreater(len(dfs.messages), 0)
@@ -24,10 +23,9 @@ def test_has_conversation_via_phone_number_only() -> None:
 
 @with_setup(set_up)
 @with_teardown(tear_down)
-def test_has_conversation_via_email_address_only() -> None:
+def test_find_conversation_via_email_address_only() -> None:
     """
-    should not error if contact with conversation is missing phone number but
-    has an email address
+    should find conversation for contact with email address only
     """
     dfs = ica.get_dataframes(contact_name="Thomas Riverstone")
     case.assertGreater(len(dfs.messages), 0)
@@ -37,7 +35,7 @@ def test_has_conversation_via_email_address_only() -> None:
 @with_teardown(tear_down)
 def test_has_contact_info_but_no_conversation() -> None:
     """
-    should not error if contact has phone number but no conversation
+    should return an empty dataframe if contact has info but no conversation
     """
     dfs = ica.get_dataframes(contact_name="Evelyn Oakhaven")
     case.assertEqual(len(dfs.messages), 0)
@@ -47,8 +45,8 @@ def test_has_contact_info_but_no_conversation() -> None:
 @with_teardown(tear_down)
 def test_missing_contact_info() -> None:
     """
-    should raise a ContactNotFoundError if contact exists but has no phone
-    number or email address on record
+    should raise a ContactNotFoundError if contact exists but has no contact
+    info
     """
     with case.assertRaises(ica.ContactNotFoundError):
         ica.get_dataframes(contact_name="Matthew Whisperton")
