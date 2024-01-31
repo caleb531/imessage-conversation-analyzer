@@ -14,6 +14,16 @@ import ica
 case = unittest.TestCase()
 
 
+def get_file_extension_from_format(format: str) -> str:
+    """
+    map the output format type to the specific file extension used for mock data
+    """
+    if format == "default":
+        return "txt"
+    else:
+        return format
+
+
 @params("default", "csv")
 def test_output_results_default_index(format: str) -> None:
     """should output a DataFrame with a default index"""
@@ -27,9 +37,10 @@ def test_output_results_default_index(format: str) -> None:
             ),
             format=format,
         )
+    ext = get_file_extension_from_format(format)
     case.assertEqual(
         out.getvalue().rstrip(),
-        Path(f"tests/data/output/{format}/output_results_default_index.txt")
+        Path(f"tests/data/output/{format}/output_results_default_index.{ext}")
         .read_text()
         .rstrip(),
     )
@@ -48,9 +59,10 @@ def test_output_results_labels_in_index(format: str) -> None:
             ).pipe(lambda df: df.set_index("metric")),
             format=format,
         )
+    ext = get_file_extension_from_format(format)
     case.assertEqual(
         out.getvalue().rstrip(),
-        Path(f"tests/data/output/{format}/output_results_labels_in_index.txt")
+        Path(f"tests/data/output/{format}/output_results_labels_in_index.{ext}")
         .read_text()
         .rstrip(),
     )
@@ -71,9 +83,10 @@ def test_output_results_date_index(format: str) -> None:
             .pipe(lambda df: df.set_index("date")),
             format=format,
         )
+    ext = get_file_extension_from_format(format)
     case.assertEqual(
         out.getvalue().rstrip(),
-        Path(f"tests/data/output/{format}/output_results_date_index.txt")
+        Path(f"tests/data/output/{format}/output_results_date_index.{ext}")
         .read_text()
         .rstrip(),
     )
