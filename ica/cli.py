@@ -74,8 +74,6 @@ def run_analyzer(analyzer: str) -> None:
         analyzer_module.__package__ = __package__
         loader.exec_module(analyzer_module)
         analyzer_module.main()
-    else:
-        return None
 
 
 # Program entry point
