@@ -83,8 +83,7 @@ def main() -> None:
     # Keep track of whether the user invokes the CLI directly via the `ica`
     # command
     global did_user_invoke_cli_directly
-    if not did_user_invoke_cli_directly:
-        did_user_invoke_cli_directly = True
+    did_user_invoke_cli_directly = True
 
     cli_args = get_cli_args()
 
