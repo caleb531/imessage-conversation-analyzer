@@ -13,6 +13,17 @@ case = unittest.TestCase()
 
 @with_setup(set_up)
 @with_teardown(tear_down)
+def test_has_conversation_via_phone_number_only() -> None:
+    """
+    should not error if contact with conversation is missing email address but
+    has a phone number
+    """
+    dfs = ica.get_dataframes(contact_name="Daniel Brightingale")
+    case.assertGreater(len(dfs.messages), 0)
+
+
+@with_setup(set_up)
+@with_teardown(tear_down)
 def test_has_conversation_via_email_address_only() -> None:
     """
     should not error if contact with conversation is missing phone number but
