@@ -88,6 +88,19 @@ def test_cli_run_analyzer_via_path() -> None:
 
 @with_setup(set_up_cli)
 @with_teardown(tear_down_cli)
+@patch("sys.argv", [cli.__file__, "message_totals", "-c", "Evelyn Oakhaven"])
+def test_cli_conversation_not_found() -> None:
+    """should print an error message if conversation was not found"""
+    with redirect_stderr(StringIO()) as out, case.assertRaises(SystemExit):
+        cli.main()
+    case.assertEqual(
+        out.getvalue().rstrip(),
+        'No conversation found for the contact "Evelyn Oakhaven"',
+    )
+
+
+@with_setup(set_up_cli)
+@with_teardown(tear_down_cli)
 @patch("sys.argv", [cli.__file__, "message_totals", "-c", "Imaginary Person"])
 def test_cli_contact_not_found() -> None:
     """should print an error message if contact was not found"""
