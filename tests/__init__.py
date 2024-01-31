@@ -58,14 +58,14 @@ def tear_down() -> None:
     contacts_db_glob_patcher.stop()
 
 
-def format_record_value(
+def parse_record_value(
     # JSON strings are always UTF-8, so a `bytes` string would never be passed
     # as one of the JSON values to format
     value: Union[str, int, float, bool]
 ) -> Union[str, bytes, int, float, bool]:
     """
-    Format the value of a mock database record, including decoding it if it's
-    base64
+    Parse the value of a mock database record, decoding the value if it's
+    base64, and simply passing it through otherwise
     """
     if type(value) is str and str(value).startswith(BASE64_PREFIX):
         return base64.standard_b64decode(
@@ -84,7 +84,7 @@ def get_mock_data_for_db(
         with open(data_path, "r") as data_file:
             records = json.load(data_file)
             yield table_name, [
-                {key: format_record_value(value) for key, value in record.items()}
+                {key: parse_record_value(value) for key, value in record.items()}
                 for record in records
             ]
 
