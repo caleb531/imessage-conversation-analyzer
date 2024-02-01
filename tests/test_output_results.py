@@ -14,7 +14,7 @@ import ica
 case = unittest.TestCase()
 
 
-@params((None, "txt"), ("csv", "csv"))
+@params((None, "txt"), ("csv", "csv"), ("markdown", "md"))
 def test_output_results_default_index(format: str, ext: str) -> None:
     """should output a DataFrame with a default index"""
     with redirect_stdout(StringIO()) as out:
@@ -35,7 +35,7 @@ def test_output_results_default_index(format: str, ext: str) -> None:
     )
 
 
-@params((None, "txt"), ("csv", "csv"))
+@params((None, "txt"), ("csv", "csv"), ("markdown", "md"))
 def test_output_results_labels_in_index(format: str, ext: str) -> None:
     """should output a DataFrame with a default index"""
     with redirect_stdout(StringIO()) as out:
@@ -56,7 +56,7 @@ def test_output_results_labels_in_index(format: str, ext: str) -> None:
     )
 
 
-@params((None, "txt"), ("csv", "csv"))
+@params((None, "txt"), ("csv", "csv"), ("markdown", "md"))
 def test_output_results_date_index(format: str, ext: str) -> None:
     """should output a DataFrame with a default index"""
     with redirect_stdout(StringIO()) as out:

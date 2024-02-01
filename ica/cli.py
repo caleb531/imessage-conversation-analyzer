@@ -49,6 +49,8 @@ def get_cli_args() -> argparse.Namespace:
         "-f",
         choices=(
             "csv",
+            "md",
+            "markdown",
             "xlsx",
             "excel",
         ),

@@ -246,6 +246,8 @@ def output_results(
         )
     elif format == "csv":
         output_df.to_csv(output, **output_args)
+    elif format in ("md", "markdown"):
+        output_df.to_markdown(output, **output_args)
     else:
         print(
             tabulate(
