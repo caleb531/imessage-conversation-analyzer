@@ -235,15 +235,17 @@ def output_results(
     if not output:
         output = StringIO()
 
+    # Keyword arguments passed to any of the to_* output methods
+    output_args: dict = {"index": not is_default_index}
+
     # Output executed DataFrame to correct format
     if format in ("xlsx", "excel"):
         output_df.to_excel(
             output,
-            index=not is_default_index,
-            header=output_df.columns,
+            **output_args,
         )
     elif format == "csv":
-        output_df.to_csv(output, index=not is_default_index, header=output_df.columns)
+        output_df.to_csv(output, **output_args)
     else:
         print(
             tabulate(
