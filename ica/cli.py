@@ -47,11 +47,25 @@ def get_cli_args() -> argparse.Namespace:
     parser.add_argument(
         "--format",
         "-f",
-        choices=("csv",),
+        choices=(
+            "csv",
+            "xlsx",
+            "excel",
+        ),
         help="an optional export format to output the analyzer results as",
     )
+    parser.add_argument(
+        "--output",
+        "-o",
+        help="the path of the file to export analyzer results to; required when"
+        " exporting Excel (xlsx) files",
+    )
 
-    return parser.parse_args()
+    cli_args = parser.parse_args()
+    if cli_args.format == "xlsx" and not cli_args.output:
+        parser.error("-o/--output must be specified when format is xlsx/excel")
+
+    return cli_args
 
 
 # Load the given metric file as a Python module, and return the DataFrame

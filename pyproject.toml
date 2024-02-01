@@ -16,6 +16,7 @@ dependencies = [
     "pandas",
     "pyarrow",
     "tabulate",
+    "xlsxwriter",
     "pytypedstream",
     "phonenumbers",
     "tzlocal"

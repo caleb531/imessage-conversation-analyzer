@@ -7,6 +7,7 @@ import os
 import os.path
 import sqlite3
 from dataclasses import dataclass
+from io import StringIO
 from typing import Union
 
 import pandas as pd
@@ -15,7 +16,7 @@ from tabulate import tabulate
 from typedstream.stream import TypedStreamReader
 
 import ica.contact as contact
-from ica.exceptions import ConversationNotFoundError
+from ica.exceptions import ConversationNotFoundError, OutputRequiredError
 
 # In order to interpolate the user-specified list of chat identifiers into the
 # SQL queries, we must join the list into a string delimited by a common
@@ -27,6 +28,12 @@ CHAT_IDENTIFIER_DELIMITER = "|"
 
 # The path to the database file for the macOS Messages application
 DB_PATH = os.path.expanduser(os.path.join("~", "Library", "Messages", "chat.db"))
+
+
+# The formats supported for file output, represented as a dictionary where each
+# key is the format name and the value is the file extension corresponding to
+# that format
+SUPPORTED_OUTPUT_FORMAT_MAP = {"csv": "csv", "excel": "xlsx"}
 
 
 @dataclass
@@ -162,8 +169,40 @@ def prettify_header_name(header_name: Union[str, int]) -> Union[str, int]:
         return header_name
 
 
+# Assuming an explicit format was not provided, infer the format from the
+# extension of the given output file path
+def infer_format_from_output_file_path(output: Union[str, None]) -> Union[str, None]:
+    if not output:
+        return None
+    _, ext = os.path.splitext(output)
+    if ext not in SUPPORTED_OUTPUT_FORMAT_MAP.values():
+        return None
+    return ext
+
+
+# Convert all of the datetime timstamps in the given dataframe to be
+# timezone-naive, including all columns and the index
+def make_dataframe_tz_naive(df: pd.DataFrame) -> pd.DataFrame:
+    return df.pipe(
+        lambda df: (
+            df.set_index(df.index.tz_localize(None))
+            if isinstance(df.index, pd.DatetimeIndex)
+            else df
+        )
+    ).assign(
+        **{
+            col: df[col].dt.tz_localize(None)
+            for col in df.select_dtypes(include=["datetime64[ns, UTC]"])
+        }
+    )
+
+
 # Print the given dataframe of metrics data
-def output_results(analyzer_df: pd.DataFrame, format: Union[str, None] = None) -> None:
+def output_results(
+    analyzer_df: pd.DataFrame,
+    format: Union[str, None] = None,
+    output: Union[str, None, StringIO] = None,
+) -> None:
     is_default_index = not analyzer_df.index.name
     output_df = (
         analyzer_df.rename(
@@ -180,11 +219,31 @@ def output_results(analyzer_df: pd.DataFrame, format: Union[str, None] = None) -
         # Make all indices start from 1 instead of 0, but only if the index is
         # the default (rather than a custom column)
         .pipe(lambda df: df.set_index(df.index + 1 if not df.index.name else df.index))
+        # Make dataframe timestamps timezone-naive (which is required for
+        # exporting to Excel)
+        .pipe(lambda df: make_dataframe_tz_naive(df))
     )
 
+    if not format and type(output) is str:
+        format = infer_format_from_output_file_path(output)
+
+    if format in ("xlsx", "excel") and not output:
+        raise OutputRequiredError(
+            'The \'output\' parameter is required when format="xlsx" or format="excel"'
+        )
+
+    if not output:
+        output = StringIO()
+
     # Output executed DataFrame to correct format
-    if format == "csv":
-        print(output_df.to_csv(index=not is_default_index, header=output_df.columns))
+    if format in ("xlsx", "excel"):
+        output_df.to_excel(
+            output,
+            index=not is_default_index,
+            header=output_df.columns,
+        )
+    elif format == "csv":
+        output_df.to_csv(output, index=not is_default_index, header=output_df.columns)
     else:
         print(
             tabulate(
@@ -197,3 +256,7 @@ def output_results(analyzer_df: pd.DataFrame, format: Union[str, None] = None) -
                 + list(output_df.columns),
             )
         )
+
+    # Print output if no output file path was supplied
+    if type(output) is StringIO:
+        print(output.getvalue())

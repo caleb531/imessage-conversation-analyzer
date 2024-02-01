@@ -31,6 +31,7 @@ def main() -> None:
             }
         ),
         format=cli_args.format,
+        output=cli_args.output,
     )
 
 
