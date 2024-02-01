@@ -7,7 +7,7 @@
 -- we opt for using a UNION ALL of a LEFT JOIN and RIGHT JOIN instead; we can
 -- also avoid duplicating the subquery for each WHERE clause by utilizing a
 -- Common Table Expression (CTE)
-WITH contact_search AS (
+WITH "contact_search" AS (
     SELECT
         "Z_PK"
     FROM "ZABCDRECORD"
@@ -32,7 +32,7 @@ SELECT
 FROM "ZABCDPHONENUMBER"
 LEFT JOIN "ZABCDEMAILADDRESS"
   ON "ZABCDPHONENUMBER"."ZOWNER" = "ZABCDEMAILADDRESS"."ZOWNER"
-WHERE "ZABCDPHONENUMBER"."ZOWNER" IN (SELECT * FROM contact_search)
+WHERE "ZABCDPHONENUMBER"."ZOWNER" IN (SELECT * FROM "contact_search")
 -- Combine the results of the LEFT JOIN queries into a single
 -- result set
 UNION ALL
@@ -45,4 +45,4 @@ FROM "ZABCDEMAILADDRESS"
 -- JOIN pretty easily by swapping the FROM and JOIN table names
 LEFT JOIN "ZABCDPHONENUMBER"
   ON "ZABCDEMAILADDRESS"."ZOWNER" = "ZABCDPHONENUMBER"."ZOWNER"
-WHERE "ZABCDEMAILADDRESS"."ZOWNER" IN (SELECT * FROM contact_search);
+WHERE "ZABCDEMAILADDRESS"."ZOWNER" IN (SELECT * FROM "contact_search");
