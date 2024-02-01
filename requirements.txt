@@ -17,6 +17,7 @@ pandas==2.2.0
 pathspec==0.12.1
 phonenumbers==8.13.29
 platformdirs==4.1.0
+pyarrow==15.0.0
 pycodestyle==2.11.1
 pyflakes==3.2.0
 pyproject_hooks==1.0.0
