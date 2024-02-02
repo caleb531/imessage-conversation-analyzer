@@ -29,7 +29,7 @@ test_cases = {
             "metric": ["Messages", "Reactions", "Attachments"],
             "total": [987, 654, 321],
         },
-    ).pipe(lambda df: df.set_index("metric")),
+    ).set_index("metric"),
     "date_index": pd.DataFrame(
         {
             "date": ["2024-01-26", "2024-01-27", "2024-01-28"],
@@ -37,7 +37,7 @@ test_cases = {
         },
     )
     .assign(date=lambda df: pd.to_datetime(df["date"]))
-    .pipe(lambda df: df.set_index("date")),
+    .set_index("date"),
 }
 
 

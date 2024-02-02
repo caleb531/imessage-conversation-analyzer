@@ -23,7 +23,7 @@ def main() -> None:
             )
             .resample("D", on="datetime")
             .sum()
-            .pipe(lambda df: df.rename_axis("date", axis=0))
+            .rename_axis("date", axis=0)
             .assign(is_from_them=lambda df: df["text"] - df["is_from_me"])
             # Do not include reaction data for brevity
             .drop(columns=["is_reaction"])
