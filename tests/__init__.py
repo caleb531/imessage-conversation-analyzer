@@ -24,14 +24,13 @@ MockDatabaseName = Union[Literal["chats"], Literal["contacts"]]
 
 # When running tests, point to mock sqlite3 database instead of the default
 # macOS chat.db under ~/Library
-temp_dir = tempfile.gettempdir()
-temp_db_dir = os.path.join(temp_dir, "ica")
+temp_ica_dir = os.path.join(tempfile.gettempdir(), "ica")
 
-mock_contacts_db_glob = os.path.join(temp_db_dir, "*.abcddb")
+mock_contacts_db_glob = os.path.join(temp_ica_dir, "*.abcddb")
 mock_contacts_db_path = mock_contacts_db_glob.replace("*", "addressbook")
 contacts_db_glob_patcher = patch("ica.contact.DB_GLOB", mock_contacts_db_glob)
 
-mock_chats_db_path = os.path.join(temp_db_dir, "chat.db")
+mock_chats_db_path = os.path.join(temp_ica_dir, "chat.db")
 chats_db_path_patcher = patch("ica.core.DB_PATH", mock_chats_db_path)
 
 
@@ -46,7 +45,7 @@ def set_up() -> None:
     contacts_db_glob_patcher.start()
     chats_db_path_patcher.start()
     with contextlib.suppress(OSError):
-        os.makedirs(temp_db_dir)
+        os.makedirs(temp_ica_dir)
     create_mock_db("contacts", mock_contacts_db_path)
     create_mock_db("chats", mock_chats_db_path)
 
@@ -54,7 +53,7 @@ def set_up() -> None:
 def tear_down() -> None:
     """global teardown fixture for all tests"""
     with contextlib.suppress(OSError):
-        shutil.rmtree(temp_db_dir)
+        shutil.rmtree(temp_ica_dir)
     chats_db_path_patcher.stop()
     contacts_db_glob_patcher.stop()
 
