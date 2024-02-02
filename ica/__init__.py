@@ -4,10 +4,10 @@
 from ica.cli import get_cli_args
 from ica.core import (
     DataFrameNamespace,
+    assign_lambda,
     get_dataframes,
     output_results,
-    wrap_assign_lambda,
-    wrap_pipe_lambda,
+    pipe_lambda,
 )
 from ica.exceptions import (
     BaseAnalyzerException,

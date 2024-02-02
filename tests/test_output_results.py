@@ -10,6 +10,7 @@ from pathlib import Path
 import pandas as pd
 
 import ica
+from ica import assign_lambda
 
 case = unittest.TestCase()
 
@@ -36,7 +37,7 @@ test_cases = {
             "total": [12, 45, 56],
         },
     )
-    .assign(date=ica.wrap_assign_lambda(lambda df: pd.to_datetime(df["date"])))
+    .assign(date=assign_lambda(lambda df: pd.to_datetime(df["date"])))
     .set_index("date"),
 }
 

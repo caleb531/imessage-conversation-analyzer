@@ -67,7 +67,7 @@ def decode_message_attributedbody(data: bytes) -> str:
     return ""
 
 
-def wrap_pipe_lambda(
+def pipe_lambda(
     df_lambda: Callable[[pd.DataFrame], pd.DataFrame]
 ) -> Callable[[pd.DataFrame], pd.DataFrame]:
     """
@@ -80,7 +80,7 @@ def wrap_pipe_lambda(
     return df_lambda
 
 
-def wrap_assign_lambda(
+def assign_lambda(
     df_lambda: Callable[[pd.DataFrame], pd.Series]
 ) -> Callable[[pd.DataFrame], pd.Series]:
     """
@@ -121,14 +121,14 @@ def get_messages_dataframe(
         # first, we must add the missing timezone information, then we must
         # convert the datetime to the specified timezone
         .assign(
-            datetime=wrap_assign_lambda(
+            datetime=assign_lambda(
                 lambda df: df["datetime"].dt.tz_localize("UTC").dt.tz_convert(timezone)
             )
         )
         # Decode any 'attributedBody' values and merge them into the 'text'
         # column
         .assign(
-            text=wrap_assign_lambda(
+            text=assign_lambda(
                 lambda df: df["text"].fillna(
                     df["attributedBody"].apply(decode_message_attributedbody)
                 )
@@ -139,7 +139,7 @@ def get_messages_dataframe(
         .drop("attributedBody", axis=1)
         # Use a regex-based heuristic to determine which messages are reactions
         .assign(
-            is_reaction=wrap_assign_lambda(
+            is_reaction=assign_lambda(
                 lambda df: df["text"].str.match(
                     r"^(Loved|Liked|Disliked|Laughed at|Emphasized|Questioned)"
                     r" (“(.*?)”|an \w+)$"
@@ -147,7 +147,7 @@ def get_messages_dataframe(
             )
         )
         # Convert 'is_from_me' values from integers to proper booleans
-        .assign(is_from_me=wrap_assign_lambda(lambda df: df["is_from_me"].astype(bool)))
+        .assign(is_from_me=assign_lambda(lambda df: df["is_from_me"].astype(bool)))
     )
 
 
@@ -214,7 +214,7 @@ def infer_format_from_output_file_path(output: Union[str, None]) -> Union[str, N
 # timezone-naive, including all columns and the index
 def make_dataframe_tz_naive(df: pd.DataFrame) -> pd.DataFrame:
     return df.pipe(
-        wrap_pipe_lambda(
+        pipe_lambda(
             lambda df: (
                 df.set_index(df.index.tz_localize(None))
                 if isinstance(df.index, pd.DatetimeIndex)
@@ -251,13 +251,13 @@ def output_results(
         # Make all indices start from 1 instead of 0, but only if the index is
         # the default (rather than a custom column)
         .pipe(
-            wrap_pipe_lambda(
+            pipe_lambda(
                 lambda df: df.set_index(df.index + 1 if not df.index.name else df.index)
             )
         )
         # Make dataframe timestamps timezone-naive (which is required for
         # exporting to Excel)
-        .pipe(wrap_pipe_lambda(lambda df: make_dataframe_tz_naive(df)))
+        .pipe(pipe_lambda(lambda df: make_dataframe_tz_naive(df)))
     )
 
     if not format and type(output) is str:

@@ -7,6 +7,7 @@ import re
 import pandas as pd
 
 import ica
+from ica import assign_lambda
 
 # The maximum number of most frequent emojis to output in the table
 EMOJI_DISPLAY_COUNT = 10
@@ -30,7 +31,7 @@ def main() -> None:
         (
             pd.DataFrame({"emoji": get_emoji_list(), "count": 0})
             .assign(
-                count=ica.wrap_assign_lambda(
+                count=assign_lambda(
                     lambda df: df["emoji"].apply(
                         lambda emoji: dfs.messages.query("is_reaction == False")
                         .get("text")
