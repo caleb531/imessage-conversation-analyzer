@@ -2,78 +2,55 @@
 """test the message_totals built-in analyzer"""
 
 import unittest
+from collections.abc import Generator
 from contextlib import redirect_stdout
 from io import StringIO
 from pathlib import Path
 
 import pandas as pd
-from nose2.tools import params
 
 import ica
 
 case = unittest.TestCase()
 
+# A series of tuples representing the output types; the first element of each
+# type is the format name, and the second element is the file extension
+output_types = ((None, "txt"), ("csv", "csv"), ("markdown", "md"))
 
-@params((None, "txt"), ("csv", "csv"), ("markdown", "md"))
-def test_output_results_default_index(format: str, ext: str) -> None:
-    """should output a DataFrame with a default index"""
-    with redirect_stdout(StringIO()) as out:
-        ica.output_results(
-            pd.DataFrame(
-                {
-                    "first": ["Steven", "Wes", "Martin"],
-                    "last": ["Spielberg", "Anderson", "Scorsese"],
-                }
-            ),
-            format=format,
-        )
-    case.assertEqual(
-        out.getvalue().rstrip(),
-        Path(f"tests/data/output/{ext}/output_results_default_index.{ext}")
-        .read_text()
-        .rstrip(),
+test_cases = {
+    "default_index": pd.DataFrame(
+        {
+            "first": ["Steven", "Wes", "Martin"],
+            "last": ["Spielberg", "Anderson", "Scorsese"],
+        }
+    ),
+    "labels_in_index": pd.DataFrame(
+        {
+            "metric": ["Messages", "Reactions", "Attachments"],
+            "total": [987, 654, 321],
+        },
+    ).pipe(lambda df: df.set_index("metric")),
+    "date_index": pd.DataFrame(
+        {
+            "date": ["2024-01-26", "2024-01-27", "2024-01-28"],
+            "total": [12, 45, 56],
+        },
     )
+    .assign(date=lambda df: pd.to_datetime(df["date"]))
+    .pipe(lambda df: df.set_index("date")),
+}
 
 
-@params((None, "txt"), ("csv", "csv"), ("markdown", "md"))
-def test_output_results_labels_in_index(format: str, ext: str) -> None:
-    """should output a DataFrame with a default index"""
-    with redirect_stdout(StringIO()) as out:
-        ica.output_results(
-            pd.DataFrame(
-                {
-                    "metric": ["Messages", "Reactions", "Attachments"],
-                    "total": [987, 654, 321],
-                },
-            ).pipe(lambda df: df.set_index("metric")),
-            format=format,
-        )
-    case.assertEqual(
-        out.getvalue().rstrip(),
-        Path(f"tests/data/output/{ext}/output_results_labels_in_index.{ext}")
-        .read_text()
-        .rstrip(),
-    )
-
-
-@params((None, "txt"), ("csv", "csv"), ("markdown", "md"))
-def test_output_results_date_index(format: str, ext: str) -> None:
-    """should output a DataFrame with a default index"""
-    with redirect_stdout(StringIO()) as out:
-        ica.output_results(
-            pd.DataFrame(
-                {
-                    "date": ["2024-01-26", "2024-01-27", "2024-01-28"],
-                    "total": [12, 45, 56],
-                },
+def test_output_results() -> Generator:
+    """should output a DataFrame under various cases"""
+    for test_name, df in test_cases.items():
+        for format, ext in output_types:
+            with redirect_stdout(StringIO()) as out:
+                ica.output_results(df, format=format)
+            yield (
+                case.assertEqual,
+                out.getvalue().rstrip(),
+                Path(f"tests/data/output/{ext}/output_results_{test_name}.{ext}")
+                .read_text()
+                .rstrip(),
             )
-            .assign(date=lambda df: pd.to_datetime(df["date"]))
-            .pipe(lambda df: df.set_index("date")),
-            format=format,
-        )
-    case.assertEqual(
-        out.getvalue().rstrip(),
-        Path(f"tests/data/output/{ext}/output_results_date_index.{ext}")
-        .read_text()
-        .rstrip(),
-    )
