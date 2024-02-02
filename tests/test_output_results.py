@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """test the message_totals built-in analyzer"""
 
+import itertools
 import unittest
-from collections.abc import Generator
 from contextlib import redirect_stdout
 from io import StringIO
 from pathlib import Path
 
 import pandas as pd
+from nose2.tools import params
 
 import ica
 from ica import assign_lambda
@@ -42,16 +43,19 @@ test_cases = {
 }
 
 
-def test_output_results() -> Generator:
+@params(*itertools.product(test_cases.items(), output_types))
+def test_output_results(
+    test_case: tuple[str, pd.DataFrame],
+    output_type: tuple[str, str],
+) -> None:
     """should output a DataFrame under various cases"""
-    for test_name, df in test_cases.items():
-        for format, ext in output_types:
-            with redirect_stdout(StringIO()) as out:
-                ica.output_results(df, format=format)
-            yield (
-                case.assertEqual,
-                out.getvalue().rstrip(),
-                Path(f"tests/data/output/{ext}/output_results_{test_name}.{ext}")
-                .read_text()
-                .rstrip(),
-            )
+    test_name, df = test_case
+    format, ext = output_type
+    with redirect_stdout(StringIO()) as out:
+        ica.output_results(df, format=format)
+        case.assertEqual(
+            out.getvalue().rstrip(),
+            Path(f"tests/data/output/{ext}/output_results_{test_name}.{ext}")
+            .read_text()
+            .rstrip(),
+        )
