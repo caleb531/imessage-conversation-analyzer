@@ -30,11 +30,19 @@ def get_sums_by_day(dfs: ica.DataFrameNamespace) -> pd.DataFrame:
         # Count all "text" column values by converting them to integers (always
         # 1), because resampling the DataFrame will remove all non-numeric
         # columns
-        .assign(text=lambda df: df["text"].apply(pd.to_numeric, errors="coerce").isna())
+        .assign(
+            text=ica.wrap_assign_lambda(
+                lambda df: df["text"].apply(pd.to_numeric, errors="coerce").isna()
+            )
+        )
         .resample("D", on="datetime")
         .sum()
         .rename_axis("date", axis=0)
-        .assign(is_from_them=lambda df: df["text"] - df["is_from_me"])
+        .assign(
+            is_from_them=ica.wrap_assign_lambda(
+                lambda df: df["text"] - df["is_from_me"]
+            )
+        )
     )
 
 

@@ -19,12 +19,18 @@ def main() -> None:
             # (always 1), because resampling the DataFrame will remove all
             # non-numeric columns
             .assign(
-                text=lambda df: df["text"].apply(pd.to_numeric, errors="coerce").isna()
+                text=ica.wrap_assign_lambda(
+                    lambda df: df["text"].apply(pd.to_numeric, errors="coerce").isna()
+                )
             )
             .resample("D", on="datetime")
             .sum()
             .rename_axis("date", axis=0)
-            .assign(is_from_them=lambda df: df["text"] - df["is_from_me"])
+            .assign(
+                is_from_them=ica.wrap_assign_lambda(
+                    lambda df: df["text"] - df["is_from_me"]
+                )
+            )
             # Do not include reaction data for brevity
             .drop(columns=["is_reaction"])
             # Rename columns to be more intuitive

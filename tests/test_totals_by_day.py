@@ -7,6 +7,7 @@ from unittest.mock import MagicMock, patch
 import pandas as pd
 from nose2.tools.decorators import with_setup, with_teardown
 
+import ica
 import ica.analyzers.totals_by_day as totals_by_day
 from tests import set_up, tear_down
 
@@ -28,7 +29,9 @@ def test_totals_by_day(output_results: MagicMock) -> None:
         # parsed from the JSON are missing timezone information (i.e. they are
         # timezone-naive); therefore, we must add the missing timezone
         # information (note that this does not perform any conversions)
-        .pipe(lambda df: df.set_index(df.index.tz_localize("UTC"))).to_dict(
+        .pipe(
+            ica.wrap_pipe_lambda(lambda df: df.set_index(df.index.tz_localize("UTC")))
+        ).to_dict(
             orient="index",
         ),
     )

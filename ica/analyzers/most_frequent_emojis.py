@@ -30,15 +30,17 @@ def main() -> None:
         (
             pd.DataFrame({"emoji": get_emoji_list(), "count": 0})
             .assign(
-                count=lambda df: df["emoji"].apply(
-                    lambda emoji: dfs.messages.query("is_reaction == False")
-                    .get("text")
-                    # A few emoji, like *️⃣, are regex special characters with
-                    # combining characters added to make them emoji; however,
-                    # because they are fundamentally regex special characters,
-                    # they will break the regex syntax unless escaped
-                    .str.count(re.escape(emoji))
-                    .sum()
+                count=ica.wrap_assign_lambda(
+                    lambda df: df["emoji"].apply(
+                        lambda emoji: dfs.messages.query("is_reaction == False")
+                        .get("text")
+                        # A few emoji, like *️⃣, are regex special characters with
+                        # combining characters added to make them emoji; however,
+                        # because they are fundamentally regex special characters,
+                        # they will break the regex syntax unless escaped
+                        .str.count(re.escape(emoji))
+                        .sum()
+                    )
                 )
             )
             .query("count > 0")

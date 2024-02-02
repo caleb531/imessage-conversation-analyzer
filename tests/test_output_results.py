@@ -36,7 +36,7 @@ test_cases = {
             "total": [12, 45, 56],
         },
     )
-    .assign(date=lambda df: pd.to_datetime(df["date"]))
+    .assign(date=ica.wrap_assign_lambda(lambda df: pd.to_datetime(df["date"])))
     .set_index("date"),
 }
 

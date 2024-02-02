@@ -8,7 +8,7 @@ import os.path
 import sqlite3
 from dataclasses import dataclass
 from io import StringIO
-from typing import Union
+from typing import Callable, Union
 
 import pandas as pd
 import tzlocal
@@ -67,6 +67,32 @@ def decode_message_attributedbody(data: bytes) -> str:
     return ""
 
 
+def wrap_pipe_lambda(
+    df_lambda: Callable[[pd.DataFrame], pd.DataFrame]
+) -> Callable[[pd.DataFrame], pd.DataFrame]:
+    """
+    If you pass a lambda to the DataFrame pipe() method, the type of the
+    dataframe parameter and the return type of the lambda will both be `Any`;
+    this breaks type-safety for the lambda itself and for subsequent chained
+    methods, but to work around this, we can introduce a wrapper function which,
+    when wrapped around the lambda, can enforce the proper type within mypy
+    """
+    return df_lambda
+
+
+def wrap_assign_lambda(
+    df_lambda: Callable[[pd.DataFrame], pd.Series]
+) -> Callable[[pd.DataFrame], pd.Series]:
+    """
+    If you pass a lambda to the DataFrame assign() method, the type of the
+    dataframe parameter and the return type of the lambda will both be `Any`;
+    this breaks type-safety for the lambda itself and for subsequent chained
+    methods, but to work around this, we can introduce a wrapper function which,
+    when wrapped around the lambda, can enforce the proper type within mypy
+    """
+    return df_lambda
+
+
 # Return a pandas dataframe representing all messages in a particular
 # conversation (identified by the given phone number)
 def get_messages_dataframe(
@@ -95,15 +121,17 @@ def get_messages_dataframe(
         # first, we must add the missing timezone information, then we must
         # convert the datetime to the specified timezone
         .assign(
-            datetime=lambda df: df["datetime"]
-            .dt.tz_localize("UTC")
-            .dt.tz_convert(timezone)
+            datetime=wrap_assign_lambda(
+                lambda df: df["datetime"].dt.tz_localize("UTC").dt.tz_convert(timezone)
+            )
         )
         # Decode any 'attributedBody' values and merge them into the 'text'
         # column
         .assign(
-            text=lambda df: df["text"].fillna(
-                df["attributedBody"].apply(decode_message_attributedbody)
+            text=wrap_assign_lambda(
+                lambda df: df["text"].fillna(
+                    df["attributedBody"].apply(decode_message_attributedbody)
+                )
             )
         )
         # Remove 'attributedBody' column now that it has been merged into the
@@ -111,13 +139,15 @@ def get_messages_dataframe(
         .drop("attributedBody", axis=1)
         # Use a regex-based heuristic to determine which messages are reactions
         .assign(
-            is_reaction=lambda df: df["text"].str.match(
-                r"^(Loved|Liked|Disliked|Laughed at|Emphasized|Questioned)"
-                r" (“(.*?)”|an \w+)$"
+            is_reaction=wrap_assign_lambda(
+                lambda df: df["text"].str.match(
+                    r"^(Loved|Liked|Disliked|Laughed at|Emphasized|Questioned)"
+                    r" (“(.*?)”|an \w+)$"
+                )
             )
         )
         # Convert 'is_from_me' values from integers to proper booleans
-        .assign(is_from_me=lambda df: df["is_from_me"].astype(bool))
+        .assign(is_from_me=wrap_assign_lambda(lambda df: df["is_from_me"].astype(bool)))
     )
 
 
@@ -184,10 +214,12 @@ def infer_format_from_output_file_path(output: Union[str, None]) -> Union[str, N
 # timezone-naive, including all columns and the index
 def make_dataframe_tz_naive(df: pd.DataFrame) -> pd.DataFrame:
     return df.pipe(
-        lambda df: (
-            df.set_index(df.index.tz_localize(None))
-            if isinstance(df.index, pd.DatetimeIndex)
-            else df
+        wrap_pipe_lambda(
+            lambda df: (
+                df.set_index(df.index.tz_localize(None))
+                if isinstance(df.index, pd.DatetimeIndex)
+                else df
+            )
         )
     ).assign(
         **{
@@ -218,10 +250,14 @@ def output_results(
         .rename_axis(prettify_header_name(analyzer_df.index.name), axis=0)
         # Make all indices start from 1 instead of 0, but only if the index is
         # the default (rather than a custom column)
-        .pipe(lambda df: df.set_index(df.index + 1 if not df.index.name else df.index))
+        .pipe(
+            wrap_pipe_lambda(
+                lambda df: df.set_index(df.index + 1 if not df.index.name else df.index)
+            )
+        )
         # Make dataframe timestamps timezone-naive (which is required for
         # exporting to Excel)
-        .pipe(lambda df: make_dataframe_tz_naive(df))
+        .pipe(wrap_pipe_lambda(lambda df: make_dataframe_tz_naive(df)))
     )
 
     if not format and type(output) is str:
