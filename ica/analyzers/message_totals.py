@@ -12,20 +12,28 @@ from ica import assign_lambda
 DATE_FORMAT = "%Y-%m-%d"
 
 
-# Retrieve the date of the very first message sent in the conversation
 def get_first_message_date(dfs: ica.DataFrameNamespace) -> datetime.datetime:
+    """
+    Retrieve the date of the very first message sent in the conversation
+    """
     datestr = str(dfs.messages["datetime"].min().strftime(DATE_FORMAT))
     return datetime.datetime.strptime(datestr, DATE_FORMAT)
 
 
-# Get all dates between (and including) the given two dates
 def get_dates_between(
     start_date: Union[str, datetime.datetime], end_date: Union[str, datetime.datetime]
 ) -> list[datetime.datetime]:
+    """
+    Get all dates between (and including) the given two dates; each date can be
+    either of type str or datetime
+    """
     return list(pd.date_range(start_date, end_date).strftime(DATE_FORMAT))
 
 
 def get_sums_by_day(dfs: ica.DataFrameNamespace) -> pd.DataFrame:
+    """
+    Calculate the text message sums, grouped by date
+    """
     return (
         dfs.messages
         # Count all "text" column values by converting them to integers (always
@@ -43,15 +51,19 @@ def get_sums_by_day(dfs: ica.DataFrameNamespace) -> pd.DataFrame:
     )
 
 
-# Get all dates sent
 def get_all_message_datestrs(dfs: ica.DataFrameNamespace) -> list[str]:
+    """
+    Retrieve a list of every date for which at least one message was sent
+    """
     sums_by_day = get_sums_by_day(dfs)
     return list(sums_by_day.query("text > 0").index)
 
 
-# Get the number of messages with no reply (i.e. only one message sent for that
-# day)
 def get_noreply_count(dfs: ica.DataFrameNamespace) -> int:
+    """
+    Generate a day-by-day breakdown of the number of messages sent where only
+    one person sent messages for that day
+    """
     sums_by_day = get_sums_by_day(dfs)
     return len(
         sums_by_day.query(
@@ -62,6 +74,10 @@ def get_noreply_count(dfs: ica.DataFrameNamespace) -> int:
 
 
 def main() -> None:
+    """
+    Generate a summary of message and reaction counts, by person and in total,
+    as well as other insightful metrics
+    """
     cli_args = ica.get_cli_args()
     dfs = ica.get_dataframes(
         contact_name=cli_args.contact_name, timezone=cli_args.timezone

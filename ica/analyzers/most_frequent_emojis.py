@@ -13,9 +13,11 @@ from ica import assign_lambda
 EMOJI_DISPLAY_COUNT = 10
 
 
-# Fetch a list of the most popular emoji on the Web to use as a basis for
-# computing this metric
 def get_emoji_list() -> list[str]:
+    """
+    Fetch a list of the most popular emoji on the Web to use as a basis for
+    computing this metric
+    """
     return json.loads(
         importlib.resources.files(__package__).joinpath("emojis.json").read_text()
     )
@@ -23,6 +25,10 @@ def get_emoji_list() -> list[str]:
 
 # Output the occurrences of specific emojis
 def main() -> None:
+    """
+    Generates count data for the top 10 most frequently used emojis across the
+    entire conversation
+    """
     cli_args = ica.get_cli_args()
     dfs = ica.get_dataframes(
         contact_name=cli_args.contact_name, timezone=cli_args.timezone

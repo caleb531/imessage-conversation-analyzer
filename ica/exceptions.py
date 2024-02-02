@@ -2,7 +2,9 @@
 
 
 class BaseAnalyzerException(Exception):
-    """A base exception class for iMessage Conversation Analyzer"""
+    """
+    A base exception class for iMessage Conversation Analyzer
+    """
 
     pass
 

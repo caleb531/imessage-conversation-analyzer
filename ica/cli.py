@@ -20,8 +20,10 @@ from ica.exceptions import BaseAnalyzerException
 did_user_invoke_cli_directly = False
 
 
-# Parse user arguments from the command line
 def get_cli_args() -> argparse.Namespace:
+    """
+    Parse user arguments from the command line
+    """
     global did_user_invoke_cli_directly
     parser = argparse.ArgumentParser()
     # Only accept an analyzer parameter if the user is interacting with the CLI
@@ -70,9 +72,11 @@ def get_cli_args() -> argparse.Namespace:
     return cli_args
 
 
-# Load the given metric file as a Python module, and return the DataFrame
-# provided by its analyze() function
 def run_analyzer(analyzer: str) -> None:
+    """
+    Load the given metric file as a Python module, and return the DataFrame
+    provided by its analyze() function
+    """
     # Check to see if the provided value is the module name of a built-in
     # analyzer, otherwise the value is an analyzer path
     with contextlib.suppress(ModuleNotFoundError):
@@ -92,8 +96,10 @@ def run_analyzer(analyzer: str) -> None:
         analyzer_module.main()
 
 
-# Program entry point
 def main() -> None:
+    """
+    Entry point for the `ica` CLI command
+    """
     # Keep track of whether the user invokes the CLI directly via the `ica`
     # command
     global did_user_invoke_cli_directly

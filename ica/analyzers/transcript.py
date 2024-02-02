@@ -5,13 +5,18 @@ import pandas as pd
 import ica
 
 
-# Convert a boolean value to "Yes"/"No"
 def convert_bool_to_yesno(value: bool) -> str:
+    """
+    Convert a boolean value to "Yes"/"No"
+    """
     return str(value).replace("True", "Yes").replace("False", "No")
 
 
-# Export the entire conversation
 def main() -> None:
+    """
+    Generates a full, unedited transcript of every message, including
+    reactions, between you and the other person (attachment files not included)
+    """
     cli_args = ica.get_cli_args()
     dfs = ica.get_dataframes(
         contact_name=cli_args.contact_name, timezone=cli_args.timezone

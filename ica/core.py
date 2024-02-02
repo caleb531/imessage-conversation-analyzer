@@ -38,14 +38,21 @@ SUPPORTED_OUTPUT_FORMAT_MAP = {"csv": "csv", "excel": "xlsx"}
 
 @dataclass
 class DataFrameNamespace:
+    """
+    The namespace containing the relevant dataframes for the specified user in
+    the chat database
+    """
+
     messages: pd.DataFrame
     attachments: pd.DataFrame
 
 
-# Join the list of chat identifiers into a delimited string; in order for the
-# SQL comparison to function properly, this string must also start and end with
-# the delimiter symbol
 def get_chat_identifier_str(chat_identifiers: list[str]) -> str:
+    """
+    Join the list of chat identifiers into a delimited string; in order for the
+    SQL comparison to function properly, this string must also start and end
+    with the delimiter symbol
+    """
     return "{start}{joined}{end}".format(
         start=CHAT_IDENTIFIER_DELIMITER,
         joined=CHAT_IDENTIFIER_DELIMITER.join(chat_identifiers),
@@ -53,11 +60,13 @@ def get_chat_identifier_str(chat_identifiers: list[str]) -> str:
     )
 
 
-# The textual contents of some messages are encoded in a special attributedBody
-# column on the message row; this attributedBody value is in Apple's proprietary
-# typedstream format, but can be parsed with the pytypedstream package
-# (<https://pypi.org/project/pytypedstream/>)
 def decode_message_attributedbody(data: bytes) -> str:
+    """
+    The textual contents of some messages are encoded in a special
+    attributedBody column on the message row; this attributedBody value is
+    in Apple's proprietary typedstream format, but can be parsed with the
+    pytypedstream package (<https://pypi.org/project/pytypedstream/>)
+    """
     if data:
         for event in TypedStreamReader.from_data(data):
             # The first bytes object is the one we want; it should be safe to
@@ -93,13 +102,15 @@ def assign_lambda(
     return df_lambda
 
 
-# Return a pandas dataframe representing all messages in a particular
-# conversation (identified by the given phone number)
 def get_messages_dataframe(
     connection: sqlite3.Connection,
     chat_identifiers: list[str],
     timezone: Union[str, None] = None,
 ) -> pd.DataFrame:
+    """
+    Return a pandas dataframe representing all messages in a particular
+    conversation (identified by the given phone number)
+    """
     # If no IANA timezone name is specified, default to the name of the system's
     # local timezone
     if not timezone:
@@ -151,13 +162,15 @@ def get_messages_dataframe(
     )
 
 
-# Return a pandas dataframe representing all attachments in a particular
-# conversation (identified by the given phone number)
 def get_attachments_dataframe(
     connection: sqlite3.Connection,
     chat_identifiers: list[str],
     timezone: Union[str, None] = None,
 ) -> pd.DataFrame:
+    """
+    Return a pandas dataframe representing all attachments in a particular
+    conversation (identified by the given phone number)
+    """
     return pd.read_sql_query(
         sql=importlib.resources.files(__package__)
         .joinpath(os.path.join("queries", "attachments.sql"))
@@ -170,10 +183,12 @@ def get_attachments_dataframe(
     )
 
 
-# Return all dataframes for a specific macOS Messages conversation
 def get_dataframes(
     contact_name: str, timezone: Union[str, None] = None
 ) -> DataFrameNamespace:
+    """
+    Return all dataframes for a specific macOS Messages conversation
+    """
     chat_identifiers = contact.get_chat_identifiers(contact_name)
 
     with sqlite3.connect(DB_PATH) as connection:
@@ -190,18 +205,22 @@ def get_dataframes(
         return dfs
 
 
-# Format the given header name to be more human-readable (e.g. "foo_bar" =>
-# "Foo Bar")
 def prettify_header_name(header_name: Union[str, int]) -> Union[str, int]:
+    """
+    Format the given header name to be more human-readable (e.g. "foo_bar" =>
+    "Foo Bar")
+    """
     if header_name and type(header_name) is str:
         return header_name.replace("_", " ").title()
     else:
         return header_name
 
 
-# Assuming an explicit format was not provided, infer the format from the
-# extension of the given output file path
 def infer_format_from_output_file_path(output: Union[str, None]) -> Union[str, None]:
+    """
+    Assuming an explicit format was not provided, infer the format from the
+    extension of the given output file path
+    """
     if not output:
         return None
     _, ext = os.path.splitext(output)
@@ -210,9 +229,11 @@ def infer_format_from_output_file_path(output: Union[str, None]) -> Union[str, N
     return ext
 
 
-# Convert all of the datetime timstamps in the given dataframe to be
-# timezone-naive, including all columns and the index
 def make_dataframe_tz_naive(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Convert all of the datetime timstamps in the given dataframe to be
+    timezone-naive, including all columns and the index
+    """
     return df.pipe(
         pipe_lambda(
             lambda df: (
@@ -229,12 +250,14 @@ def make_dataframe_tz_naive(df: pd.DataFrame) -> pd.DataFrame:
     )
 
 
-# Print the given dataframe of metrics data
 def output_results(
     analyzer_df: pd.DataFrame,
     format: Union[str, None] = None,
     output: Union[str, None, StringIO] = None,
 ) -> None:
+    """
+    Print the given dataframe of metrics data
+    """
     is_default_index = not analyzer_df.index.name
     output_df = (
         analyzer_df.rename(
