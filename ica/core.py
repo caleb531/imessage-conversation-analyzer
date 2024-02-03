@@ -309,10 +309,7 @@ def output_results(
 
     # Output executed DataFrame to correct format
     if format in ("xlsx", "excel"):
-        output_df.to_excel(
-            output,
-            **output_args,
-        )
+        output_df.to_excel(output, **output_args)
     elif format == "csv":
         output_df.to_csv(output, **output_args)
     elif format in ("md", "markdown"):
