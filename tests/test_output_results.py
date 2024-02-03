@@ -4,6 +4,7 @@
 import itertools
 import unittest
 from contextlib import redirect_stdout
+from enum import Enum
 from io import StringIO
 from pathlib import Path
 
@@ -15,6 +16,13 @@ from ica import assign_lambda
 from ica.core import prepare_df_for_output
 from tests import set_up, tear_down, temp_ica_dir
 
+
+class IndexType(Enum):
+
+    USE_DEFAULT_INDEX = True
+    USE_CUSTOM_INDEX = False
+
+
 # A series of tuples representing the output types; the first element of each
 # type is the format name, and the second element is the file extension
 output_types = (
@@ -23,28 +31,40 @@ output_types = (
     ("markdown", "md", "read_table"),
 )
 
-test_cases = {
-    "default_index": pd.DataFrame(
-        {
-            "first": ["Steven", "Wes", "Martin"],
-            "last": ["Spielberg", "Anderson", "Scorsese"],
-        }
+test_cases = (
+    (
+        "default_index",
+        pd.DataFrame(
+            {
+                "first": ["Steven", "Wes", "Martin"],
+                "last": ["Spielberg", "Anderson", "Scorsese"],
+            }
+        ),
+        IndexType.USE_DEFAULT_INDEX,
     ),
-    "labels_in_index": pd.DataFrame(
-        {
-            "metric": ["Messages", "Reactions", "Attachments"],
-            "total": [987, 654, 321],
-        },
-    ).set_index("metric"),
-    "date_index": pd.DataFrame(
-        {
-            "date": ["2024-01-26", "2024-01-27", "2024-01-28"],
-            "total": [12, 45, 56],
-        },
-    )
-    .assign(date=assign_lambda(lambda df: pd.to_datetime(df["date"])))
-    .set_index("date"),
-}
+    (
+        "labels_in_index",
+        pd.DataFrame(
+            {
+                "metric": ["Messages", "Reactions", "Attachments"],
+                "total": [987, 654, 321],
+            },
+        ).set_index("metric"),
+        IndexType.USE_CUSTOM_INDEX,
+    ),
+    (
+        "date_index",
+        pd.DataFrame(
+            {
+                "date": ["2024-01-26", "2024-01-27", "2024-01-28"],
+                "total": [12, 45, 56],
+            },
+        )
+        .assign(date=assign_lambda(lambda df: pd.to_datetime(df["date"])))
+        .set_index("date"),
+        IndexType.USE_CUSTOM_INDEX,
+    ),
+)
 
 
 class TestOutputResults(unittest.TestCase):
@@ -55,14 +75,14 @@ class TestOutputResults(unittest.TestCase):
     def tearDown(self) -> None:
         tear_down()
 
-    @params(*itertools.product(test_cases.items(), output_types))
+    @params(*itertools.product(test_cases, output_types))
     def test_output_results(
         self,
-        test_case: tuple[str, pd.DataFrame],
+        test_case: tuple[str, pd.DataFrame, IndexType],
         output_type: tuple[str, str, str],
     ) -> None:
         """should output a DataFrame under various cases"""
-        test_name, df = test_case
+        test_name, df, use_default_index = test_case
         format, ext, df_read_method_name = output_type
         with redirect_stdout(StringIO()) as out:
             ica.output_results(df, format=format)
@@ -75,7 +95,7 @@ class TestOutputResults(unittest.TestCase):
 
     @params(
         *itertools.product(
-            test_cases.items(),
+            test_cases,
             # Exclude 'txt' and 'markdown', and add 'excel' to the list of
             # output formats to test
             output_types[1:-1] + (("excel", "xlsx", "read_excel"),),
@@ -83,11 +103,11 @@ class TestOutputResults(unittest.TestCase):
     )
     def test_output_results_file(
         self,
-        test_case: tuple[str, pd.DataFrame],
+        test_case: tuple[str, pd.DataFrame, IndexType],
         output_type: tuple[str, str, str],
     ) -> None:
         """should print a DataFrame to stdout"""
-        test_name, df = test_case
+        test_name, df, use_default_index = test_case
         format, ext, df_read_method_name = output_type
         output_path = f"{temp_ica_dir}/{test_name}_{format}.{ext}"
         ica.output_results(
@@ -95,15 +115,20 @@ class TestOutputResults(unittest.TestCase):
             format=format,
             output=output_path,
         )
-        expected_df = prepare_df_for_output(df.reset_index())
+        expected_df = prepare_df_for_output(df)
         df_read_method = getattr(pd, df_read_method_name)
-        actual_df: pd.DataFrame = df_read_method(output_path)
+        actual_df: pd.DataFrame = df_read_method(
+            output_path,
+            index_col=None if use_default_index.value else 0,
+            parse_dates=True,
+            date_format="ISO8601",
+        )
+        # Use base-1 index if index is the default auto-incrementing index
+        # (since that's how prepare_df_for_output will normalize expected_df)
         actual_df.reset_index()
-        actual_df.index += 1
-        expected_df
-        # print("Actual:\n", actual_df)
-        # print("Expected:\n", expected_df)
-        # self.assertTrue(
-        #     actual_df.equals(expected_df),
-        #     f"Dataframes do not match: {actual_df.compare(expected_df)}",
-        # )
+        if use_default_index.value:
+            actual_df.index += 1
+        self.assertEqual(
+            actual_df.to_dict(orient="index"),
+            expected_df.to_dict(orient="index"),
+        )
