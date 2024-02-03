@@ -250,27 +250,24 @@ def make_dataframe_tz_naive(df: pd.DataFrame) -> pd.DataFrame:
     )
 
 
-def output_results(
-    analyzer_df: pd.DataFrame,
-    format: Union[str, None] = None,
-    output: Union[str, None, StringIO] = None,
-) -> None:
+def prepare_df_for_output(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Print the given dataframe of metrics data
+    Prepare the given dataframe for output by prettifying column names,
+    strippnig timezone details incompatible with Excel, and other normalization
+    operations; return the normalized dataframe
     """
-    is_default_index = not analyzer_df.index.name
-    output_df = (
-        analyzer_df.rename(
+    return (
+        df.rename(
             # Prettify header column (i.e. textual values in first column)
             index=prettify_header_name,
             # Prettify header row (i.e. column names)
             columns={
                 column_name: prettify_header_name(column_name)
-                for column_name in analyzer_df.columns
+                for column_name in df.columns
             },
         )
         # Prettify index column name
-        .rename_axis(prettify_header_name(analyzer_df.index.name), axis=0)
+        .rename_axis(prettify_header_name(df.index.name), axis=0)
         # Make all indices start from 1 instead of 0, but only if the index is
         # the default (rather than a custom column)
         .pipe(
@@ -282,6 +279,18 @@ def output_results(
         # exporting to Excel)
         .pipe(pipe_lambda(lambda df: make_dataframe_tz_naive(df)))
     )
+
+
+def output_results(
+    analyzer_df: pd.DataFrame,
+    format: Union[str, None] = None,
+    output: Union[str, None, StringIO] = None,
+) -> None:
+    """
+    Print the dataframe provided by an analyzer module
+    """
+    is_default_index = not analyzer_df.index.name
+    output_df = prepare_df_for_output(analyzer_df)
 
     if not format and type(output) is str:
         format = infer_format_from_output_file_path(output)
