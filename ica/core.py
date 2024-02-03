@@ -8,6 +8,7 @@ import os.path
 import sqlite3
 from dataclasses import dataclass
 from io import StringIO
+from pathlib import Path
 from typing import Callable, Union
 
 import pandas as pd
@@ -223,7 +224,7 @@ def infer_format_from_output_file_path(output: Union[str, None]) -> Union[str, N
     """
     if not output:
         return None
-    _, ext = os.path.splitext(output)
+    ext = Path(output).suffix[1:]
     if ext not in SUPPORTED_OUTPUT_FORMAT_MAP.values():
         return None
     return ext
