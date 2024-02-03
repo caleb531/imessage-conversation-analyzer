@@ -22,14 +22,6 @@ class IndexType(Enum):
     USE_CUSTOM_INDEX = False
 
 
-# A series of tuples representing the output types; the first element of each
-# type is the format name, and the second element is the file extension
-output_types = (
-    (None, "txt", "read_table"),
-    ("csv", "csv", "read_csv"),
-    ("markdown", "md", "read_table"),
-)
-
 test_cases = (
     (
         "default_index",
@@ -68,13 +60,22 @@ test_cases = (
 
 class TestOutputResults(ICATestCase):
 
-    @params(*itertools.product(test_cases, output_types))
+    @params(
+        *itertools.product(
+            test_cases,
+            (
+                (None, "txt", "read_table"),
+                ("csv", "csv", "read_csv"),
+                ("markdown", "md", "read_table"),
+            ),
+        )
+    )
     def test_output_results(
         self,
         test_case: tuple[str, pd.DataFrame, IndexType],
         output_type: tuple[str, str, str],
     ) -> None:
-        """should output a DataFrame under various cases"""
+        """should print a dataframe to stdout"""
         test_name, df, use_default_index = test_case
         format, ext, df_read_method_name = output_type
         with redirect_stdout(StringIO()) as out:
@@ -89,9 +90,12 @@ class TestOutputResults(ICATestCase):
     @params(
         *itertools.product(
             test_cases,
-            # Exclude 'txt' and 'markdown', and add 'excel' to the list of
-            # output formats to test
-            output_types[1:-1] + (("excel", "xlsx", "read_excel"),),
+            (
+                (None, "csv", "read_csv"),
+                ("csv", "csv", "read_csv"),
+                ("excel", "xlsx", "read_excel"),
+                (None, "xlsx", "read_excel"),
+            ),
         )
     )
     def test_output_results_file(
@@ -99,7 +103,7 @@ class TestOutputResults(ICATestCase):
         test_case: tuple[str, pd.DataFrame, IndexType],
         output_type: tuple[str, str, str],
     ) -> None:
-        """should print a DataFrame to stdout"""
+        """should write a DataFrame to file"""
         test_name, df, use_default_index = test_case
         format, ext, df_read_method_name = output_type
         output_path = f"{temp_ica_dir}/{test_name}_{format}.{ext}"
