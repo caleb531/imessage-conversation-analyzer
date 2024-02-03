@@ -325,8 +325,11 @@ def output_results(
                 # names, whereas tabulate represents all header row names as a
                 # single list; therefore, we must include the index name if this
                 # list if the index has a name
-                headers=([output_df.index.name] if output_df.index.name else [])
-                + list(output_df.columns),
+                headers=(
+                    [output_df.index.name, *output_df.columns]
+                    if output_df.index.name
+                    else output_df.columns
+                ),
             )
         )
 
