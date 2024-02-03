@@ -57,7 +57,6 @@ def main() -> None:
             .head(EMOJI_DISPLAY_COUNT)
         ),
         format=cli_args.format,
-        output=cli_args.output,
     )
 
 

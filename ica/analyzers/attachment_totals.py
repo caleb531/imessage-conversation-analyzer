@@ -47,7 +47,6 @@ def main() -> None:
         .set_index("type")
         .sort_values(by="total", ascending=False),
         format=cli_args.format,
-        output=cli_args.output,
     )
 
 

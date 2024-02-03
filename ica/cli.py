@@ -58,18 +58,7 @@ def get_cli_args() -> argparse.Namespace:
         ),
         help="an optional export format to output the analyzer results as",
     )
-    parser.add_argument(
-        "--output",
-        "-o",
-        help="the path of the file to export analyzer results to; required when"
-        " exporting Excel (xlsx) files",
-    )
-
-    cli_args = parser.parse_args()
-    if cli_args.format == "xlsx" and not cli_args.output:
-        parser.error("-o/--output must be specified when format is xlsx/excel")
-
-    return cli_args
+    return parser.parse_args()
 
 
 def run_analyzer(analyzer: str) -> None:
