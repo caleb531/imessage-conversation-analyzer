@@ -1,27 +1,20 @@
 #!/usr/bin/env python3
 """global test fixtures and helper methods"""
 
-import base64
 import contextlib
-import glob
-import json
 import os
 import os.path
 import shutil
-import sqlite3
 import tempfile
 import unittest
-from collections.abc import Generator
-from pathlib import Path
-from typing import Any, Literal, Union
 from unittest import TestCase
 from unittest.mock import patch
+
+from tests.mock_db_utils import create_mock_db
 
 # Disable maximum length of test diff output for all tests (source:
 # <https://stackoverflow.com/a/23617918/560642>)
 TestCase.maxDiff = None
-
-MockDatabaseName = Union[Literal["chats"], Literal["contacts"]]
 
 # When running tests, point to mock sqlite3 database instead of the default
 # macOS chat.db under ~/Library
@@ -35,79 +28,27 @@ mock_chats_db_path = os.path.join(temp_ica_dir, "chat.db")
 chats_db_path_patcher = patch("ica.core.DB_PATH", mock_chats_db_path)
 
 
-# A string prefix that can be placed at the beginning of any JSON string within
-# the mock data to indicate that the rest of the string is base64
-BASE64_PREFIX = "base64:"
-
-
-def set_up() -> None:
-    """global setup fixture for all tests"""
-    tear_down()  # in case something prevents tear_down() from running normally
-    contacts_db_glob_patcher.start()
-    chats_db_path_patcher.start()
-    with contextlib.suppress(OSError):
-        os.makedirs(temp_ica_dir)
-    create_mock_db("contacts", mock_contacts_db_path)
-    create_mock_db("chats", mock_chats_db_path)
-
-
-def tear_down() -> None:
-    """global teardown fixture for all tests"""
-    with contextlib.suppress(OSError):
-        shutil.rmtree(temp_ica_dir)
-    chats_db_path_patcher.stop()
-    contacts_db_glob_patcher.stop()
-
-
 class ICATestCase(unittest.TestCase):
+    """A base class from which all other ICA test case classes inherit"""
 
     def setUp(self) -> None:
-        set_up()
+        """global setup fixture for all tests"""
+        # If the user aborts the tests with control-C before all tests complete,
+        # it can prevent the teardown code from running, thus causing an error
+        # the next time tests are run because the database tables still exist;
+        # to fix this, we simply run the teardown logic before running the setup
+        # logic (we still run it at the end of every test, as well)
+        self.tearDown()
+        contacts_db_glob_patcher.start()
+        chats_db_path_patcher.start()
+        with contextlib.suppress(OSError):
+            os.makedirs(temp_ica_dir)
+        create_mock_db("contacts", mock_contacts_db_path)
+        create_mock_db("chats", mock_chats_db_path)
 
     def tearDown(self) -> None:
-        tear_down()
-
-
-def parse_record_value(
-    # JSON strings are always UTF-8, so a `bytes` string would never be passed
-    # as one of the JSON values to format
-    value: Union[str, int, float, bool]
-) -> Union[str, bytes, int, float, bool]:
-    """
-    Parse the value of a mock database record, decoding the value if it's
-    base64, and simply passing it through otherwise
-    """
-    if type(value) is str and str(value).startswith(BASE64_PREFIX):
-        return base64.standard_b64decode(
-            value.removeprefix(BASE64_PREFIX).encode("utf-8")
-        )
-    else:
-        return value
-
-
-def get_mock_data_for_db(
-    db_name: MockDatabaseName,
-) -> Generator[tuple[str, list[dict]], Any, Any]:
-    """Retrieve the JSON mock data for the DB table with the given name"""
-    for data_path in glob.iglob(f"tests/data/dbs/{db_name}/*.json"):
-        table_name = os.path.splitext(os.path.basename(data_path))[0]
-        records = json.loads(Path(data_path).read_text())
-        yield table_name, [
-            {key: parse_record_value(value) for key, value in record.items()}
-            for record in records
-        ]
-
-
-def create_mock_db(db_name: MockDatabaseName, db_path: str) -> None:
-    """Create and populate a mock database with the given name and path"""
-    with sqlite3.connect(db_path) as con:
-        for table_name, records in get_mock_data_for_db(db_name):
-            if not len(records):
-                continue
-            cur = con.cursor()
-            cur.execute(f"CREATE TABLE {table_name}({', '.join(records[0].keys())})")
-            key_placeholders = ", ".join(f":{key}" for key in records[0].keys())
-            cur.executemany(
-                f"INSERT INTO {table_name} VALUES({key_placeholders})", records
-            )
-            con.commit()
+        """global teardown fixture for all tests"""
+        with contextlib.suppress(OSError):
+            shutil.rmtree(temp_ica_dir)
+        chats_db_path_patcher.stop()
+        contacts_db_glob_patcher.stop()
