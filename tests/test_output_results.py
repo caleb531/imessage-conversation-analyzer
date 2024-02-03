@@ -2,7 +2,6 @@
 """test the message_totals built-in analyzer"""
 
 import itertools
-import unittest
 from contextlib import redirect_stdout
 from enum import Enum
 from io import StringIO
@@ -14,7 +13,7 @@ from nose2.tools import params
 import ica
 from ica import assign_lambda
 from ica.core import prepare_df_for_output
-from tests import set_up, tear_down, temp_ica_dir
+from tests import ICATestCase, temp_ica_dir
 
 
 class IndexType(Enum):
@@ -67,13 +66,7 @@ test_cases = (
 )
 
 
-class TestOutputResults(unittest.TestCase):
-
-    def setUp(self) -> None:
-        set_up()
-
-    def tearDown(self) -> None:
-        tear_down()
+class TestOutputResults(ICATestCase):
 
     @params(*itertools.product(test_cases, output_types))
     def test_output_results(

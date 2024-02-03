@@ -10,6 +10,7 @@ import os.path
 import shutil
 import sqlite3
 import tempfile
+import unittest
 from collections.abc import Generator
 from pathlib import Path
 from typing import Any, Literal, Union
@@ -56,6 +57,15 @@ def tear_down() -> None:
         shutil.rmtree(temp_ica_dir)
     chats_db_path_patcher.stop()
     contacts_db_glob_patcher.stop()
+
+
+class ICATestCase(unittest.TestCase):
+
+    def setUp(self) -> None:
+        set_up()
+
+    def tearDown(self) -> None:
+        tear_down()
 
 
 def parse_record_value(
