@@ -33,6 +33,9 @@ def main() -> None:
             .rename_axis("date", axis=0)
             # Filter out any rows for dates where neither person sent a message
             .pipe(pipe_lambda(lambda df: df[df["text"] != 0]))
+            # Add a column for the by-day number of messages from the other
+            # person, for convenience (even though it can technically be derived
+            # from the existing columns)
             .assign(
                 is_from_them=assign_lambda(lambda df: df["text"] - df["is_from_me"])
             )
