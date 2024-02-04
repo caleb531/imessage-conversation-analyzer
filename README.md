@@ -71,11 +71,11 @@ You can optionally pass the `-f`/`--format` flag to output to a specific format
 like CSV (supported formats include `csv`, `excel`/`xlsx`, and `markdown`/`md`).
 
 ```sh
-ica message_totals -c 'John Doe'
+ica message_totals -c 'John Doe' -f csv
 ```
 
 ```sh
-ica ./my_custom_analyzer.py -c 'John Doe'
+ica ./my_custom_analyzer.py -c 'John Doe' -f csv
 ```
 
 Finally, there is an optional `-o`/`--output` flag if you want to output to a
