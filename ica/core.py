@@ -6,8 +6,9 @@ import importlib.util
 import os
 import os.path
 import sqlite3
+import sys
 from dataclasses import dataclass
-from io import StringIO
+from io import BytesIO, StringIO
 from pathlib import Path
 from typing import Callable, Union
 
@@ -16,7 +17,7 @@ import tzlocal
 from typedstream.stream import TypedStreamReader
 
 import ica.contact as contact
-from ica.exceptions import ConversationNotFoundError, OutputRequiredError
+from ica.exceptions import ConversationNotFoundError
 
 # In order to interpolate the user-specified list of chat identifiers into the
 # SQL queries, we must join the list into a string delimited by a common
@@ -284,7 +285,7 @@ def prepare_df_for_output(df: pd.DataFrame) -> pd.DataFrame:
 def output_results(
     analyzer_df: pd.DataFrame,
     format: Union[str, None] = None,
-    output: Union[str, None, StringIO] = None,
+    output: Union[str, None, StringIO, BytesIO] = None,
 ) -> None:
     """
     Print the dataframe provided by an analyzer module
@@ -295,12 +296,9 @@ def output_results(
     if not format and type(output) is str:
         format = infer_format_from_output_file_path(output)
 
-    if format in ("xlsx", "excel") and not output:
-        raise OutputRequiredError(
-            'The \'output\' parameter is required when format="xlsx" or format="excel"'
-        )
-
-    if not output:
+    if not output and format in ("excel", "xlsx"):
+        output = BytesIO()
+    elif not output:
         output = StringIO()
 
     # Keyword arguments passed to any of the to_* output methods
@@ -325,5 +323,7 @@ def output_results(
         output_df.to_string(output, index=True, line_width=100000)
 
     # Print output if no output file path was supplied
-    if type(output) is StringIO:
-        print(output.getvalue())
+    if type(output) is BytesIO:
+        sys.stdout.buffer.write(output.getvalue())
+    elif type(output) is StringIO:
+        print(output.getvalue(), flush=True)
