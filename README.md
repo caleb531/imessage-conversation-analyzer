@@ -191,7 +191,7 @@ You can also import any built-in analyzer (for your own post-processing) via the
 - `ConversationNotFoundError`: raised if the specified conversation was not
   found
 
-#### A note about timezones
+#### Using a specific timezone
 
 By default, all dates and times are in the local timezone of the system on which
 ICA is run. If you'd like to change this, you can pass the `--timezone` / `-t`
