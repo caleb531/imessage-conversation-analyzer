@@ -110,6 +110,7 @@ class TestOutputResults(ICATestCase):
         ica.output_results(
             df,
             format=format,
+            output=output_path,
         )
         expected_df = prepare_df_for_output(df)
         df_read_method = getattr(pd, df_read_method_name)

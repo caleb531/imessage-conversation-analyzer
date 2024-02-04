@@ -6,9 +6,9 @@ import importlib.util
 import os
 import os.path
 import sqlite3
-import sys
 from dataclasses import dataclass
-from io import BytesIO, StringIO
+from io import StringIO
+from pathlib import Path
 from typing import Callable, Union
 
 import pandas as pd
@@ -17,7 +17,7 @@ from tabulate import tabulate
 from typedstream.stream import TypedStreamReader
 
 import ica.contact as contact
-from ica.exceptions import ConversationNotFoundError
+from ica.exceptions import ConversationNotFoundError, OutputRequiredError
 
 # In order to interpolate the user-specified list of chat identifiers into the
 # SQL queries, we must join the list into a string delimited by a common
@@ -217,6 +217,19 @@ def prettify_header_name(header_name: Union[str, int]) -> Union[str, int]:
         return header_name
 
 
+def infer_format_from_output_file_path(output: Union[str, None]) -> Union[str, None]:
+    """
+    Assuming an explicit format was not provided, infer the format from the
+    extension of the given output file path
+    """
+    if not output:
+        return None
+    ext = Path(output).suffix[1:]
+    if ext not in SUPPORTED_OUTPUT_FORMAT_MAP.values():
+        return None
+    return ext
+
+
 def make_dataframe_tz_naive(df: pd.DataFrame) -> pd.DataFrame:
     """
     Convert all of the datetime timstamps in the given dataframe to be
@@ -272,6 +285,7 @@ def prepare_df_for_output(df: pd.DataFrame) -> pd.DataFrame:
 def output_results(
     analyzer_df: pd.DataFrame,
     format: Union[str, None] = None,
+    output: Union[str, None, StringIO] = None,
 ) -> None:
     """
     Print the dataframe provided by an analyzer module
@@ -279,18 +293,27 @@ def output_results(
     is_default_index = not analyzer_df.index.name
     output_df = prepare_df_for_output(analyzer_df)
 
-    out: Union[StringIO, BytesIO] = StringIO()
+    if not format and type(output) is str:
+        format = infer_format_from_output_file_path(output)
+
+    if format in ("xlsx", "excel") and not output:
+        raise OutputRequiredError(
+            'The \'output\' parameter is required when format="xlsx" or format="excel"'
+        )
+
+    if not output:
+        output = StringIO()
+
     # Keyword arguments passed to any of the to_* output methods
     output_args: dict = {"index": not is_default_index}
 
     # Output executed DataFrame to correct format
     if format in ("xlsx", "excel"):
-        out = BytesIO()
-        output_df.to_excel(out, **output_args)
+        output_df.to_excel(output, **output_args)
     elif format == "csv":
-        output_df.to_csv(out, **output_args)
+        output_df.to_csv(output, **output_args)
     elif format in ("md", "markdown"):
-        output_df.to_markdown(out, **output_args)
+        output_df.to_markdown(output, **output_args)
     else:
         print(
             tabulate(
@@ -307,7 +330,6 @@ def output_results(
             )
         )
 
-    if type(out) is BytesIO:
-        sys.stdout.buffer.write(out.getvalue())
-    else:
-        print(out.getvalue())
+    # Print output if no output file path was supplied
+    if type(output) is StringIO:
+        print(output.getvalue())

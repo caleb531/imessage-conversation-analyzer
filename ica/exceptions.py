@@ -23,3 +23,12 @@ class ConversationNotFoundError(BaseAnalyzerException):
     """
 
     pass
+
+
+class OutputRequiredError(BaseAnalyzerException):
+    """
+    Raised when the specified format is xlsx/excel but no output path is
+    provided
+    """
+
+    pass

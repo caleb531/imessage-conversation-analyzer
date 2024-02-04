@@ -112,6 +112,7 @@ def main() -> None:
             {"metric": tuple(totals_map.keys()), "total": tuple(totals_map.values())},
         ).set_index("metric"),
         format=cli_args.format,
+        output=cli_args.output,
     )
 
 
