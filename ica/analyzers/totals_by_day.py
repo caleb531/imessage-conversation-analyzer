@@ -2,7 +2,7 @@
 import pandas as pd
 
 import ica
-from ica import assign_lambda
+from ica import assign_lambda, pipe_lambda
 
 # The format to use for all date strings
 DATE_FORMAT = "%Y-%m-%d"
@@ -31,6 +31,8 @@ def main() -> None:
             .resample("D", on="datetime")
             .sum()
             .rename_axis("date", axis=0)
+            # Filter out any rows for dates where neither person sent a message
+            .pipe(pipe_lambda(lambda df: df[df["text"] != 0]))
             .assign(
                 is_from_them=assign_lambda(lambda df: df["text"] - df["is_from_me"])
             )
