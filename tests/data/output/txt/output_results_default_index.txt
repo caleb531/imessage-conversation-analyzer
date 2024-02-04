@@ -1,5 +1,4 @@
-    First    Last
---  -------  ---------
- 1  Steven   Spielberg
- 2  Wes      Anderson
- 3  Martin   Scorsese
+    First       Last
+1  Steven  Spielberg
+2     Wes   Anderson
+3  Martin   Scorsese

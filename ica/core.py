@@ -13,7 +13,6 @@ from typing import Callable, Union
 
 import pandas as pd
 import tzlocal
-from tabulate import tabulate
 from typedstream.stream import TypedStreamReader
 
 import ica.contact as contact
@@ -315,20 +314,15 @@ def output_results(
     elif format in ("md", "markdown"):
         output_df.to_markdown(output, **output_args)
     else:
-        print(
-            tabulate(
-                output_df,
-                # pandas treats the index name separately from the other column
-                # names, whereas tabulate represents all header row names as a
-                # single list; therefore, we must include the index name if this
-                # list if the index has a name
-                headers=(
-                    [output_df.index.name, *output_df.columns]
-                    if output_df.index.name
-                    else output_df.columns
-                ),
-            )
-        )
+        # When we output the dataframe with to_string(), if the row index has a
+        # name, it will be displayed on a separate line underneath the line with
+        # the column names; this is because space needs to be reserved for the
+        # columns index name; to solve this, we can make the name of the row
+        # index the name of the column index, then remove the name from the row
+        # index (source: <https://stackoverflow.com/a/43635736/560642>)
+        output_df.columns.name = output_df.index.name
+        output_df.index.name = None
+        output_df.to_string(output, index=True, line_width=100000)
 
     # Print output if no output file path was supplied
     if type(output) is StringIO:
