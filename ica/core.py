@@ -296,9 +296,12 @@ def output_results(
     if not format and type(output) is str:
         format = infer_format_from_output_file_path(output)
 
+    output_not_specified: bool = False
     if not output and format in ("excel", "xlsx"):
+        output_not_specified = True
         output = BytesIO()
     elif not output:
+        output_not_specified = True
         output = StringIO()
 
     # Keyword arguments passed to any of the to_* output methods
@@ -323,7 +326,7 @@ def output_results(
         output_df.to_string(output, index=True, line_width=100000)
 
     # Print output if no output file path was supplied
-    if type(output) is BytesIO:
+    if output_not_specified and type(output) is BytesIO:
         sys.stdout.buffer.write(output.getvalue())
-    elif type(output) is StringIO:
+    elif output_not_specified and type(output) is StringIO:
         print(output.getvalue(), flush=True)

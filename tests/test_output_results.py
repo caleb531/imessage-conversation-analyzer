@@ -78,13 +78,13 @@ class TestOutputResults(ICATestCase):
         """should print a dataframe to stdout"""
         test_name, df, use_default_index = test_case
         format, ext, df_read_method_name = output_type
-        with redirect_stdout(StringIO()) as out:
+        with redirect_stdout(StringIO()) as stdout:
             ica.output_results(df, format=format)
             self.assertEqual(
-                out.getvalue().rstrip(),
-                Path(f"tests/data/output/{ext}/output_results_{test_name}.{ext}")
-                .read_text()
-                .rstrip(),
+                stdout.getvalue(),
+                Path(
+                    f"tests/data/output/{ext}/output_results_{test_name}.{ext}"
+                ).read_text(),
             )
 
     @params(
@@ -129,3 +129,25 @@ class TestOutputResults(ICATestCase):
             actual_df.to_dict(orient="index"),
             expected_df.to_dict(orient="index"),
         )
+
+    def test_output_results_buffer(
+        self,
+    ) -> None:
+        """should write a dataframe to a buffer, but not print to stdout"""
+        test_name, df, use_default_index = test_cases[0]
+        format = "csv"
+        ext = "csv"
+        out = StringIO()
+        with redirect_stdout(StringIO()) as stdout:
+            ica.output_results(
+                df,
+                format=format,
+                output=out,
+            )
+            self.assertEqual(stdout.getvalue(), "")
+            self.assertEqual(
+                out.getvalue() + "\n",
+                Path(
+                    f"tests/data/output/{ext}/output_results_{test_name}.{ext}"
+                ).read_text(),
+            )

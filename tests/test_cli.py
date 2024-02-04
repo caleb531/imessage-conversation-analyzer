@@ -83,6 +83,6 @@ class TestCLI(ICATestCase):
     @patch("sys.argv", [cli.__file__, "message_totals", "-c", "Jane Fernbrook"])
     def test_keyboardinterrupt(self, spec_from_loader: MagicMock) -> None:
         """should print a newline when user presses control-C"""
-        with redirect_stdout(StringIO()) as out:
+        with redirect_stdout(StringIO()) as stdout:
             cli.main()
-        self.assertEqual(out.getvalue(), "\n")
+        self.assertEqual(stdout.getvalue(), "\n")
