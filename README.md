@@ -148,8 +148,11 @@ def main() -> None:
                 ),
             }
         ),
-        # The default format (None) is the pandas default dataframe table format
+        # The default format (None) corresponds to the pandas default dataframe
+        # table format
         format=cli_args.format,
+        # When output is None (the default), ICA will print to stdout
+        output=cli_args.output,
     )
 
 
