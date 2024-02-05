@@ -127,9 +127,11 @@ import ica
 # Export a transcript of the entire conversation
 def main() -> None:
     # Allow your program to accept all the same CLI arguments as the `ica`
-    # command; you can skip calling this if have other means of specifying the contact name and output format
+    # command; you can skip calling this if have other means of specifying the
+    # contact name and output format
     cli_args = ica.get_cli_args()
-    # Retrieve the dataframes corresponding to the massaged contents of the database; dataframes include `message` and `attachment`
+    # Retrieve the dataframes corresponding to the massaged contents of the
+    # database; dataframes include `message` and `attachment`
     dfs = ica.get_dataframes(
         contact_name=cli_args.contact_name,
         timezone=cli_args.timezone
