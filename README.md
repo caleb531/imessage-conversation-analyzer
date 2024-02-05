@@ -71,11 +71,11 @@ You can optionally pass the `-f`/`--format` flag to output to a specific format
 like CSV (supported formats include `csv`, `excel`/`xlsx`, and `markdown`/`md`).
 
 ```sh
-ica message_totals -c 'John Doe' -f csv
+ica message_totals -c 'Jane Fernbrook' -f csv
 ```
 
 ```sh
-ica ./my_custom_analyzer.py -c 'John Doe' -f csv
+ica ./my_custom_analyzer.py -c 'Jane Fernbrook' -f csv
 ```
 
 Finally, there is an optional `-o`/`--output` flag if you want to output to a
@@ -84,7 +84,7 @@ extension, although you could also pass `--format` if you have special filename
 requirements.
 
 ```sh
-ica transcript -c 'John Doe' -o ./my_transcript.xlsx
+ica transcript -c 'Thomas Riverstone' -o ./my_transcript.xlsx
 ```
 
 #### Built-in analyzers
@@ -107,7 +107,7 @@ Again, to call one of these built-in analyzers, just pass it as the first
 argument to the `ica` command:
 
 ```sh
-ica most_frequent_emojis -c 'John Doe'
+ica most_frequent_emojis -c 'Jane Fernbrook'
 ```
 
 ### Python API
@@ -164,21 +164,21 @@ You can run the above program using the `ica` command, or execute it directly
 like any other Python program.
 
 ```sh
-ica ./get_my_transcript.py -c 'John Doe'
+ica ./get_my_transcript.py -c 'Thomas Riverstone'
 ```
 
 ```sh
-python ./get_my_transcript.py -c 'John Doe'
+python ./get_my_transcript.py -c 'Thomas Riverstone'
 ```
 
 ```sh
-python -m get_my_transcript -c 'John Doe'
+python -m get_my_transcript -c 'Thomas Riverstone'
 ```
 
 You're not limited to writing a command line program, though! The
 `ica.get_dataframes()` function is the only function you will need in any
 analyzer program. But beyond that, feel free to import other modules, send your
-results to other processes, or do whatever you need to do!
+results to other processes, or whatever you need to do!
 
 You can also import any built-in analyzer (for your own post-processing) via the
 `ica.analyzers` namespace.
@@ -198,11 +198,11 @@ ICA is run. If you'd like to change this, you can pass the `--timezone` / `-t`
 option to the CLI with an IANA timezone name.
 
 ```sh
-ica message_totals -c 'John Doe' -t UTC
+ica message_totals -c 'Daniel Brightingale' -t UTC
 ```
 
 ```sh
-ica message_totals -c 'John Doe' -t America/New_York
+ica message_totals -c 'Daniel Brightingale' -t America/New_York
 ```
 
 The equivalent option for the Python API is the `timezone` parameter to
