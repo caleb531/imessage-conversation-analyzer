@@ -178,7 +178,7 @@ python -m get_my_transcript -c 'John Doe'
 You're not limited to writing a command line program, though! The
 `ica.get_dataframes()` function is the only function you will need in any
 analyzer program. But beyond that, feel free to import other modules, send your
-results to other processes, or whatever you need to do!
+results to other processes, or do whatever you need to do!
 
 You can also import any built-in analyzer (for your own post-processing) via the
 `ica.analyzers` namespace.
