@@ -21,10 +21,11 @@ class TestTotalsByDay(ICATestCase):
         self.assertEqual(
             df.to_dict(orient="index"),
             pd.read_json("tests/data/totals_by_day.json", orient="index")
-            # ICA provides timezone-aware date/times, however the date/time objects
-            # parsed from the JSON are missing timezone information (i.e. they are
-            # timezone-naive); therefore, we must add the missing timezone
-            # information (note that this does not perform any conversions)
+            # ICA provides timezone-aware date/times, however the date/time
+            # objects parsed from the JSON are missing timezone information
+            # (i.e. they are timezone-naive); therefore, we must add the missing
+            # timezone information (note that this does not perform any
+            # conversions)
             .pipe(
                 pipe_lambda(lambda df: df.set_index(df.index.tz_localize("UTC")))
             ).to_dict(
