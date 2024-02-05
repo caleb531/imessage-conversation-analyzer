@@ -198,11 +198,11 @@ ICA is run. If you'd like to change this, you can pass the `--timezone` / `-t`
 option to the CLI with an IANA timezone name.
 
 ```sh
-ica message_totals -c 'Daniel Brightingale' -t UTC
+ica totals_by_day -c 'Daniel Brightingale' -t UTC
 ```
 
 ```sh
-ica message_totals -c 'Daniel Brightingale' -t America/New_York
+ica totals_by_day -c 'Daniel Brightingale' -t America/New_York
 ```
 
 The equivalent option for the Python API is the `timezone` parameter to
