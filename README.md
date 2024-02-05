@@ -134,7 +134,7 @@ def main() -> None:
         contact_name=cli_args.contact_name,
         timezone=cli_args.timezone
     )
-    # Send the results to stdout in the given format
+    # Send the results to stdout (or to file) in the given format
     ica.output_results(
         pd.DataFrame(
             {
