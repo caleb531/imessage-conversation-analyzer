@@ -67,6 +67,8 @@ To use ICA from the command line, simply invoke the `ica` command. The minimum r
    1. If the contact has no last name on record, you can just pass the first
       name
 
+### Other formats
+
 You can optionally pass the `-f`/`--format` flag to output to a specific format
 like CSV (supported formats include `csv`, `excel`/`xlsx`, and `markdown`/`md`).
 
@@ -77,6 +79,8 @@ ica message_totals -c 'Jane Fernbrook' -f csv
 ```sh
 ica ./my_custom_analyzer.py -c 'Jane Fernbrook' -f csv
 ```
+
+### Writing to a file
 
 Finally, there is an optional `-o`/`--output` flag if you want to output to a
 specified file. ICA will do its best to infer the format from the file
