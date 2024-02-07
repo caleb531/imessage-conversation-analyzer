@@ -17,6 +17,10 @@ from tests import ICATestCase, StdoutMockWithBuffer, temp_ica_dir
 
 
 class IndexType(Enum):
+    """
+    A boolean enum type indicating whether a DataFrame uses the default
+    (auto-incrementing) index versus setting a custom index
+    """
 
     USE_DEFAULT_INDEX = True
     USE_CUSTOM_INDEX = False
