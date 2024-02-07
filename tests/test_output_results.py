@@ -204,3 +204,21 @@ class TestOutputResults(ICATestCase):
         with self.assertRaises(ica.FormatNotSupportedError):
             with redirect_stdout(StringIO()):
                 ica.output_results(df, format="abc")
+
+    def test_output_results_cannot_infer_format(
+        self,
+    ) -> None:
+        """
+        should fall back to default format if format cannot be inferred from
+        output path's file extension
+        """
+        test_name, df, use_default_index = test_cases[0]
+        output_path = f"{temp_ica_dir}/output.abc"
+        ica.output_results(
+            df,
+            output=output_path,
+        )
+        self.assertEqual(
+            Path(output_path).read_text() + "\n",
+            Path(f"tests/data/output/txt/output_results_{test_name}.txt").read_text(),
+        )
