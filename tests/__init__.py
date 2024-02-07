@@ -7,6 +7,7 @@ import os.path
 import shutil
 import tempfile
 import unittest
+from io import BytesIO, StringIO
 from unittest import TestCase
 from unittest.mock import patch
 
@@ -52,3 +53,15 @@ class ICATestCase(unittest.TestCase):
             shutil.rmtree(temp_ica_dir)
         chats_db_path_patcher.stop()
         contacts_db_glob_patcher.stop()
+
+
+# The sys.stdout.buffer object is a readonly attribute, and not even
+# unittest.mock.patch is able to override it; however, we can subclass
+# StringIO() and add a 'buffer' object pointing to a BytesIO() object, then pass
+# an instance of this subclass to the stdlib contextlib.redirect_stdout context
+# manager without issue
+class StdoutMockWithBuffer(StringIO):
+
+    def __init__(self, initial_value: str = "", newline: str = "\n") -> None:
+        super().__init__(initial_value, newline)
+        object.__setattr__(self, "buffer", BytesIO())

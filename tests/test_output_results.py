@@ -13,7 +13,7 @@ from nose2.tools import params
 import ica
 from ica import assign_lambda
 from ica.core import prepare_df_for_output
-from tests import ICATestCase, temp_ica_dir
+from tests import ICATestCase, StdoutMockWithBuffer, temp_ica_dir
 
 
 class IndexType(Enum):
@@ -85,6 +85,26 @@ class TestOutputResults(ICATestCase):
                 Path(
                     f"tests/data/output/{ext}/output_results_{test_name}.{ext}"
                 ).read_text(),
+            )
+
+    def test_output_results_bytes(
+        self,
+    ) -> None:
+        """
+        should print the dataframe to stdout as binary Excel data
+        """
+        test_name, df, use_default_index = test_cases[0]
+        with redirect_stdout(StdoutMockWithBuffer()) as stdout:
+            ica.output_results(
+                df,
+                format="excel",
+            )
+            self.assertEqual(stdout.getvalue(), "")
+            expected_df = prepare_df_for_output(df)
+            actual_df = prepare_df_for_output(pd.read_excel(stdout.buffer))
+            self.assertEqual(
+                expected_df.to_dict(orient="index"),
+                actual_df.to_dict(orient="index"),
             )
 
     @params(
