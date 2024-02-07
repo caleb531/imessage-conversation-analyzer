@@ -87,9 +87,7 @@ class TestOutputResults(ICATestCase):
                 ).read_text(),
             )
 
-    def test_output_results_bytes(
-        self,
-    ) -> None:
+    def test_output_results_bytes(self) -> None:
         """
         should print the dataframe to stdout as binary Excel data
         """
@@ -147,9 +145,7 @@ class TestOutputResults(ICATestCase):
             expected_df.to_dict(orient="index"),
         )
 
-    def test_output_results_string_buffer(
-        self,
-    ) -> None:
+    def test_output_results_string_buffer(self) -> None:
         """
         should write a dataframe to an explicitly-passed StringIO buffer, but
         not print to stdout
@@ -172,9 +168,7 @@ class TestOutputResults(ICATestCase):
                 ).read_text(),
             )
 
-    def test_output_results_bytes_buffer(
-        self,
-    ) -> None:
+    def test_output_results_bytes_buffer(self) -> None:
         """
         should write a dataframe to an explicitly-passed BytesIO buffer, but not
         print to stdout
@@ -196,18 +190,14 @@ class TestOutputResults(ICATestCase):
                 actual_df.to_dict(orient="index"),
             )
 
-    def test_output_results_invalid_format(
-        self,
-    ) -> None:
+    def test_output_results_invalid_format(self) -> None:
         """should raise an error if format is invalid"""
         test_name, df, use_default_index = test_cases[0]
         with self.assertRaises(ica.FormatNotSupportedError):
             with redirect_stdout(StringIO()):
                 ica.output_results(df, format="abc")
 
-    def test_output_results_cannot_infer_format(
-        self,
-    ) -> None:
+    def test_output_results_cannot_infer_format(self) -> None:
         """
         should fall back to default format if format cannot be inferred from
         output path's file extension
@@ -223,9 +213,7 @@ class TestOutputResults(ICATestCase):
             Path(f"tests/data/output/txt/output_results_{test_name}.txt").read_text(),
         )
 
-    def test_output_results_empty_output_string(
-        self,
-    ) -> None:
+    def test_output_results_empty_output_string(self) -> None:
         """
         should print to stdout using default format if output is an empty string
         """
