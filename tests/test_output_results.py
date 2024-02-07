@@ -6,6 +6,7 @@ from contextlib import redirect_stdout
 from enum import Enum
 from io import BytesIO, StringIO
 from pathlib import Path
+from typing import Union
 
 import pandas as pd
 from nose2.tools import params
@@ -91,19 +92,34 @@ class TestOutputResults(ICATestCase):
                 ).read_text(),
             )
 
-    def test_output_results_bytes(self) -> None:
+    @params(
+        *itertools.product(
+            test_cases,
+            ("excel",),
+        )
+    )
+    def test_output_results_bytes(
+        self,
+        test_case: tuple[str, pd.DataFrame, IndexType],
+        format: Union[str, None],
+    ) -> None:
         """
         should print the dataframe to stdout as binary Excel data
         """
-        test_name, df, use_default_index = test_cases[0]
+        test_name, df, use_default_index = test_case
         with redirect_stdout(StdoutMockWithBuffer()) as stdout:
             ica.output_results(
                 df,
-                format="excel",
+                format=format,
             )
             self.assertEqual(stdout.getvalue(), "")
             expected_df = prepare_df_for_output(df)
-            actual_df = prepare_df_for_output(pd.read_excel(stdout.buffer))
+            actual_df = prepare_df_for_output(
+                pd.read_excel(
+                    stdout.buffer,
+                    index_col=None if use_default_index.value else 0,
+                )
+            )
             self.assertEqual(
                 expected_df.to_dict(orient="index"),
                 actual_df.to_dict(orient="index"),
