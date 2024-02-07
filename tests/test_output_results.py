@@ -222,3 +222,22 @@ class TestOutputResults(ICATestCase):
             Path(output_path).read_text() + "\n",
             Path(f"tests/data/output/txt/output_results_{test_name}.txt").read_text(),
         )
+
+    def test_output_results_empty_output_string(
+        self,
+    ) -> None:
+        """
+        should print to stdout using default format if output is an empty string
+        """
+        test_name, df, use_default_index = test_cases[0]
+        with redirect_stdout(StringIO()) as stdout:
+            ica.output_results(
+                df,
+                output="",
+            )
+            self.assertEqual(
+                stdout.getvalue(),
+                Path(
+                    f"tests/data/output/txt/output_results_{test_name}.txt"
+                ).read_text(),
+            )
