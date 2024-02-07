@@ -114,17 +114,14 @@ class TestOutputResults(ICATestCase):
         )
         expected_df = prepare_df_for_output(df)
         df_read_method = getattr(pd, df_read_method_name)
-        actual_df: pd.DataFrame = df_read_method(
-            output_path,
-            index_col=None if use_default_index.value else 0,
-            parse_dates=True,
-            date_format="ISO8601",
+        actual_df: pd.DataFrame = prepare_df_for_output(
+            df_read_method(
+                output_path,
+                index_col=None if use_default_index.value else 0,
+                parse_dates=True,
+                date_format="ISO8601",
+            )
         )
-        # Use base-1 index if index is the default auto-incrementing index
-        # (since that's how prepare_df_for_output will normalize expected_df)
-        actual_df.reset_index()
-        if use_default_index.value:
-            actual_df.index += 1
         self.assertEqual(
             actual_df.to_dict(orient="index"),
             expected_df.to_dict(orient="index"),
