@@ -323,15 +323,19 @@ def output_results(
     elif format in ("md", "markdown"):
         output_df.to_markdown(output, **output_args)
     else:
-        # When we output the dataframe with to_string(), if the row index has a
-        # name, it will be displayed on a separate line underneath the line with
-        # the column names; this is because space needs to be reserved for the
-        # columns index name; to solve this, we can make the name of the row
-        # index the name of the column index, then remove the name from the row
-        # index (source: <https://stackoverflow.com/a/43635736/560642>)
-        output_df.columns.name = output_df.index.name
-        output_df.index.name = None
-        output_df.to_string(output, index=True, line_width=100000)
+        (
+            output_df
+            # When we output the dataframe with to_string(), if the row index
+            # has a name, it will be displayed on a separate line underneath the
+            # line with the column names; this is because space needs to be
+            # reserved for the columns index name; to solve this, we can make
+            # the name of the row index the name of the column index, then
+            # remove the name from the row index (source:
+            # <https://stackoverflow.com/a/43635736/560642>)
+            .rename_axis(output_df.index.name, axis="columns")
+            .rename_axis(None, axis="index")
+            .to_string(output, index=True, line_width=100000)
+        )
 
     # Print output if no output file path was supplied
     if output_not_specified and type(output) is BytesIO:
