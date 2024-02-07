@@ -151,3 +151,12 @@ class TestOutputResults(ICATestCase):
                     f"tests/data/output/{ext}/output_results_{test_name}.{ext}"
                 ).read_text(),
             )
+
+    def test_output_results_invalid_format(
+        self,
+    ) -> None:
+        """should raise an error if format is invalid"""
+        test_name, df, use_default_index = test_cases[0]
+        with self.assertRaises(ica.FormatNotSupportedError):
+            with redirect_stdout(StringIO()):
+                ica.output_results(df, format="abc")

@@ -13,4 +13,5 @@ from ica.exceptions import (
     BaseAnalyzerException,
     ContactNotFoundError,
     ConversationNotFoundError,
+    FormatNotSupportedError,
 )

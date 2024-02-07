@@ -17,7 +17,7 @@ import tzlocal
 from typedstream.stream import TypedStreamReader
 
 import ica.contact as contact
-from ica.exceptions import ConversationNotFoundError
+from ica.exceptions import ConversationNotFoundError, FormatNotSupportedError
 
 # In order to interpolate the user-specified list of chat identifiers into the
 # SQL queries, we must join the list into a string delimited by a common
@@ -292,6 +292,14 @@ def output_results(
     """
     is_default_index = not analyzer_df.index.name
     output_df = prepare_df_for_output(analyzer_df)
+
+    if format and format not in {
+        *SUPPORTED_OUTPUT_FORMAT_MAP.keys(),
+        *SUPPORTED_OUTPUT_FORMAT_MAP.values(),
+    }:
+        raise FormatNotSupportedError(
+            f'The format "{format}" is not supported for output'
+        )
 
     if not format and type(output) is str:
         format = infer_format_from_output_file_path(output)

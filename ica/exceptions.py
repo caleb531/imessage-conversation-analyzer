@@ -23,3 +23,11 @@ class ConversationNotFoundError(BaseAnalyzerException):
     """
 
     pass
+
+
+class FormatNotSupportedError(BaseAnalyzerException):
+    """
+    Raised when the specified format is not supported by the library
+    """
+
+    pass
