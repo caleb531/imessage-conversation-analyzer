@@ -34,7 +34,7 @@ DB_PATH = os.path.expanduser(os.path.join("~", "Library", "Messages", "chat.db")
 # The formats supported for file output, represented as a dictionary where each
 # key is the format name and the value is the file extension corresponding to
 # that format
-SUPPORTED_OUTPUT_FORMAT_MAP = {"csv": "csv", "excel": "xlsx"}
+SUPPORTED_OUTPUT_FORMAT_MAP = {"csv": "csv", "excel": "xlsx", "markdown": "md"}
 
 
 @dataclass
