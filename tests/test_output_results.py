@@ -113,21 +113,49 @@ class TestOutputResults(ICATestCase):
         *itertools.product(
             test_cases,
             (
-                (None, "csv", "read_csv"),
-                ("csv", "csv", "read_csv"),
-                ("excel", "xlsx", "read_excel"),
-                (None, "xlsx", "read_excel"),
+                (None, "csv"),
+                ("csv", "csv"),
             ),
         )
     )
-    def test_output_results_file(
+    def test_output_results_file_plaintext(
         self,
         test_case: tuple[str, pd.DataFrame, IndexType],
-        output_type: tuple[str, str, str],
+        output_type: tuple[str, str],
     ) -> None:
-        """should write a DataFrame to file"""
+        """should write a DataFrame to a plain-text file"""
         test_name, df, use_default_index = test_case
-        format, ext, df_read_method_name = output_type
+        format, ext = output_type
+        output_path = f"{temp_ica_dir}/{test_name}_{format}.{ext}"
+        ica.output_results(
+            df,
+            format=format,
+            output=output_path,
+        )
+        self.assertEqual(
+            Path(output_path).read_text() + "\n",
+            Path(
+                f"tests/data/output/{ext}/output_results_{test_name}.{ext}"
+            ).read_text(),
+        )
+
+    @params(
+        *itertools.product(
+            test_cases,
+            (
+                ("excel", "xlsx"),
+                (None, "xlsx"),
+            ),
+        )
+    )
+    def test_output_results_file_binary(
+        self,
+        test_case: tuple[str, pd.DataFrame, IndexType],
+        output_type: tuple[str, str],
+    ) -> None:
+        """should write a DataFrame to a binary file (i.e. Excel)"""
+        test_name, df, use_default_index = test_case
+        format, ext = output_type
         output_path = f"{temp_ica_dir}/{test_name}_{format}.{ext}"
         ica.output_results(
             df,
@@ -135,9 +163,8 @@ class TestOutputResults(ICATestCase):
             output=output_path,
         )
         expected_df = prepare_df_for_output(df)
-        df_read_method = getattr(pd, df_read_method_name)
         actual_df: pd.DataFrame = prepare_df_for_output(
-            df_read_method(
+            pd.read_excel(
                 output_path,
                 index_col=None if use_default_index.value else 0,
                 parse_dates=True,
