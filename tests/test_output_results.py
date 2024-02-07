@@ -4,7 +4,7 @@
 import itertools
 from contextlib import redirect_stdout
 from enum import Enum
-from io import StringIO
+from io import BytesIO, StringIO
 from pathlib import Path
 
 import pandas as pd
@@ -130,10 +130,13 @@ class TestOutputResults(ICATestCase):
             expected_df.to_dict(orient="index"),
         )
 
-    def test_output_results_buffer(
+    def test_output_results_string_buffer(
         self,
     ) -> None:
-        """should write a dataframe to a buffer, but not print to stdout"""
+        """
+        should write a dataframe to an explicitly-passed StringIO buffer, but
+        not print to stdout
+        """
         test_name, df, use_default_index = test_cases[0]
         format = "csv"
         ext = "csv"
@@ -150,6 +153,30 @@ class TestOutputResults(ICATestCase):
                 Path(
                     f"tests/data/output/{ext}/output_results_{test_name}.{ext}"
                 ).read_text(),
+            )
+
+    def test_output_results_bytes_buffer(
+        self,
+    ) -> None:
+        """
+        should write a dataframe to an explicitly-passed BytesIO buffer, but not
+        print to stdout
+        """
+        test_name, df, use_default_index = test_cases[0]
+        format = "excel"
+        out = BytesIO()
+        with redirect_stdout(StringIO()) as stdout:
+            ica.output_results(
+                df,
+                format=format,
+                output=out,
+            )
+            self.assertEqual(stdout.getvalue(), "")
+            expected_df = prepare_df_for_output(df)
+            actual_df = prepare_df_for_output(pd.read_excel(out))
+            self.assertEqual(
+                expected_df.to_dict(orient="index"),
+                actual_df.to_dict(orient="index"),
             )
 
     def test_output_results_invalid_format(
