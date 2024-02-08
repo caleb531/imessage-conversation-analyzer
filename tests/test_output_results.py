@@ -192,14 +192,27 @@ class TestOutputResults(ICATestCase):
             expected_df.to_dict(orient="index"),
         )
 
-    def test_output_results_string_buffer(self) -> None:
+    @params(
+        *itertools.product(
+            test_cases,
+            (
+                (None, "txt"),
+                ("csv", "csv"),
+                ("markdown", "md"),
+            ),
+        )
+    )
+    def test_output_results_string_buffer(
+        self,
+        test_case: tuple[str, pd.DataFrame, IndexType],
+        output_type: tuple[str, str],
+    ) -> None:
         """
         should write a dataframe to an explicitly-passed StringIO buffer, but
         not print to stdout
         """
-        test_name, df, use_default_index = test_cases[0]
-        format = "csv"
-        ext = "csv"
+        test_name, df, use_default_index = test_case
+        format, ext = output_type
         out = StringIO()
         with redirect_stdout(StringIO()) as stdout:
             ica.output_results(
