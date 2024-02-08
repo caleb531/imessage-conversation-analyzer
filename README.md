@@ -196,6 +196,8 @@ You can also import any built-in analyzer (for your own post-processing) via the
 - `ContactNotFoundError`: raised if the specified contact was not found
 - `ConversationNotFoundError`: raised if the specified conversation was not
   found
+- `FormatNotSupportedError`: raised if the specified format is not supported by
+  the library
 
 #### Using a specific timezone
 
