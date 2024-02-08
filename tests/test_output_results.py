@@ -131,6 +131,8 @@ class TestOutputResults(ICATestCase):
             (
                 (None, "csv"),
                 ("csv", "csv"),
+                (None, "md"),
+                ("markdown", "md"),
             ),
         )
     )
