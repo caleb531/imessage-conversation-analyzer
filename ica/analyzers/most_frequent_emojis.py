@@ -7,7 +7,6 @@ import re
 import pandas as pd
 
 import ica
-from ica import assign_lambda
 
 # The maximum number of most frequent emojis to output in the table
 EMOJI_DISPLAY_COUNT = 10
@@ -33,28 +32,19 @@ def main() -> None:
     dfs = ica.get_dataframes(
         contact_name=cli_args.contact_name, timezone=cli_args.timezone
     )
+    emojis = get_emoji_list()
+    text = dfs.messages.query("is_reaction == False").get("text")
+    emoji_patt = re.compile(
+        f"({'|'.join(re.escape(emoji) for emoji in reversed(emojis))})"
+    )
+    matches = (
+        text.str.findall(emoji_patt).apply(pd.Series).stack().reset_index(drop=True)
+    )
     ica.output_results(
         (
-            pd.DataFrame({"emoji": get_emoji_list(), "count": 0})
-            .assign(
-                count=assign_lambda(
-                    lambda df: df["emoji"].apply(
-                        lambda emoji: dfs.messages.query("is_reaction == False")
-                        .get("text")
-                        # A few emoji, like *️⃣, are regex special characters
-                        # with combining characters added to make them emoji;
-                        # however, because they are fundamentally regex special
-                        # characters, they will break the regex syntax unless
-                        # escaped
-                        .str.count(re.escape(emoji))
-                        .sum()
-                    )
-                )
-            )
-            .query("count > 0")
-            .sort_values(by="count", ascending=False)
-            .reset_index(drop=True)
-            .set_index("emoji")
+            pd.DataFrame({"emoji": matches.value_counts()})
+            .rename({"emoji": "count"}, axis="columns")
+            .rename_axis("emoji", axis="index")
             .head(EMOJI_DISPLAY_COUNT)
         ),
         format=cli_args.format,
