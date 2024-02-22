@@ -262,10 +262,7 @@ def prepare_df_for_output(df: pd.DataFrame) -> pd.DataFrame:
             # Prettify header column (i.e. textual values in first column)
             index=prettify_header_name,
             # Prettify header row (i.e. column names)
-            columns={
-                column_name: prettify_header_name(column_name)
-                for column_name in df.columns
-            },
+            columns=prettify_header_name,
         )
         # Prettify index column name
         .rename_axis(prettify_header_name(df.index.name), axis="index")
