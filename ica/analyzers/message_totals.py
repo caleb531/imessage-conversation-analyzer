@@ -46,7 +46,7 @@ def get_sums_by_day(dfs: ica.DataFrameNamespace) -> pd.DataFrame:
         )
         .resample("D", on="datetime")
         .sum()
-        .rename_axis("date", axis=0)
+        .rename_axis("date", axis="index")
         .assign(is_from_them=assign_lambda(lambda df: df["text"] - df["is_from_me"]))
     )
 
