@@ -1,4 +1,6 @@
-SELECT "mime_type"
+SELECT "mime_type",
+       "filename",
+       "message_id"
 FROM "attachment"
 INNER JOIN "message_attachment_join"
     ON "attachment"."ROWID" = "attachment_id"

@@ -40,6 +40,7 @@ def main() -> None:
             .count()
             .item()
         ),
+        "audio_messages": (dfs.attachments["filename"].str.endswith(".caf").sum()),
         "recorded_videos": (dfs.attachments["mime_type"].eq("video/quicktime").sum()),
     }
     ica.output_results(

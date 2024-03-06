@@ -19,7 +19,7 @@ def main() -> None:
     )
     ica.output_results(
         (
-            dfs.messages
+            dfs.messages[["text", "is_from_me", "datetime", "is_reaction"]]
             # Count all "text" column values by converting them to integers
             # (always 1), because resampling the DataFrame will remove all
             # non-numeric columns
