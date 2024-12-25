@@ -13,7 +13,7 @@ from nose2.tools import params
 
 import ica
 from ica import assign_lambda
-from ica.core import prepare_df_for_output
+from ica.core import normalize_df_for_output
 from tests import ICATestCase, StdoutMockWithBuffer, temp_ica_dir
 
 
@@ -113,8 +113,8 @@ class TestOutputResults(ICATestCase):
                 format=format,
             )
             self.assertEqual(stdout.getvalue(), "")
-            expected_df = prepare_df_for_output(df)
-            actual_df = prepare_df_for_output(
+            expected_df = normalize_df_for_output(df)
+            actual_df = normalize_df_for_output(
                 pd.read_excel(
                     stdout.buffer,
                     index_col=None if use_default_index.value else 0,
@@ -180,8 +180,8 @@ class TestOutputResults(ICATestCase):
             format=format,
             output=output_path,
         )
-        expected_df = prepare_df_for_output(df)
-        actual_df: pd.DataFrame = prepare_df_for_output(
+        expected_df = normalize_df_for_output(df)
+        actual_df: pd.DataFrame = normalize_df_for_output(
             pd.read_excel(
                 output_path,
                 index_col=None if use_default_index.value else 0,
@@ -245,8 +245,8 @@ class TestOutputResults(ICATestCase):
                 output=out,
             )
             self.assertEqual(stdout.getvalue(), "")
-            expected_df = prepare_df_for_output(df)
-            actual_df = prepare_df_for_output(pd.read_excel(out))
+            expected_df = normalize_df_for_output(df)
+            actual_df = normalize_df_for_output(pd.read_excel(out))
             self.assertEqual(
                 expected_df.to_dict(orient="index"),
                 actual_df.to_dict(orient="index"),

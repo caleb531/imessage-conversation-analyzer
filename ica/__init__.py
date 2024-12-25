@@ -6,9 +6,9 @@ from ica.core import (
     DataFrameNamespace,
     assign_lambda,
     get_dataframes,
+    normalize_df_for_output,
     output_results,
     pipe_lambda,
-    prepare_df_for_output,
 )
 from ica.exceptions import (
     BaseAnalyzerException,
