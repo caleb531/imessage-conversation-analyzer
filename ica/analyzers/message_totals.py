@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import datetime
 from typing import Union
 
@@ -73,12 +74,11 @@ def get_noreply_count(dfs: ica.DataFrameNamespace) -> int:
     )
 
 
-def main() -> None:
+def get_results(cli_args: argparse.Namespace) -> pd.DataFrame:
     """
     Generate a summary of message and reaction counts, by person and in total,
     as well as other insightful metrics
     """
-    cli_args = ica.get_cli_args()
     dfs = ica.get_dataframes(
         contact_name=cli_args.contact_name, timezone=cli_args.timezone
     )
@@ -107,10 +107,16 @@ def main() -> None:
         "days_missed": len(all_datestrs) - len(message_datestrs),
         "days_with_no_reply": get_noreply_count(dfs),
     }
+
+    return pd.DataFrame(
+        {"metric": tuple(totals_map.keys()), "total": tuple(totals_map.values())},
+    ).set_index("metric")
+
+
+def main() -> None:
+    cli_args = ica.get_cli_args()
     ica.output_results(
-        pd.DataFrame(
-            {"metric": tuple(totals_map.keys()), "total": tuple(totals_map.values())},
-        ).set_index("metric"),
+        get_results(cli_args),
         format=cli_args.format,
         output=cli_args.output,
     )

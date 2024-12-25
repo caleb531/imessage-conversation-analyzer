@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import importlib.resources
 import json
 import re
@@ -23,12 +24,11 @@ def get_emoji_list() -> list[str]:
 
 
 # Output the occurrences of specific emojis
-def main() -> None:
+def get_results(cli_args: argparse.Namespace) -> pd.DataFrame:
     """
     Generates count data for the top 10 most frequently used emojis across the
     entire conversation
     """
-    cli_args = ica.get_cli_args()
     dfs = ica.get_dataframes(
         contact_name=cli_args.contact_name, timezone=cli_args.timezone
     )
@@ -40,13 +40,18 @@ def main() -> None:
     matches = (
         text.str.findall(emoji_patt).apply(pd.Series).stack().reset_index(drop=True)
     )
+    return (
+        pd.DataFrame({"emoji": matches.value_counts()})
+        .rename({"emoji": "count"}, axis="columns")
+        .rename_axis("emoji", axis="index")
+        .head(EMOJI_DISPLAY_COUNT)
+    )
+
+
+def main() -> None:
+    cli_args = ica.get_cli_args()
     ica.output_results(
-        (
-            pd.DataFrame({"emoji": matches.value_counts()})
-            .rename({"emoji": "count"}, axis="columns")
-            .rename_axis("emoji", axis="index")
-            .head(EMOJI_DISPLAY_COUNT)
-        ),
+        get_results(cli_args),
         format=cli_args.format,
         output=cli_args.output,
     )

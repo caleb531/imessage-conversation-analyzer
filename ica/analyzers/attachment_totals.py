@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 
+import argparse
 
 import pandas as pd
 
 import ica
 
 
-def main() -> None:
+def get_results(cli_args: argparse.Namespace) -> pd.DataFrame:
     """
     Generate count data by attachment type, including number of Spotify links
     shared, YouTube videos, Apple Music, etc.
     """
-    cli_args = ica.get_cli_args()
     dfs = ica.get_dataframes(
         contact_name=cli_args.contact_name, timezone=cli_args.timezone
     )
@@ -43,10 +43,17 @@ def main() -> None:
         "audio_messages": (dfs.attachments["filename"].str.endswith(".caf").sum()),
         "recorded_videos": (dfs.attachments["mime_type"].eq("video/quicktime").sum()),
     }
-    ica.output_results(
+    return (
         pd.DataFrame({"type": totals_map.keys(), "total": totals_map.values()})
         .set_index("type")
-        .sort_values(by="total", ascending=False),
+        .sort_values(by="total", ascending=False)
+    )
+
+
+def main() -> None:
+    cli_args = ica.get_cli_args()
+    ica.output_results(
+        get_results(cli_args),
         format=cli_args.format,
         output=cli_args.output,
     )
