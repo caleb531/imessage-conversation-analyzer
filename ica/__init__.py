@@ -8,6 +8,7 @@ from ica.core import (
     get_dataframes,
     output_results,
     pipe_lambda,
+    prepare_df_for_output,
 )
 from ica.exceptions import (
     BaseAnalyzerException,
