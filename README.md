@@ -16,56 +16,73 @@ Much of this program was inspired by and built using findings from [this blog po
 
 ### Caveats
 
-Please note that currently, you can only query conversations between you and a
-single other person (i.e. group chats are currently unsupported).
-
-It should also be clarified that this program only supports macOS, since the
-presence of the chat.db file in your user Library directory is essential for the
-program to function.
+- Group chats (three or more people) are not supported at this time
+- This program only runs on macOS
 
 ## Installation
 
-### 1. Install Python 3
-
-To install Python 3, you'll need to install the Apple Command Line Tools, which
-you can install by running:
+Open a Terminal and run the following:
 
 ```sh
-xcode-select --install
-```
-
-Don't worry if you see a long download time; it will shorten rather quickly.
-
-### 2. Set up virtualenv
-
-```sh
-pip3 install virtualenv
-```
-
-```sh
-virtualenv --python=python3 .virtualenv
-source .virtualenv/bin/activate
-```
-
-### 3. Install project depdendencies
-
-```sh
-pip install -r requirements.txt
+pip3 install imessage-conversation-analyzer
 ```
 
 ## Usage
 
 The package includes both a Command Line API for simplicity/convenience, as well
-as a Python API for maximum flexibility.
+as a Python API for developers who want maximum flexibility.
 
 ### Command Line API
 
-To use ICA from the command line, simply invoke the `ica` command. The minimum required arguments are:
+To use ICA from the command line, run the `ica` command from the Terminal. The
+minimum required arguments are:
 
 1. A path to an analyzer file to run, or the name of a built-in analyzer
 2. The first and last name of the contact, via the `-c`/`--contact` flag
    1. If the contact has no last name on record, you can just pass the first
       name
+
+#### Example
+
+```sh
+ica message_totals -c 'Jane Fernbrook'
+```
+
+The following outputs a table like:
+
+```
+Metric               Total
+Messages             14535
+Messages From Me      7289
+Messages From Them    7246
+Reactions             5050
+Reactions From Me     3901
+Reactions From Them   1149
+Days Messaged          115
+Days Missed              0
+Days With No Reply       0
+```
+
+#### Built-in analyzers
+
+ICA includes several built-in analyzers out of the box:
+
+1. `message_totals`: a summary of message and reaction counts, by person and in
+   total, as well as other insightful metrics
+2. `attachment_totals`: lists count data by attachment type, including
+   number of Spotify links shared, YouTube videos, Apple Music, etc.
+3. `most_frequent_emojis`: count data for the top 10 most frequently used emojis
+   across the entire conversation
+4. `totals_by_day`: a comprehensive breakdown of message totals for every day
+   you and the other person have been messaging in the conversation
+5. `transcript`: a full, unedited transcript of every message, including
+   reactions, between you and the other person (attachment files not included)
+
+##### Example
+
+```sh
+ica most_frequent_emojis -c 'Jane Fernbrook'
+```
 
 ### Other formats
 
@@ -89,29 +106,6 @@ requirements.
 
 ```sh
 ica transcript -c 'Thomas Riverstone' -o ./my_transcript.xlsx
-```
-
-#### Built-in analyzers
-
-The library includes several built-in analyzers so that you can use ICA out of
-the box:
-
-1. `message_totals`: a summary of message and reaction counts, by person and in
-   total, as well as other insightful metrics
-2. `attachment_totals`: lists count data by attachment type, including
-   number of Spotify links shared, YouTube videos, Apple Music, etc.
-3. `most_frequent_emojis`: count data for the top 10 most frequently used emojis
-   across the entire conversation
-4. `totals_by_day`: a comprehensive breakdown of message totals for every day
-   you and the other person have been messaging in the conversation
-5. `transcript`: a full, unedited transcript of every message, including
-   reactions, between you and the other person (attachment files not included)
-
-Again, to call one of these built-in analyzers, just pass it as the first
-argument to the `ica` command:
-
-```sh
-ica most_frequent_emojis -c 'Jane Fernbrook'
 ```
 
 ### Python API
@@ -218,4 +212,26 @@ The equivalent option for the Python API is the `timezone` parameter to
 
 ```python
 dfs = ica.get_dataframes(contact_name=my_contact_name, timezone='UTC')
+```
+
+## Developer Setup
+
+The following instructions are written for developers who want to run the
+package locally, or write their own analyzers.
+
+### 1. Set up virtualenv
+
+```sh
+pip3 install virtualenv
+```
+
+```sh
+virtualenv --python=python3 .virtualenv
+source .virtualenv/bin/activate
+```
+
+### 2. Install project depdendencies
+
+```sh
+pip install -r requirements.txt
 ```
