@@ -12,7 +12,9 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    environment: release
+    environment:
+      name: release
+      url: https://pypi.org/p/imessage-conversation-analyzer
     permissions:
       id-token: write
 
