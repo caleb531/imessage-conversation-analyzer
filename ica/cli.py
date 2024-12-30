@@ -87,14 +87,13 @@ def run_analyzer(analyzer: str) -> None:
                     os.path.join("analyzers", f"{analyzer}.py")
                 )
             )
-    loader = importlib.machinery.SourceFileLoader("analyzer", analyzer)
+    loader = importlib.machinery.SourceFileLoader("__main__", analyzer)
     spec = importlib.util.spec_from_loader(loader.name, loader)
     if spec:
         analyzer_module = importlib.util.module_from_spec(spec)
         # Expose package information to dynamically-imported module
         analyzer_module.__package__ = __package__
         loader.exec_module(analyzer_module)
-        analyzer_module.main()
 
 
 def main() -> None:
