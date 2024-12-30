@@ -2,6 +2,8 @@
 
 import re
 
+import pandas as pd
+
 import ica
 
 
@@ -16,7 +18,11 @@ def main() -> None:
     )
     filtered_messages = dfs.messages[~dfs.messages["is_reaction"]]
     count = filtered_messages["text"].str.count(phrase, flags=re.IGNORECASE).sum()
-    print(f"The phrase '{phrase}' appears {count} times.")
+    ica.output_results(
+        (pd.DataFrame({"phrase": (phrase,), "count": (count,)}).set_index("phrase")),
+        format=cli_args.format,
+        output=cli_args.output,
+    )
 
 
 if __name__ == "__main__":
