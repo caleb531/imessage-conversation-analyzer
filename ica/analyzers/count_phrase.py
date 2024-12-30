@@ -15,12 +15,7 @@ def main() -> None:
         contact_name=cli_args.contact_name, timezone=cli_args.timezone
     )
     filtered_messages = dfs.messages[~dfs.messages["is_reaction"]]
-    count = (
-        filtered_messages["text"]
-        .str.findall(phrase, flags=re.IGNORECASE)
-        .str.len()
-        .sum()
-    )
+    count = filtered_messages["text"].str.count(phrase, flags=re.IGNORECASE).sum()
     print(f"The phrase '{phrase}' appears {count} times.")
 
 
