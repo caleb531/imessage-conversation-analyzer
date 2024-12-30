@@ -67,6 +67,7 @@ profile = "black"
 [tool.coverage.run]
 # Enable branch coverage
 branch = true
+source = ['ica']
 
 [tool.coverage.report]
 # Regexes for lines to exclude from consideration
