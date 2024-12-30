@@ -251,7 +251,9 @@ def make_dataframe_tz_naive(df: pd.DataFrame) -> pd.DataFrame:
     )
 
 
-def prepare_df_for_output(df: pd.DataFrame) -> pd.DataFrame:
+def prepare_df_for_output(
+    df: pd.DataFrame, prettify_index: bool = True
+) -> pd.DataFrame:
     """
     Prepare the given dataframe for output by prettifying column names,
     strippnig timezone details incompatible with Excel, and other normalization
@@ -260,7 +262,7 @@ def prepare_df_for_output(df: pd.DataFrame) -> pd.DataFrame:
     return (
         df.rename(
             # Prettify header column (i.e. textual values in first column)
-            index=prettify_header_name,
+            index=prettify_header_name if prettify_index else None,
             # Prettify header row (i.e. column names)
             columns=prettify_header_name,
         )
@@ -283,12 +285,13 @@ def output_results(
     analyzer_df: pd.DataFrame,
     format: Union[str, None] = None,
     output: Union[str, None, StringIO, BytesIO] = None,
+    prettify_index: bool = True,
 ) -> None:
     """
     Print the dataframe provided by an analyzer module
     """
     is_default_index = not analyzer_df.index.name
-    output_df = prepare_df_for_output(analyzer_df)
+    output_df = prepare_df_for_output(analyzer_df, prettify_index=prettify_index)
 
     if format and format not in {
         *SUPPORTED_OUTPUT_FORMAT_MAP.keys(),
