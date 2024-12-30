@@ -24,7 +24,7 @@ def main() -> None:
                     "phrase": phrases,
                     "count": (
                         filtered_messages["text"]
-                        .str.count(phrase, flags=re.IGNORECASE)
+                        .str.count(re.escape(phrase), flags=re.IGNORECASE)
                         .sum()
                         for phrase in phrases
                     ),
