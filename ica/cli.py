@@ -64,6 +64,11 @@ def get_cli_args() -> argparse.Namespace:
         help="the path of the file to export analyzer results to; required when"
         " exporting Excel (xlsx) files",
     )
+    parser.add_argument(
+        "args",
+        nargs="*",
+        help="any additional arguments you want to pass to the analyzer",
+    )
 
     return parser.parse_args()
 
