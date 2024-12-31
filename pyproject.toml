@@ -1,6 +1,6 @@
 [project]
 name = "imessage-conversation-analyzer"
-version = "2.5.0-rc.1"
+version = "2.5.0-rc.2"
 description = "Analyzes the entire history of a macOS Messages conversation"
 readme = "README.md"
 requires-python = ">=3.9"
