@@ -20,9 +20,10 @@ from ica.exceptions import BaseAnalyzerException
 did_user_invoke_cli_directly = False
 
 
-def get_cli_args() -> argparse.Namespace:
+def get_cli_parser() -> argparse.ArgumentParser:
     """
-    Parse user arguments from the command line
+    Retrieve the instance of the parser used to parse user arguments
+    from the command line
     """
     global did_user_invoke_cli_directly
     parser = argparse.ArgumentParser()
@@ -64,13 +65,18 @@ def get_cli_args() -> argparse.Namespace:
         help="the path of the file to export analyzer results to; required when"
         " exporting Excel (xlsx) files",
     )
-    parser.add_argument(
-        "args",
-        nargs="*",
-        help="any additional arguments you want to pass to the analyzer",
-    )
 
-    return parser.parse_args()
+    return parser
+
+
+def get_cli_args() -> argparse.Namespace:
+    """
+    Parse user arguments from the command line
+    """
+    # parse_known_args() is slightly different from parse_args() in that the
+    # former returns a two-item tuple where the first item is the Namespace of
+    # known arguments, and the second item is a list of any unknown arguments
+    return get_cli_parser().parse_known_args()[0]
 
 
 def run_analyzer(analyzer: str) -> None:

@@ -9,10 +9,10 @@ import ica
 
 def main() -> None:
 
-    cli_args = ica.get_cli_args()
-    phrases = cli_args.args
-    if not phrases:
-        raise Exception("Must provide at least one phrase to count")
+    cli_parser = ica.get_cli_parser()
+    cli_parser.add_argument("phrases", nargs="+", help="one or more phrases to count")
+    cli_args = cli_parser.parse_args()
+    phrases = cli_args.phrases
     dfs = ica.get_dataframes(
         contact_name=cli_args.contact_name, timezone=cli_args.timezone
     )

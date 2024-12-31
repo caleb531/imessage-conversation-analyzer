@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # flake8: noqa
 
-from ica.cli import get_cli_args
+from ica.cli import get_cli_args, get_cli_parser
 from ica.core import (
     DataFrameNamespace,
     assign_lambda,
