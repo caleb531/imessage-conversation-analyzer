@@ -127,7 +127,7 @@ def main() -> None:
     # Allow your program to accept all the same CLI arguments as the `ica`
     # command; you can skip calling this if have other means of specifying the
     # contact name and output format
-    cli_args = ica.get_cli_args()
+    cli_args = ica.get_cli_parser().parse_args()
     # Retrieve the dataframes corresponding to the massaged contents of the
     # database; dataframes include `message` and `attachment`
     dfs = ica.get_dataframes(

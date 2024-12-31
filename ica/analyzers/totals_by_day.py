@@ -13,7 +13,7 @@ def main() -> None:
     Generates a comprehensive breakdown of message totals for every day you and
     the other person have been messaging in the conversation
     """
-    cli_args = ica.get_cli_args()
+    cli_args = ica.get_cli_parser().parse_args()
     dfs = ica.get_dataframes(
         contact_name=cli_args.contact_name, timezone=cli_args.timezone
     )

@@ -71,12 +71,9 @@ def get_cli_parser() -> argparse.ArgumentParser:
 
 def get_cli_args() -> argparse.Namespace:
     """
-    Parse user arguments from the command line
+    [DEPRECATED]: Parse user arguments from the command line
     """
-    # parse_known_args() is slightly different from parse_args() in that the
-    # former returns a two-item tuple where the first item is the Namespace of
-    # known arguments, and the second item is a list of any unknown arguments
-    return get_cli_parser().parse_known_args()[0]
+    return get_cli_parser().parse_args()
 
 
 def run_analyzer(analyzer: str) -> None:
@@ -111,7 +108,10 @@ def main() -> None:
     global did_user_invoke_cli_directly
     did_user_invoke_cli_directly = True
 
-    cli_args = get_cli_args()
+    # parse_known_args() is slightly different from parse_args() in that the
+    # former returns a two-item tuple where the first item is the Namespace of
+    # known arguments, and the second item is a list of any unknown arguments
+    cli_args = get_cli_parser().parse_known_args()[0]
 
     try:
         run_analyzer(cli_args.analyzer)

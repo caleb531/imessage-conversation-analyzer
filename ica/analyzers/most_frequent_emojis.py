@@ -28,7 +28,7 @@ def main() -> None:
     Generates count data for the top 10 most frequently used emojis across the
     entire conversation
     """
-    cli_args = ica.get_cli_args()
+    cli_args = ica.get_cli_parser().parse_args()
     dfs = ica.get_dataframes(
         contact_name=cli_args.contact_name, timezone=cli_args.timezone
     )
