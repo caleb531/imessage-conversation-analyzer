@@ -71,7 +71,8 @@ def get_cli_parser() -> argparse.ArgumentParser:
 
 def get_cli_args() -> argparse.Namespace:
     """
-    [DEPRECATED]: Parse user arguments from the command line
+    [DEPRECATED]: Parse user arguments from the command line; use
+    get_cli_parser().parse_args() instead
     """
     return get_cli_parser().parse_args()
 
