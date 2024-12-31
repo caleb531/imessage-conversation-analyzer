@@ -60,6 +60,17 @@ class TestCLI(ICATestCase):
                 message_totals.main()
         self.assertEqual(actual_out.getvalue(), expected_out.getvalue())
 
+    @patch("importlib.util.spec_from_loader", return_value=None)
+    def test_cli_spec_error(self, spec_from_loader: MagicMock) -> None:
+        """should raise error when spec cannot be created for analyzer"""
+        cli_arg_list = ["-c", "Jane Fernbrook"]
+        with patch(
+            "sys.argv", [cli.__file__, "ica/analyzers/message_totals.py", *cli_arg_list]
+        ):
+            with self.assertRaises(ImportError):
+                cli.main()
+            spec_from_loader.assert_called_once()
+
     @patch("sys.argv", [cli.__file__, "message_totals", "-c", "Evelyn Oakhaven"])
     def test_cli_conversation_not_found(self) -> None:
         """should print an error message if conversation was not found"""
