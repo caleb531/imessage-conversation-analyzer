@@ -9,7 +9,7 @@ flake8-isort==6.1.1
 freezegun==1.5.1
 isort==5.13.2
 mccabe==0.7.0
-mypy==1.14.0
+mypy==1.14.1
 mypy-extensions==1.0.0
 nose2==0.15.1
 numpy==2.2.1
