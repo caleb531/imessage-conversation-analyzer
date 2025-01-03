@@ -114,6 +114,9 @@ The Python API is much more powerful, allowing you to integrate ICA into any
 type of Python project that can run on macOS. All of the built-in analyzers
 themselves (under the `ica/analyzers` directory) actually use this API.
 
+Here's a complete example that shows how to retrieve the transcript of an entire
+iMessage conversation with one other person.
+
 ```python
 # get_my_transcript.py
 
