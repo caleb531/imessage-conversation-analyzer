@@ -1,6 +1,6 @@
 # iMessage Conversation Analyzer
 
-*Copyright 2020-2024 Caleb Evans*  
+*Copyright 2020-2025 Caleb Evans*  
 *Released under the MIT license*
 
 [![tests](https://github.com/caleb531/imessage-conversation-analyzer/actions/workflows/tests.yml/badge.svg)](https://github.com/caleb531/imessage-conversation-analyzer/actions/workflows/tests.yml)
