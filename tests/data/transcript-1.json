@@ -6,6 +6,12 @@
     "message": "Hey Jane, how's your day going? 😊"
   },
   {
+    "timestamp": "2024-01-08T21:33:20.000Z",
+    "is_from_me": "No",
+    "is_reaction": "Yes",
+    "message": "Reacted 👋 to “Hey Jane, how's your day going? 😊”"
+  },
+  {
     "timestamp": "2024-01-08T21:33:27.000Z",
     "is_from_me": "No",
     "is_reaction": "No",

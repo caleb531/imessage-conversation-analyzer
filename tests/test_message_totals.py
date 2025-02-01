@@ -28,9 +28,9 @@ class TestMessageTotals(ICATestCase):
         """should count the number of reactions according to various criteria"""
         message_totals.main()
         df: pd.DataFrame = output_results.call_args[0][0]
-        self.assertEqual(df.loc["reactions"]["total"], 1)
+        self.assertEqual(df.loc["reactions"]["total"], 2)
         self.assertEqual(df.loc["reactions_from_me"]["total"], 0)
-        self.assertEqual(df.loc["reactions_from_them"]["total"], 1)
+        self.assertEqual(df.loc["reactions_from_them"]["total"], 2)
 
     @patch("ica.output_results")
     @patch("sys.argv", [message_totals.__file__, "-c", "Jane Fernbrook"])

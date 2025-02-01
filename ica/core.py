@@ -157,8 +157,8 @@ def get_messages_dataframe(
         .assign(
             is_reaction=assign_lambda(
                 lambda df: df["text"].str.match(
-                    r"^(Loved|Liked|Disliked|Laughed at|Emphasized|Questioned)"
-                    r" (“(.*?)”|an \w+)$"
+                    r"^(Loved|Liked|Disliked|Laughed at|Emphasized|Questioned|Reacted)"
+                    r" (“(.*?)”|an \w+|(.*?) to “(.*?)”)$"
                 )
             )
         )
