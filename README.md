@@ -146,10 +146,7 @@ def main() -> None:
     cli_args = ica.get_cli_parser().parse_args()
     # Retrieve the dataframes corresponding to the massaged contents of the
     # database; dataframes include `message` and `attachment`
-    dfs = ica.get_dataframes(
-        contact_name=cli_args.contact_name,
-        timezone=cli_args.timezone
-    )
+    dfs = ica.get_dataframes(**vars(cli_args))
     # Send the results to stdout (or to file) in the given format
     ica.output_results(
         pd.DataFrame(
