@@ -185,26 +185,20 @@ def filter_dataframe(
     return (
         df.pipe(
             pipe_lambda(
-                lambda df: (
-                    df.query("is_from_me == True") if from_person == "me" else df
-                )
+                lambda df: df[df["is_from_me"].eq(True)] if from_person == "me" else df
             )
         )
         .pipe(
             pipe_lambda(
                 lambda df: (
-                    df.query("is_from_me == False") if from_person == "them" else df
+                    df[df["is_from_me"].eq(False)] if from_person == "them" else df
                 )
             )
         )
         .pipe(
-            pipe_lambda(
-                lambda df: (df[df["datetime"] >= from_date] if from_date else df)
-            )
+            pipe_lambda(lambda df: df[df["datetime"] >= from_date] if from_date else df)
         )
-        .pipe(
-            pipe_lambda(lambda df: (df[df["datetime"] <= to_date] if to_date else df))
-        )
+        .pipe(pipe_lambda(lambda df: df[df["datetime"] <= to_date] if to_date else df))
     )
 
 
