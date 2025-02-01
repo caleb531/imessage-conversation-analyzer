@@ -58,7 +58,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--from-person",
         choices=["me", "them", "both"],
-        help="A reference to the person by whom to filter messages; accepted values can be 'me', 'them', or 'both'",
+        help="A reference to the person by whom to filter messages; accepted values can be 'me', 'them', or 'both' (the default)",
     )
     parser.add_argument(
         "--format",

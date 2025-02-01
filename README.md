@@ -89,7 +89,7 @@ There are several built-in flags you can use to filter the messages.
 - `--to-date`: An end date to filter messages by (exclusive); the format must be
   ISO 8601-compliant, e.g. YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS
 - `--from-person`: A reference to the person by whom to filter messages;
-  accepted values can be 'me', 'them', or 'both'
+  accepted values can be 'me', 'them', or 'both' (the default)
 
 
 ```sh
