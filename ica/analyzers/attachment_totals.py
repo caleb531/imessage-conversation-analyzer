@@ -12,9 +12,7 @@ def main() -> None:
     shared, YouTube videos, Apple Music, etc.
     """
     cli_args = ica.get_cli_parser().parse_args()
-    dfs = ica.get_dataframes(
-        contact_name=cli_args.contact_name, timezone=cli_args.timezone
-    )
+    dfs = ica.get_dataframes(**vars(cli_args))
     totals_map = {
         "gifs": dfs.attachments["mime_type"].eq("image/gif").sum(),
         "youtube_videos": (

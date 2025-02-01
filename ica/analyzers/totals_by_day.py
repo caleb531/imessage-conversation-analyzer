@@ -14,9 +14,7 @@ def main() -> None:
     the other person have been messaging in the conversation
     """
     cli_args = ica.get_cli_parser().parse_args()
-    dfs = ica.get_dataframes(
-        contact_name=cli_args.contact_name, timezone=cli_args.timezone
-    )
+    dfs = ica.get_dataframes(**vars(cli_args))
     ica.output_results(
         (
             dfs.messages[["text", "is_from_me", "datetime", "is_reaction"]]

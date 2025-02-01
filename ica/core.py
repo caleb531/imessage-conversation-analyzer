@@ -10,7 +10,7 @@ import sys
 from dataclasses import dataclass
 from io import BytesIO, StringIO
 from pathlib import Path
-from typing import Callable, Union
+from typing import Any, Callable, Union
 
 import pandas as pd
 import tzlocal
@@ -167,12 +167,11 @@ def get_messages_dataframe(
     )
 
 
-def filter_messages_dataframe(
-    messages_df: pd.DataFrame,
+def filter_dataframe(
+    df: pd.DataFrame,
     from_date: Union[str, None] = None,
     to_date: Union[str, None] = None,
     from_person: Union[str, None] = None,
-    timezone: Union[str, None] = None,
 ) -> pd.DataFrame:
     """
     Return a copy of the messages dataframe that has been filtered by the
@@ -184,7 +183,7 @@ def filter_messages_dataframe(
         raise DateRangeInvalidError("Date range is backwards")
 
     return (
-        messages_df.pipe(
+        df.pipe(
             pipe_lambda(
                 lambda df: (
                     df.query("is_from_me == True") if from_person == "me" else df
@@ -218,15 +217,25 @@ def get_attachments_dataframe(
     Return a pandas dataframe representing all attachments in a particular
     conversation (identified by the given phone number)
     """
-    return pd.read_sql_query(
-        sql=importlib.resources.files(__package__)
-        .joinpath(os.path.join("queries", "attachments.sql"))
-        .read_text(),
-        con=connection,
-        params={
-            "chat_identifiers": get_chat_identifier_str(chat_identifiers),
-            "chat_identifier_delimiter": CHAT_IDENTIFIER_DELIMITER,
-        },
+    return (
+        pd.read_sql_query(
+            sql=importlib.resources.files(__package__)
+            .joinpath(os.path.join("queries", "attachments.sql"))
+            .read_text(),
+            con=connection,
+            params={
+                "chat_identifiers": get_chat_identifier_str(chat_identifiers),
+                "chat_identifier_delimiter": CHAT_IDENTIFIER_DELIMITER,
+            },
+            parse_dates={"datetime": "ISO8601"},
+        )
+        # Expose the date/time of the message alongside each attachment record,
+        # for convenience
+        .assign(
+            datetime=assign_lambda(
+                lambda df: df["datetime"].dt.tz_localize("UTC").dt.tz_convert(timezone)
+            )
+        )
     )
 
 
@@ -236,6 +245,7 @@ def get_dataframes(
     from_date: Union[str, None] = None,
     to_date: Union[str, None] = None,
     from_person: Union[str, None] = None,
+    **kwargs: Any,
 ) -> DataFrameNamespace:
     """
     Return all dataframes for a specific macOS Messages conversation
@@ -252,12 +262,17 @@ def get_dataframes(
             raise ConversationNotFoundError(
                 f'No conversation found for the contact "{contact_name}"'
             )
-        dfs.messages = filter_messages_dataframe(
+        dfs.messages = filter_dataframe(
             dfs.messages,
             from_date,
             to_date,
             from_person,
-            timezone,
+        )
+        dfs.attachments = filter_dataframe(
+            dfs.attachments,
+            from_date,
+            to_date,
+            from_person,
         )
         return dfs
 

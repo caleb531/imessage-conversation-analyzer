@@ -18,9 +18,7 @@ def main() -> None:
     reactions, between you and the other person (attachment files not included)
     """
     cli_args = ica.get_cli_parser().parse_args()
-    dfs = ica.get_dataframes(
-        contact_name=cli_args.contact_name, timezone=cli_args.timezone
-    )
+    dfs = ica.get_dataframes(**vars(cli_args))
     ica.output_results(
         pd.DataFrame(
             {
