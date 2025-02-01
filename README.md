@@ -80,7 +80,7 @@ ICA includes several built-in analyzers out of the box:
 6. `count_phrases`: count the number of case-insensitive occurrences of any
    arbitrary strings across all messages in a conversation (excluding reactions)
 
-### Other formats
+#### Other formats
 
 You can optionally pass the `-f`/`--format` flag to output to a specific format
 like CSV (supported formats include `csv`, `excel`/`xlsx`, and `markdown`/`md`).
@@ -93,7 +93,7 @@ ica message_totals -c 'Jane Fernbrook' -f csv
 ica ./my_custom_analyzer.py -c 'Jane Fernbrook' -f csv
 ```
 
-### Writing to a file
+#### Writing to a file
 
 Finally, there is an optional `-o`/`--output` flag if you want to output to a
 specified file. ICA will do its best to infer the format from the file
