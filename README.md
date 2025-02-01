@@ -91,6 +91,11 @@ There are several built-in flags you can use to filter the messages.
 - `--from-person`: A reference to the person by whom to filter messages;
   accepted values can be 'me', 'them', or 'both'
 
+
+```sh
+ica message_totals -c 'Jane Fernbrook' --from-date 2024-12-01 --to-date 2025-01-01 --from-person them
+```
+
 #### Other formats
 
 You can optionally pass the `-f`/`--format` flag to output to a specific format
