@@ -80,12 +80,6 @@ ICA includes several built-in analyzers out of the box:
 6. `count_phrases`: count the number of case-insensitive occurrences of any
    arbitrary strings across all messages in a conversation (excluding reactions)
 
-##### Example
-
-```sh
-ica most_frequent_emojis -c 'Jane Fernbrook'
-```
-
 ### Other formats
 
 You can optionally pass the `-f`/`--format` flag to output to a specific format
