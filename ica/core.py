@@ -17,7 +17,11 @@ import tzlocal
 from typedstream.stream import TypedStreamReader
 
 import ica.contact as contact
-from ica.exceptions import ConversationNotFoundError, FormatNotSupportedError
+from ica.exceptions import (
+    ConversationNotFoundError,
+    DateRangeInvalidError,
+    FormatNotSupportedError,
+)
 
 # In order to interpolate the user-specified list of chat identifiers into the
 # SQL queries, we must join the list into a string delimited by a common
@@ -163,6 +167,48 @@ def get_messages_dataframe(
     )
 
 
+def filter_messages_dataframe(
+    messages_df: pd.DataFrame,
+    from_date: Union[str, None] = None,
+    to_date: Union[str, None] = None,
+    from_person: Union[str, None] = None,
+    timezone: Union[str, None] = None,
+) -> pd.DataFrame:
+    """
+    Return a copy of the messages dataframe that has been filtered by the
+    user-supplied filters
+    """
+
+    # Raise an exception if the 'from' date is after the 'to' date
+    if from_date and to_date and pd.Timestamp(from_date) > pd.Timestamp(to_date):
+        raise DateRangeInvalidError("Date range is backwards")
+
+    return (
+        messages_df.pipe(
+            pipe_lambda(
+                lambda df: (
+                    df.query("is_from_me == True") if from_person == "me" else df
+                )
+            )
+        )
+        .pipe(
+            pipe_lambda(
+                lambda df: (
+                    df.query("is_from_me == False") if from_person == "them" else df
+                )
+            )
+        )
+        .pipe(
+            pipe_lambda(
+                lambda df: (df[df["datetime"] >= from_date] if from_date else df)
+            )
+        )
+        .pipe(
+            pipe_lambda(lambda df: (df[df["datetime"] <= to_date] if to_date else df))
+        )
+    )
+
+
 def get_attachments_dataframe(
     connection: sqlite3.Connection,
     chat_identifiers: list[str],
@@ -185,13 +231,16 @@ def get_attachments_dataframe(
 
 
 def get_dataframes(
-    contact_name: str, timezone: Union[str, None] = None
+    contact_name: str,
+    timezone: Union[str, None] = None,
+    from_date: Union[str, None] = None,
+    to_date: Union[str, None] = None,
+    from_person: Union[str, None] = None,
 ) -> DataFrameNamespace:
     """
     Return all dataframes for a specific macOS Messages conversation
     """
     chat_identifiers = contact.get_chat_identifiers(contact_name)
-
     with sqlite3.connect(DB_PATH) as connection:
         dfs = DataFrameNamespace(
             messages=get_messages_dataframe(connection, chat_identifiers, timezone),
@@ -203,6 +252,13 @@ def get_dataframes(
             raise ConversationNotFoundError(
                 f'No conversation found for the contact "{contact_name}"'
             )
+        dfs.messages = filter_messages_dataframe(
+            dfs.messages,
+            from_date,
+            to_date,
+            from_person,
+            timezone,
+        )
         return dfs
 
 

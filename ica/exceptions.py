@@ -25,6 +25,14 @@ class ConversationNotFoundError(BaseAnalyzerException):
     pass
 
 
+class DateRangeInvalidError(BaseAnalyzerException):
+    """
+    Raised when the specified date range is mismatched (e.g. the start date is after the end date)
+    """
+
+    pass
+
+
 class FormatNotSupportedError(BaseAnalyzerException):
     """
     Raised when the specified format is not supported by the library

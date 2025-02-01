@@ -80,6 +80,17 @@ ICA includes several built-in analyzers out of the box:
 6. `count_phrases`: count the number of case-insensitive occurrences of any
    arbitrary strings across all messages in a conversation (excluding reactions)
 
+#### Filtering
+
+There are several built-in flags you can use to filter the messages.
+
+- `--from-date`: A start date to filter messages by (inclusive); the format must
+  be ISO 8601-compliant, e.g. YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS
+- `--to-date`: An end date to filter messages by (exclusive); the format must be
+  ISO 8601-compliant, e.g. YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS
+- `--from-person`: A reference to the person by whom to filter messages;
+  accepted values can be 'me', 'them', or 'both'
+
 #### Other formats
 
 You can optionally pass the `-f`/`--format` flag to output to a specific format
