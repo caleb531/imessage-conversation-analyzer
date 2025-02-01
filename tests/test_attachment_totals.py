@@ -25,7 +25,7 @@ class TestAttachmentTotals(ICATestCase):
         """should count the number of YouTube videos for a conversation"""
         attachment_totals.main()
         df: pd.DataFrame = output_results.call_args[0][0]
-        self.assertEqual(df.loc["youtube_videos"]["total"], 2)
+        self.assertEqual(df.loc["youtube_videos"]["total"], 3)
 
     @patch("ica.output_results")
     @patch("sys.argv", [attachment_totals.__file__, "-c", "Thomas Riverstone"])
