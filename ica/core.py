@@ -114,7 +114,7 @@ def get_messages_dataframe(
 ) -> pd.DataFrame:
     """
     Return a pandas dataframe representing all messages in a particular
-    conversation (identified by the given phone number)
+    conversation (identified by the given phone number or email address)
     """
     # If no IANA timezone name is specified, default to the name of the system's
     # local timezone
