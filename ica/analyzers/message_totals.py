@@ -56,7 +56,7 @@ def get_all_message_datestrs(dfs: ica.DataFrameNamespace) -> list[str]:
     Retrieve a list of every date for which at least one message was sent
     """
     sums_by_day = get_sums_by_day(dfs)
-    return list(sums_by_day.query("text > 0").index)
+    return list(sums_by_day[sums_by_day["text"] > 0].index)
 
 
 def get_noreply_count(dfs: ica.DataFrameNamespace) -> int:
@@ -65,11 +65,13 @@ def get_noreply_count(dfs: ica.DataFrameNamespace) -> int:
     one person sent messages for that day
     """
     sums_by_day = get_sums_by_day(dfs)
+    is_from_me = sums_by_day["is_from_me"]
+    is_from_them = sums_by_day["is_from_them"]
     return len(
-        sums_by_day.query(
-            "(is_from_me == 0 and is_from_them > 0) or "
-            "(is_from_me > 0 and is_from_them == 0)"
-        )
+        sums_by_day[
+            (is_from_me.eq(0) & is_from_them.gt(0))
+            | (is_from_me.gt(0) & is_from_them.eq(0))
+        ]
     )
 
 
@@ -86,20 +88,22 @@ def main() -> None:
     )
     message_datestrs = get_all_message_datestrs(dfs)
 
+    is_reaction = dfs.messages["is_reaction"]
+
     totals_map = {
-        "messages": len(dfs.messages.query("is_reaction == False")),
+        "messages": len(dfs.messages[is_reaction.eq(False)]),
         "messages_from_me": (
-            dfs.messages.query("is_reaction == False")["is_from_me"].eq(True).sum()
+            dfs.messages[is_reaction.eq(False)]["is_from_me"].eq(True).sum()
         ),
         "messages_from_them": (
-            dfs.messages.query("is_reaction == False")["is_from_me"].eq(False).sum()
+            dfs.messages[is_reaction.eq(False)]["is_from_me"].eq(False).sum()
         ),
-        "reactions": len(dfs.messages.query("is_reaction == True")),
+        "reactions": len(dfs.messages[is_reaction.eq(True)]),
         "reactions_from_me": (
-            dfs.messages.query("is_reaction == True")["is_from_me"].eq(True).sum()
+            dfs.messages[is_reaction.eq(True)]["is_from_me"].eq(True).sum()
         ),
         "reactions_from_them": (
-            dfs.messages.query("is_reaction == True")["is_from_me"].eq(False).sum()
+            dfs.messages[is_reaction.eq(True)]["is_from_me"].eq(False).sum()
         ),
         "days_messaged": len(message_datestrs),
         "days_missed": len(all_datestrs) - len(message_datestrs),

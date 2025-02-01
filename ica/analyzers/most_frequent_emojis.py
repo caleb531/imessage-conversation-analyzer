@@ -31,7 +31,7 @@ def main() -> None:
     cli_args = ica.get_cli_parser().parse_args()
     dfs = ica.get_dataframes(**vars(cli_args))
     emojis = get_emoji_list()
-    text = dfs.messages.query("is_reaction == False").get("text")
+    text = dfs.messages[dfs.messages["is_reaction"].eq(False)].get("text")
     emoji_patt = re.compile(
         f"({'|'.join(re.escape(emoji) for emoji in reversed(emojis))})"
     )
