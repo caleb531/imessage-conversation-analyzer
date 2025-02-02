@@ -49,16 +49,19 @@ def get_cli_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--from-date",
-        help="a start date to filter messages by (inclusive); the format must be ISO 8601-compliant, e.g. YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS",
+        help="a start date to filter messages by (inclusive); the format must "
+        "be ISO 8601-compliant, e.g. YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS",
     )
     parser.add_argument(
         "--to-date",
-        help="an end date to filter messages by (exclusive); the format must be ISO 8601-compliant, e.g. YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS",
+        help="an end date to filter messages by (exclusive); the format must be"
+        " ISO 8601-compliant, e.g. YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS",
     )
     parser.add_argument(
         "--from-person",
         choices=["me", "them", "both"],
-        help="A reference to the person by whom to filter messages; accepted values can be 'me', 'them', or 'both' (the default)",
+        help="A reference to the person by whom to filter messages; accepted "
+        "values can be 'me', 'them', or 'both' (the default)",
     )
     parser.add_argument(
         "--format",

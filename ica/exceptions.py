@@ -27,7 +27,8 @@ class ConversationNotFoundError(BaseAnalyzerException):
 
 class DateRangeInvalidError(BaseAnalyzerException):
     """
-    Raised when the specified date range is mismatched (e.g. the start date is after the end date)
+    Raised when the specified date range is mismatched (e.g. the start date is
+    after the end date)
     """
 
     pass
