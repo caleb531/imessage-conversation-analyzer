@@ -8,9 +8,6 @@ import pandas as pd
 
 import ica
 
-# The maximum number of most frequent emojis to output in the table
-EMOJI_DISPLAY_COUNT = 10
-
 
 def get_emoji_list() -> list[str]:
     """
@@ -28,7 +25,14 @@ def main() -> None:
     Generates count data for the top 10 most frequently used emojis across the
     entire conversation
     """
-    cli_args = ica.get_cli_parser().parse_args()
+    cli_parser = ica.get_cli_parser()
+    cli_parser.add_argument(
+        "--result-count",
+        type=int,
+        default=10,
+        help="the number of emoji results to rank",
+    )
+    cli_args = cli_parser.parse_args()
     dfs = ica.get_dataframes(
         contact_name=cli_args.contact_name,
         timezone=cli_args.timezone,
@@ -50,7 +54,7 @@ def main() -> None:
             pd.DataFrame({"emoji": matches.value_counts()})
             .rename({"emoji": "count"}, axis="columns")
             .rename_axis("emoji", axis="index")
-            .head(EMOJI_DISPLAY_COUNT)
+            .head(cli_args.result_count)
         ),
         format=cli_args.format,
         output=cli_args.output,
