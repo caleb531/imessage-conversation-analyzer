@@ -5,7 +5,7 @@ import importlib.resources
 import os
 import os.path
 import sqlite3
-from typing import Union
+from typing import Optional
 
 import pandas as pd
 import phonenumbers
@@ -24,7 +24,7 @@ DB_GLOB = os.path.expanduser(
 DEFAULT_PHONE_NUMBER_REGION = "US"
 
 
-def normalize_phone_number(phone_number: str) -> Union[str, None]:
+def normalize_phone_number(phone_number: str) -> Optional[str]:
     """
     Normalize the given phone number to the format required for searching in the
     iMessage database
@@ -37,7 +37,7 @@ def normalize_phone_number(phone_number: str) -> Union[str, None]:
     )
 
 
-def normalize_email_address(email_address: str) -> Union[str, None]:
+def normalize_email_address(email_address: str) -> Optional[str]:
     """
     Normalize the given email address to the format required for searching in
     the iMessage database

@@ -6,7 +6,7 @@ from contextlib import redirect_stdout
 from enum import Enum
 from io import BytesIO, StringIO
 from pathlib import Path
-from typing import Union
+from typing import Optional
 
 import pandas as pd
 from nose2.tools import params
@@ -101,7 +101,7 @@ class TestOutputResults(ICATestCase):
     def test_output_results_bytes(
         self,
         test_case: tuple[str, pd.DataFrame, IndexType],
-        format: Union[str, None],
+        format: Optional[str],
     ) -> None:
         """
         should print the dataframe to stdout as binary Excel data

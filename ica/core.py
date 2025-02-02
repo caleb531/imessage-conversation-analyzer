@@ -10,7 +10,7 @@ import sys
 from dataclasses import dataclass
 from io import BytesIO, StringIO
 from pathlib import Path
-from typing import Callable, Union
+from typing import Callable, Optional, Union
 
 import pandas as pd
 import tzlocal
@@ -110,7 +110,7 @@ def assign_lambda(
 def get_messages_dataframe(
     connection: sqlite3.Connection,
     chat_identifiers: list[str],
-    timezone: Union[str, None] = None,
+    timezone: Optional[str] = None,
 ) -> pd.DataFrame:
     """
     Return a pandas dataframe representing all messages in a particular
@@ -169,9 +169,9 @@ def get_messages_dataframe(
 
 def filter_dataframe(
     df: pd.DataFrame,
-    from_date: Union[str, None] = None,
-    to_date: Union[str, None] = None,
-    from_person: Union[str, None] = None,
+    from_date: Optional[str] = None,
+    to_date: Optional[str] = None,
+    from_person: Optional[str] = None,
 ) -> pd.DataFrame:
     """
     Return a copy of the messages dataframe that has been filtered by the
@@ -205,7 +205,7 @@ def filter_dataframe(
 def get_attachments_dataframe(
     connection: sqlite3.Connection,
     chat_identifiers: list[str],
-    timezone: Union[str, None] = None,
+    timezone: Optional[str] = None,
 ) -> pd.DataFrame:
     """
     Return a pandas dataframe representing all attachments in a particular
@@ -235,10 +235,10 @@ def get_attachments_dataframe(
 
 def get_dataframes(
     contact_name: str,
-    timezone: Union[str, None] = None,
-    from_date: Union[str, None] = None,
-    to_date: Union[str, None] = None,
-    from_person: Union[str, None] = None,
+    timezone: Optional[str] = None,
+    from_date: Optional[str] = None,
+    to_date: Optional[str] = None,
+    from_person: Optional[str] = None,
 ) -> DataFrameNamespace:
     """
     Return all dataframes for a specific macOS Messages conversation
@@ -281,7 +281,7 @@ def prettify_header_name(header_name: Union[str, int]) -> Union[str, int]:
         return header_name
 
 
-def infer_format_from_output_file_path(output: Union[str, None]) -> Union[str, None]:
+def infer_format_from_output_file_path(output: Optional[str]) -> Optional[str]:
     """
     Assuming an explicit format was not provided, infer the format from the
     extension of the given output file path
@@ -347,8 +347,8 @@ def prepare_df_for_output(
 
 def output_results(
     analyzer_df: pd.DataFrame,
-    format: Union[str, None] = None,
-    output: Union[str, None, StringIO, BytesIO] = None,
+    format: Optional[str] = None,
+    output: Union[str, StringIO, BytesIO, None] = None,
     prettify_index: bool = True,
 ) -> None:
     """
