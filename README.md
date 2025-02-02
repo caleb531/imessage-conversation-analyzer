@@ -82,7 +82,7 @@ ICA includes several built-in analyzers out of the box:
 
 #### Filtering
 
-There are several built-in flags you can use to filter the messages.
+There are several built-in flags you can use to filter messages and attachments.
 
 - `--from-date`: A start date to filter messages by (inclusive); the format must
   be ISO 8601-compliant, e.g. YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS
