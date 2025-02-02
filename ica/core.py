@@ -10,7 +10,7 @@ import sys
 from dataclasses import dataclass
 from io import BytesIO, StringIO
 from pathlib import Path
-from typing import Any, Callable, Union
+from typing import Callable, Union
 
 import pandas as pd
 import tzlocal
@@ -239,7 +239,6 @@ def get_dataframes(
     from_date: Union[str, None] = None,
     to_date: Union[str, None] = None,
     from_person: Union[str, None] = None,
-    **kwargs: Any,
 ) -> DataFrameNamespace:
     """
     Return all dataframes for a specific macOS Messages conversation
