@@ -320,7 +320,7 @@ def prepare_df_for_output(
 ) -> pd.DataFrame:
     """
     Prepare the given dataframe for output by prettifying column names,
-    strippnig timezone details incompatible with Excel, and other normalization
+    stripping timezone details incompatible with Excel, and other normalization
     operations; return the normalized dataframe
     """
     return (
