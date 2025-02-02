@@ -124,7 +124,7 @@ ica transcript -c 'Thomas Riverstone' -o ./my_transcript.xlsx
 
 The Python API is much more powerful, allowing you to integrate ICA into any
 type of Python project that can run on macOS. All of the built-in analyzers
-themselves (under the `ica/analyzers` directory) actually use this API.
+(under the `ica/analyzers` directory) actually use this API.
 
 Here's a complete example that shows how to retrieve the transcript of an entire
 iMessage conversation with one other person.
@@ -144,8 +144,8 @@ def main() -> None:
     # contact name and output format; you can also add your own arguments this
     # way (see the count_phrases analyzer for an example of this)
     cli_args = ica.get_cli_parser().parse_args()
-    # Retrieve the dataframes corresponding to the massaged contents of the
-    # database; dataframes include `message` and `attachment`
+    # Retrieve the dataframes corresponding to the processed contents of the
+    # database; dataframes include `messages` and `attachments`
     dfs = ica.get_dataframes(
         contact_name=cli_args.contact_name,
         timezone=cli_args.timezone,
