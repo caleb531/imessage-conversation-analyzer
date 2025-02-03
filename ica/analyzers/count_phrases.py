@@ -32,6 +32,22 @@ def main() -> None:
                         .sum()
                         for phrase in cli_args.phrases
                     ),
+                    "count_from_me": (
+                        filtered_messages[filtered_messages["is_from_me"].eq(True)][
+                            "text"
+                        ]
+                        .str.count(re.escape(phrase), flags=re.IGNORECASE)
+                        .sum()
+                        for phrase in cli_args.phrases
+                    ),
+                    "count_from_them": (
+                        filtered_messages[filtered_messages["is_from_me"].eq(False)][
+                            "text"
+                        ]
+                        .str.count(re.escape(phrase), flags=re.IGNORECASE)
+                        .sum()
+                        for phrase in cli_args.phrases
+                    ),
                 }
             ).set_index("phrase")
         ),
