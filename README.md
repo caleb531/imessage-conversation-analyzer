@@ -199,13 +199,6 @@ You're not limited to writing a command line program, though! The
 analyzer program. But beyond that, feel free to import other modules, send your
 results to other processes, or whatever you need to do!
 
-You can also import any built-in analyzer (for your own post-processing) via the
-`ica.analyzers` namespace.
-
-```py
-import ica.analyzers.message_totals as message_totals
-```
-
 ### Errors and exceptions
 
 - `BaseAnalyzerException`: the base exception class for all library-related
