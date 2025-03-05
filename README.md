@@ -12,7 +12,7 @@ macOS. You can then gather various metrics of interest on the messages. The libr
 
 Much of this program was inspired by and built using findings from [this blog post by Yorgos Askalidis][blog-post].
 
-[blog-post]: https://towardsdatascience.com/heres-how-you-can-access-your-entire-imessage-history-on-your-mac-f8878276c6e9
+[blog-post]: https://medium.com/@yaskalidis/heres-how-you-can-access-your-entire-imessage-history-on-your-mac-f8878276c6e9
 
 ### Caveats
 
