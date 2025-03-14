@@ -1,10 +1,20 @@
 #!/usr/bin/env python3
 
 import re
+import typing
 
 import pandas as pd
 
 import ica
+
+
+def get_phrase_counts(
+    messages_df: pd.DataFrame, phrases: list[str]
+) -> typing.Generator[int, None, None]:
+    return (
+        messages_df["text"].str.count(re.escape(phrase), flags=re.IGNORECASE).sum()
+        for phrase in phrases
+    )
 
 
 def main() -> None:
@@ -26,27 +36,14 @@ def main() -> None:
             pd.DataFrame(
                 {
                     "phrase": cli_args.phrases,
-                    "count": (
-                        filtered_messages["text"]
-                        .str.count(re.escape(phrase), flags=re.IGNORECASE)
-                        .sum()
-                        for phrase in cli_args.phrases
+                    "count": get_phrase_counts(filtered_messages, cli_args.phrases),
+                    "count_from_me": get_phrase_counts(
+                        filtered_messages[filtered_messages["is_from_me"].eq(True)],
+                        cli_args.phrases,
                     ),
-                    "count_from_me": (
-                        filtered_messages[filtered_messages["is_from_me"].eq(True)][
-                            "text"
-                        ]
-                        .str.count(re.escape(phrase), flags=re.IGNORECASE)
-                        .sum()
-                        for phrase in cli_args.phrases
-                    ),
-                    "count_from_them": (
-                        filtered_messages[filtered_messages["is_from_me"].eq(False)][
-                            "text"
-                        ]
-                        .str.count(re.escape(phrase), flags=re.IGNORECASE)
-                        .sum()
-                        for phrase in cli_args.phrases
+                    "count_from_them": get_phrase_counts(
+                        filtered_messages[filtered_messages["is_from_me"].eq(False)],
+                        cli_args.phrases,
                     ),
                 }
             ).set_index("phrase")
