@@ -27,7 +27,7 @@ class TestMessageTotals(ICATestCase):
     @patch("ica.output_results")
     @patch(
         "sys.argv",
-        [count_phrases.__file__, "-c", "Thomas Riverstone", "hey", "reminds me"],
+        [count_phrases.__file__, "-c", "Thomas Riverstone", "-i", "hey", "reminds me"],
     )
     def test_multiple_phrases(self, output_results: MagicMock) -> None:
         """should count the number of occurrences of multiple phrases"""
@@ -81,3 +81,20 @@ class TestMessageTotals(ICATestCase):
         self.assertEqual(df.loc[phrase]["count"], 10)
         self.assertEqual(df.loc[phrase]["count_from_me"], 5)
         self.assertEqual(df.loc[phrase]["count_from_them"], 5)
+
+    @patch("ica.output_results")
+    @patch(
+        "sys.argv",
+        [count_phrases.__file__, "-c", "Thomas Riverstone", "--use-regex", "🤣|😅"],
+    )
+    def test_regex(self, output_results: MagicMock) -> None:
+        """
+        should count the number of occurrences of strings matching a regular
+        expression
+        """
+        count_phrases.main()
+        df: pd.DataFrame = output_results.call_args[0][0]
+        phrase = sys.argv[-1]
+        self.assertEqual(df.loc[phrase]["count"], 3)
+        self.assertEqual(df.loc[phrase]["count_from_me"], 1)
+        self.assertEqual(df.loc[phrase]["count_from_them"], 2)

@@ -9,10 +9,18 @@ import ica
 
 
 def get_phrase_counts(
-    messages_df: pd.DataFrame, phrases: list[str]
+    messages_df: pd.DataFrame,
+    phrases: list[str],
+    use_regex: bool = False,
+    insensitive: bool = False,
 ) -> typing.Generator[int, None, None]:
     return (
-        messages_df["text"].str.count(re.escape(phrase), flags=re.IGNORECASE).sum()
+        messages_df["text"]
+        .str.count(
+            re.escape(phrase) if use_regex else phrase,
+            flags=re.IGNORECASE if insensitive else 0,
+        )
+        .sum()
         for phrase in phrases
     )
 
@@ -21,6 +29,18 @@ def main() -> None:
 
     cli_parser = ica.get_cli_parser()
     cli_parser.add_argument("phrases", nargs="+", help="one or more phrases to count")
+    cli_parser.add_argument(
+        "--use-regex",
+        "-r",
+        action="store_true",
+        help="if specified, treats phrases as regular expressions",
+    )
+    cli_parser.add_argument(
+        "--insensitive",
+        "-i",
+        action="store_true",
+        help="if specified, treats phrases as case-insensitive",
+    )
     cli_args = cli_parser.parse_args()
     dfs = ica.get_dataframes(
         contact_name=cli_args.contact_name,
@@ -36,7 +56,11 @@ def main() -> None:
             pd.DataFrame(
                 {
                     "phrase": cli_args.phrases,
-                    "count": get_phrase_counts(filtered_messages, cli_args.phrases),
+                    "count": get_phrase_counts(
+                        filtered_messages,
+                        cli_args.phrases,
+                        insensitive=cli_args.insensitive,
+                    ),
                     "count_from_me": get_phrase_counts(
                         filtered_messages[filtered_messages["is_from_me"].eq(True)],
                         cli_args.phrases,
