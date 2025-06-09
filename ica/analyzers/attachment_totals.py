@@ -42,6 +42,7 @@ def main() -> None:
             r"(https?://(?:open\.spotify\.com)/(?:.*?)(?:\s|$))",
         ),
         "audio_messages": (dfs.attachments["filename"].str.endswith(".caf").sum()),
+        "audio_files": (dfs.attachments["filename"].str.endswith(".m4a").sum()),
         "recorded_videos": (dfs.attachments["mime_type"].eq("video/quicktime").sum()),
     }
     ica.output_results(
