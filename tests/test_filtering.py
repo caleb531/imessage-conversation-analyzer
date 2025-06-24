@@ -12,7 +12,6 @@ from tests import ICATestCase
 
 
 class TestFiltering(ICATestCase):
-
     @patch("ica.output_results")
     @patch(
         "sys.argv",

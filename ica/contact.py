@@ -67,13 +67,15 @@ def get_chat_identifiers(contact_name: str) -> list[str]:
             )
             # Combine the results
             chat_identifiers.update(
-                rows["ZFULLNUMBER"].apply(normalize_phone_number)
+                rows["ZFULLNUMBER"]
+                .apply(normalize_phone_number)
                 # The normalization function will convert empty strings to None
                 # so that we can filter them out with dropna()
                 .dropna()
             )
             chat_identifiers.update(
-                rows["ZADDRESS"].apply(normalize_email_address)
+                rows["ZADDRESS"]
+                .apply(normalize_email_address)
                 # The normalization function will convert empty strings to None
                 # so that we can filter them out with dropna()
                 .dropna()

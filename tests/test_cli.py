@@ -12,7 +12,6 @@ from tests import ICATestCase
 
 
 class TestCLI(ICATestCase):
-
     def tearDown(self) -> None:
         super().tearDown()
         cli.did_user_invoke_cli_directly = False

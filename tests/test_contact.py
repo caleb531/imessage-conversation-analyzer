@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
 """test the message_totals built-in analyzer"""
 
-
 import ica
 from tests import ICATestCase
 
 
 class TestContact(ICATestCase):
-
     def test_find_conversation_via_phone_number_only(self) -> None:
         """
         should find conversation for contact with phone number only

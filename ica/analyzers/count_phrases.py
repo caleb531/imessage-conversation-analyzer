@@ -26,7 +26,6 @@ def get_phrase_counts(
 
 
 def main() -> None:
-
     cli_parser = ica.get_cli_parser()
     cli_parser.add_argument("phrases", nargs="+", help="one or more phrases to count")
     cli_parser.add_argument(

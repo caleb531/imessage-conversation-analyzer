@@ -12,7 +12,6 @@ from tests import ICATestCase
 
 
 class TestMostFrequentEmojis(ICATestCase):
-
     @patch("ica.output_results")
     @patch("sys.argv", [most_frequent_emojis.__file__, "-c", "Jane Fernbrook"])
     def test_most_frequent_emojis(self, output_results: MagicMock) -> None:

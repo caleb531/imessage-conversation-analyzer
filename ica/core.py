@@ -82,7 +82,7 @@ def decode_message_attributedbody(data: bytes) -> str:
 
 
 def pipe_lambda(
-    df_lambda: Callable[[pd.DataFrame], pd.DataFrame]
+    df_lambda: Callable[[pd.DataFrame], pd.DataFrame],
 ) -> Callable[[pd.DataFrame], pd.DataFrame]:
     """
     If you pass a lambda to the DataFrame pipe() method, the type of the
@@ -95,7 +95,7 @@ def pipe_lambda(
 
 
 def assign_lambda(
-    df_lambda: Callable[[pd.DataFrame], pd.Series]
+    df_lambda: Callable[[pd.DataFrame], pd.Series],
 ) -> Callable[[pd.DataFrame], pd.Series]:
     """
     If you pass a lambda to the DataFrame assign() method, the type of the

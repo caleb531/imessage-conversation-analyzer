@@ -11,7 +11,6 @@ from tests import ICATestCase
 
 
 class TestMessageTotals(ICATestCase):
-
     @patch("ica.output_results")
     @patch(
         "sys.argv",

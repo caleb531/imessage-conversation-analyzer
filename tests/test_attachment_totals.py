@@ -10,7 +10,6 @@ from tests import ICATestCase
 
 
 class TestAttachmentTotals(ICATestCase):
-
     @patch("ica.output_results")
     @patch("sys.argv", [attachment_totals.__file__, "-c", "Jane Fernbrook"])
     def test_gif_count(self, output_results: MagicMock) -> None:

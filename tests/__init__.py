@@ -61,7 +61,6 @@ class ICATestCase(unittest.TestCase):
 # an instance of this subclass to the stdlib contextlib.redirect_stdout context
 # manager without issue
 class StdoutMockWithBuffer(StringIO):
-
     def __init__(self, initial_value: str = "", newline: str = "\n") -> None:
         super().__init__(initial_value, newline)
         object.__setattr__(self, "buffer", BytesIO())

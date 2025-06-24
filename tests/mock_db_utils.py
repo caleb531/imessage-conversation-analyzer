@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Utilities for creating the mock databases used for testing"""
 
-
 import base64
 import glob
 import json
@@ -22,7 +21,7 @@ BASE64_PREFIX = "base64:"
 def parse_record_value(
     # JSON strings are always UTF-8, so a `bytes` string would never be passed
     # as one of the JSON values to format
-    value: Union[str, int, float, bool]
+    value: Union[str, int, float, bool],
 ) -> Union[str, bytes, int, float, bool]:
     """
     Parse the value of a mock database record, decoding the value if it's
@@ -43,10 +42,13 @@ def get_mock_data_for_db(
     for data_path in glob.iglob(f"tests/data/dbs/{db_name}/*.json"):
         table_name = os.path.splitext(os.path.basename(data_path))[0]
         records = json.loads(Path(data_path).read_text())
-        yield table_name, [
-            {key: parse_record_value(value) for key, value in record.items()}
-            for record in records
-        ]
+        yield (
+            table_name,
+            [
+                {key: parse_record_value(value) for key, value in record.items()}
+                for record in records
+            ],
+        )
 
 
 def create_mock_db(db_name: MockDatabaseName, db_path: str) -> None:

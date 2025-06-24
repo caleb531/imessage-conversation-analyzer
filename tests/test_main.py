@@ -10,7 +10,6 @@ from tests import ICATestCase
 
 
 class TestMain(ICATestCase):
-
     @patch("ica.cli.main", return_value=None)
     def test_main(self, cli_main: MagicMock) -> None:
         """should import main"""

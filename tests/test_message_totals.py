@@ -11,7 +11,6 @@ from tests import ICATestCase
 
 
 class TestMessageTotals(ICATestCase):
-
     @patch("ica.output_results")
     @patch("sys.argv", [message_totals.__file__, "-c", "Jane Fernbrook"])
     def test_message_counts(self, output_results: MagicMock) -> None:

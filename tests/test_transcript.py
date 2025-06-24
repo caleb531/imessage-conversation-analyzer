@@ -12,7 +12,6 @@ from tests import ICATestCase
 
 
 class TestTranscript(ICATestCase):
-
     @params((1, "Jane Fernbrook"), (2, "Thomas Riverstone"))
     @patch("ica.output_results")
     def test_transcripts(

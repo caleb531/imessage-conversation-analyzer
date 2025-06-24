@@ -64,7 +64,6 @@ test_cases = (
 
 
 class TestOutputResults(ICATestCase):
-
     @params(
         *itertools.product(
             test_cases,

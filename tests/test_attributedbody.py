@@ -6,7 +6,6 @@ from tests import ICATestCase
 
 
 class TestAttributedbody(ICATestCase):
-
     def test_decode_attributedbody(self) -> None:
         """should properly decode message contents encoded in attributedBody"""
         dfs = ica.get_dataframes(contact_name="Thomas Riverstone")

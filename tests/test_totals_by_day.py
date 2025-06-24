@@ -11,7 +11,6 @@ from tests import ICATestCase
 
 
 class TestTotalsByDay(ICATestCase):
-
     @patch("ica.output_results")
     @patch("sys.argv", [totals_by_day.__file__, "-c", "Jane Fernbrook", "-t", "UTC"])
     def test_totals_by_day(self, output_results: MagicMock) -> None:
@@ -26,9 +25,8 @@ class TestTotalsByDay(ICATestCase):
             # (i.e. they are timezone-naive); therefore, we must add the missing
             # timezone information (note that this does not perform any
             # conversions)
-            .pipe(
-                pipe_lambda(lambda df: df.set_index(df.index.tz_localize("UTC")))
-            ).to_dict(
+            .pipe(pipe_lambda(lambda df: df.set_index(df.index.tz_localize("UTC"))))
+            .to_dict(
                 orient="index",
             ),
         )
