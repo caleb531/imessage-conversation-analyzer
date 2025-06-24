@@ -19,7 +19,7 @@ dependencies = [
     "openpyxl",
     "pytypedstream",
     "phonenumbers",
-    "tzlocal"
+    "tzlocal",
 ]
 
 [project.urls]
@@ -79,3 +79,12 @@ exclude_lines = [
 ]
 # Only check coverage for source files
 include = ["ica/**/*.py"]
+
+[dependency-groups]
+dev = [
+    "coverage==7.6.10",
+    "freezegun==1.5.1",
+    "mypy==1.14.1",
+    "nose2==0.15.1",
+    "ruff>=0.12.0",
+]
