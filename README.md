@@ -80,7 +80,9 @@ ICA includes several built-in analyzers out of the box:
    reactions, between you and the other person (attachment files not included)
 6. `count_phrases`: count the number of case-insensitive occurrences of any
    arbitrary strings across all messages in a conversation (excluding
-   reactions); use the `-s` / `--case-sensitive` option for case-sensitive counts
+   reactions); use the `-s` / `--case-sensitive` option for case-sensitive
+   counts, and the `-r` / `--use-regex` option to enable regular expression mode
+   for all phrases you specify
 
 #### Filtering
 
