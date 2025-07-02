@@ -78,9 +78,9 @@ ICA includes several built-in analyzers out of the box:
    you and the other person have been messaging in the conversation
 5. `transcript`: a full, unedited transcript of every message, including
    reactions, between you and the other person (attachment files not included)
-6. `count_phrases`: count the number of case-sensitive occurrences of any
+6. `count_phrases`: count the number of case-insensitive occurrences of any
    arbitrary strings across all messages in a conversation (excluding
-   reactions); use the `-i` / `--insensitive` option for case-insensitive counts
+   reactions); use the `-s` / `--case-sensitive` option for case-sensitive counts
 
 #### Filtering
 

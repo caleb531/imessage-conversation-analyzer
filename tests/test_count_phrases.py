@@ -26,7 +26,7 @@ class TestMessageTotals(ICATestCase):
     @patch("ica.output_results")
     @patch(
         "sys.argv",
-        [count_phrases.__file__, "-c", "Thomas Riverstone", "-i", "hey", "reminds me"],
+        [count_phrases.__file__, "-c", "Thomas Riverstone", "hey", "reminds me"],
     )
     def test_multiple_phrases(self, output_results: MagicMock) -> None:
         """should count the number of occurrences of multiple phrases"""
