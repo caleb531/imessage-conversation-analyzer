@@ -39,9 +39,6 @@ build-backend = "uv_build"
 module-name = "ica"
 module-root = ""
 
-[tool.setuptools.package-data]
-ica = ["*.json", "queries/*.sql", "py.typed"]
-
 [tool.mypy]
 exclude = ["build"]
 disallow_untyped_defs = true
