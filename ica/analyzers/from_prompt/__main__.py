@@ -12,12 +12,7 @@ from openai.types.chat import ChatCompletion
 import ica  # type: ignore
 
 MODEL: Final[str] = "gpt-4.1"
-ICA_REPO: Final[str] = os.path.join(
-    os.path.expanduser("~"),
-    "Repositories",
-    "personal",
-    "imessage-conversation-analyzer",
-)
+ICA_REPO: Final[str] = os.getcwd()
 README_PATH: Final[str] = os.path.join(ICA_REPO, "README.md")
 ANALYZERS_DIR: Final[str] = os.path.join(ICA_REPO, "ica/analyzers")
 PROMPT_TEMPLATE_PATH: Final[str] = os.path.join(
@@ -27,6 +22,7 @@ PROMPT_TEMPLATE_PATH: Final[str] = os.path.join(
 
 
 def get_analyzer_files() -> list[str]:
+    """Retrieve the paths of all analyzer files to send to the model"""
     return [
         os.path.join(ANALYZERS_DIR, fname)
         for fname in os.listdir(ANALYZERS_DIR)
@@ -35,6 +31,10 @@ def get_analyzer_files() -> list[str]:
 
 
 def build_system_prompt() -> str:
+    """
+    Construct the system prompt to send to the model by reading in the README
+    and all existing analyzer code files
+    """
     readme = Path(README_PATH).read_text()
     analyzers_content = "\n\n".join(
         f"# {Path(f).name}\n" + Path(f).read_text() for f in get_analyzer_files()
@@ -43,15 +43,8 @@ def build_system_prompt() -> str:
     return template.format(readme=readme, analyzers_content=analyzers_content)
 
 
-def get_openai_api_key() -> str:
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        print("OPENAI_API_KEY not found in .env file.", file=sys.stderr)
-        sys.exit(1)
-    return api_key
-
-
 def generate_analyzer_code(prompt: str, system_prompt: str) -> ChatCompletion:
+    """Send the prompts to the OpenAI API and return the response"""
     print(f"Generating analyzer with AI ({MODEL})...")
     response = openai.chat.completions.create(
         model=MODEL,
@@ -65,6 +58,7 @@ def generate_analyzer_code(prompt: str, system_prompt: str) -> ChatCompletion:
 
 
 def parse_code_from_response(response: ChatCompletion) -> str:
+    """Extract the analyzer code from a GFM fenced code block in the response"""
     # content can be None depending on SDK types; guard to satisfy type checker
     content = response.choices[0].message.content
     code = (content or "").strip()
@@ -77,17 +71,25 @@ def parse_code_from_response(response: ChatCompletion) -> str:
     return code
 
 
-def get_analyzer_file_path(code: str) -> str:
-    # Extract analyzer name from the first line
-    return os.path.relpath(
-        os.path.join(
-            os.path.dirname(__file__), code.splitlines()[1][1:].strip() if code else ""
-        ),
-        ".",
-    )
+# def get_analyzer_file_path(code: str) -> str:
+#     """
+#     Extract the file name of the generated analyzer from a comment on the second
+#     line, then return the relevant relative path to the file to be written to
+#     disk
+#     """
+#     return os.path.relpath(
+#         os.path.join(
+#             os.path.dirname(__file__), code.splitlines()[1][1:].strip() if code else ""
+#         ),
+#         ".",
+#     )
 
 
 def main() -> None:
+    """
+    Use the OpenAI API to generate an ICA analyzer from the supplied prompt,
+    then execute the generated code
+    """
     cli_parser = ica.get_cli_parser()
     cli_parser.add_argument(
         "--api-key",
@@ -116,7 +118,19 @@ def main() -> None:
     # Execute the generated analyzer code by piping it to Python via stdin
     cmd = [sys.executable, "-"] + sys.argv[1:]
     print("Running analyzer...")
-    subprocess.run(cmd, input=f"{code}\n", text=True)
+    result = subprocess.run(
+        cmd,
+        input=f"{code}\n",
+        text=True,
+        # Roll the printing of stdout/stderr back up to the parent process so
+        # that stdout can be captured by our tests
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    if result.stdout:
+        print(result.stdout, end="")
+    if result.stderr:
+        print(result.stderr, end="", file=sys.stderr)
 
 
 if __name__ == "__main__":

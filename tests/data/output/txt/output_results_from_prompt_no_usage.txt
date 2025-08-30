@@ -1,0 +1,7 @@
+Generating analyzer with AI ({MODEL})...
+Token usage information not available.
+Running analyzer...
+Metric              Total
+Messages             1200
+Messages From Me      700
+Messages From Them    500
