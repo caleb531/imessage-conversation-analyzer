@@ -85,6 +85,14 @@ def get_cli_parser() -> argparse.ArgumentParser:
     return parser
 
 
+# Retrieve the file path of a module given its module path (e.g. "ica.analyzers.message_totals")
+def get_file_path_from_module_path(module_name: str) -> str:
+    spec = importlib.util.find_spec(module_name)
+    if spec is None or spec.origin is None or spec.origin == "namespace":
+        raise ModuleNotFoundError(module_name)
+    return spec.origin
+
+
 def get_cli_args() -> argparse.Namespace:
     """
     [DEPRECATED]: Parse user arguments from the command line; use
@@ -101,12 +109,9 @@ def run_analyzer(analyzer: str) -> None:
     # Check to see if the provided value is the module name of a built-in
     # analyzer, otherwise the value is an analyzer path
     with contextlib.suppress(ModuleNotFoundError):
-        if importlib.util.find_spec(f"ica.analyzers.{analyzer}"):
-            analyzer = str(
-                importlib.resources.files(__package__).joinpath(
-                    os.path.join("analyzers", f"{analyzer}.py")
-                )
-            )
+        analyzer = get_file_path_from_module_path(f"ica.analyzers.{analyzer}").replace(
+            "__init__.py", "__main__.py"
+        )
     loader = importlib.machinery.SourceFileLoader("__main__", analyzer)
     spec = importlib.util.spec_from_loader(loader.name, loader)
     if not spec:

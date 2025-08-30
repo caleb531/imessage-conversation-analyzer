@@ -20,6 +20,7 @@ dependencies = [
     "pytypedstream",
     "phonenumbers",
     "tzlocal",
+    "openai>=1.102.0",
 ]
 
 [project.urls]
