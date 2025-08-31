@@ -8,32 +8,32 @@ import ica.analyzers.from_prompt.__main__ as from_prompt
 from tests import ICATestCase
 from tests.utils import use_env
 
+API_KEY = "abc"
+PROMPT = "test prompt"
+
+MOCK_ANALYZER_CONTENTS = Path(
+    "tests/data/analyzers/generated_from_prompt.py"
+).read_text()
+
+
+def get_mock_completion_response(
+    content: str = f"```python\n{MOCK_ANALYZER_CONTENTS}\n```",
+    include_usage: bool = True,
+) -> types.SimpleNamespace:
+    """
+    Construct a mock object that resembles a response from the OpenAI
+    Completions API
+    """
+    msg = types.SimpleNamespace(content=content)
+    choice = types.SimpleNamespace(message=msg)
+    if include_usage:
+        usage = types.SimpleNamespace(prompt_tokens=10, completion_tokens=2)
+    else:
+        usage = None
+    return types.SimpleNamespace(choices=[choice], usage=usage)
+
 
 class TestFromPrompt(ICATestCase):
-    API_KEY = "abc"
-    PROMPT = "test prompt"
-
-    MOCK_ANALYZER_CONTENTS = Path(
-        "tests/data/analyzers/generated_from_prompt.py"
-    ).read_text()
-
-    @staticmethod
-    def get_mock_completion_response(
-        content: str = f"```python\n{MOCK_ANALYZER_CONTENTS}\n```",
-        include_usage: bool = True,
-    ) -> types.SimpleNamespace:
-        """
-        Construct a mock object that resembles a response from the OpenAI
-        Completions API
-        """
-        msg = types.SimpleNamespace(content=content)
-        choice = types.SimpleNamespace(message=msg)
-        if include_usage:
-            usage = types.SimpleNamespace(prompt_tokens=10, completion_tokens=2)
-        else:
-            usage = None
-        return types.SimpleNamespace(choices=[choice], usage=usage)
-
     # The openai.OpenAIError raised when we mock the OpenAI API below due to the
     # API_KEY environment variable not being set
     @use_env("OPENAI_API_KEY", API_KEY)
