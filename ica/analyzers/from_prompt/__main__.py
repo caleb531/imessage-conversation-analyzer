@@ -9,7 +9,7 @@ from typing import Final
 import openai
 from openai.types.chat import ChatCompletion
 
-import ica  # type: ignore
+import ica
 
 MODEL: Final[str] = "gpt-4.1"
 ICA_REPO: Final[str] = os.getcwd()
