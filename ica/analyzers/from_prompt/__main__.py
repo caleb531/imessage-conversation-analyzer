@@ -71,18 +71,13 @@ def parse_code_from_response(response: ChatCompletion) -> str:
     return code
 
 
-# def get_analyzer_file_path(code: str) -> str:
-#     """
-#     Extract the file name of the generated analyzer from a comment on the second
-#     line, then return the relevant relative path to the file to be written to
-#     disk
-#     """
-#     return os.path.relpath(
-#         os.path.join(
-#             os.path.dirname(__file__), code.splitlines()[1][1:].strip() if code else ""
-#         ),
-#         ".",
-#     )
+def get_analyzer_file_path(code: str) -> Path:
+    """
+    Extract the file name of the generated analyzer from a comment on the second
+    line, then return the relevant Path object to the file to be written to disk
+    """
+    filename = code.splitlines()[0][1:].strip() if code else ""
+    return Path.cwd() / filename
 
 
 def main() -> None:
@@ -93,8 +88,14 @@ def main() -> None:
     cli_parser = ica.get_cli_parser()
     cli_parser.add_argument(
         "--api-key",
-        "-k",
+        "-a",
         help="API key to send to the OpenAI API.",
+    )
+    cli_parser.add_argument(
+        "--keep",
+        "-k",
+        action="store_true",
+        help="Writes the generated analyzer to disk before executing it",
     )
     cli_parser.add_argument(
         "prompt",
@@ -116,7 +117,13 @@ def main() -> None:
         print("Token usage information not available.")
     code = parse_code_from_response(response)
     # Execute the generated analyzer code by piping it to Python via stdin
-    cmd = [sys.executable, "-"] + sys.argv[1:]
+    if cli_args.keep:
+        analyzer_file_path = get_analyzer_file_path(code)
+        print(f"Writing analyzer to {analyzer_file_path}")
+        analyzer_file_path.write_text(code)
+        cmd = [sys.executable, str(analyzer_file_path)] + sys.argv[1:]
+    else:
+        cmd = [sys.executable, "-"] + sys.argv[1:]
     print("Running analyzer...")
     result = subprocess.run(
         cmd,

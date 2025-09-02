@@ -12,7 +12,7 @@ Here are several example ICA analyzers:
 
 You will receive a user request for the analyzer you must generate as a separate message.
 
-Choose a clear, concise, and descriptive name for the analyzer based on the user request (should include .py file extension). This line should be the second line of the program (below the shebang), and should be in the following format:
+Choose a clear, concise, and descriptive name for the analyzer based on the user request (should include .py file extension). This line should be the first line of the program (no shebang), and should be in the following format:
 
 # <your_chosen_name.py>
 
