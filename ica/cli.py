@@ -3,7 +3,6 @@
 import argparse
 import contextlib
 import importlib.machinery
-import importlib.resources
 import importlib.util
 import os
 import os.path
