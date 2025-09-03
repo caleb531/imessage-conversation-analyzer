@@ -4,9 +4,8 @@ import argparse
 import contextlib
 import importlib.machinery
 import importlib.util
-import os
-import os.path
 import sys
+from pathlib import Path
 
 from ica.exceptions import BaseAnalyzerException
 
@@ -31,7 +30,7 @@ def get_cli_parser() -> argparse.ArgumentParser:
     if did_user_invoke_cli_directly:
         parser.add_argument(
             "analyzer",
-            type=os.path.expanduser,
+            type=lambda p: str(Path(p).expanduser()),
             help="the name of a built-in analyzer, or a path to an analyzer file",
         )
     parser.add_argument(

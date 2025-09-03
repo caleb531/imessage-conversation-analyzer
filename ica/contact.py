@@ -3,8 +3,8 @@
 import glob
 import importlib.resources
 import os
-import os.path
 import sqlite3
+from pathlib import Path
 from typing import Optional
 
 import pandas as pd
@@ -13,10 +13,14 @@ import phonenumbers
 from ica.exceptions import ContactNotFoundError
 
 # The glob pattern matching all AddressBook SQL databases to read from
-DB_GLOB = os.path.expanduser(
-    os.path.join(
-        "~", "Library", "Application Support", "AddressBook", "Sources", "*", "*.abcddb"
-    )
+DB_GLOB = (
+    Path.home()
+    / "Library"
+    / "Application Support"
+    / "AddressBook"
+    / "Sources"
+    / "*"
+    / "*.abcddb"
 )
 
 
@@ -56,7 +60,7 @@ def get_chat_identifiers(contact_name: str) -> list[str]:
     # There is a separate AddressBook database file for each "source" of
     # contacts (e.g. On My Mac, iCloud, etc.); we must query each of these
     # databases and combine the separate results into a single result set
-    for db_path in glob.iglob(DB_GLOB):
+    for db_path in glob.iglob(str(DB_GLOB)):
         with sqlite3.connect(db_path) as connection:
             rows = pd.read_sql_query(
                 sql=importlib.resources.files(__package__)

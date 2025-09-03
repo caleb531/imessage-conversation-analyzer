@@ -4,8 +4,6 @@
 import base64
 import glob
 import json
-import os
-import os.path
 import sqlite3
 from collections.abc import Generator
 from pathlib import Path
@@ -40,7 +38,7 @@ def get_mock_data_for_db(
 ) -> Generator[tuple[str, list[dict]], Any, Any]:
     """Retrieve all JSON mock table data for the DB with the given name"""
     for data_path in glob.iglob(f"tests/data/dbs/{db_name}/*.json"):
-        table_name = os.path.splitext(os.path.basename(data_path))[0]
+        table_name = Path(data_path).stem
         records = json.loads(Path(data_path).read_text())
         yield (
             table_name,
@@ -51,7 +49,7 @@ def get_mock_data_for_db(
         )
 
 
-def create_mock_db(db_name: MockDatabaseName, db_path: str) -> None:
+def create_mock_db(db_name: MockDatabaseName, db_path: Path) -> None:
     """Create and populate a mock database with the given name and path"""
     with sqlite3.connect(db_path) as con:
         for table_name, records in get_mock_data_for_db(db_name):

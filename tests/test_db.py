@@ -28,8 +28,8 @@ class TestDB(ICATestCase):
         self.assertEqual(core.DB_PATH, mock_chats_db_path)
         self.assertEqual(contact.DB_GLOB, mock_contacts_db_glob)
         self.assertIn(
-            mock_contacts_db_path,
-            glob.glob(mock_contacts_db_glob),
+            str(mock_contacts_db_path),
+            glob.glob(str(mock_contacts_db_glob)),
             "glob for mock contact database does not correctly resolve to"
             " database path",
         )

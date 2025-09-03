@@ -10,6 +10,7 @@ import tempfile
 import unittest
 from functools import wraps
 from io import BytesIO, StringIO
+from pathlib import Path
 from typing import Any, Callable, Generator
 from unittest import TestCase
 from unittest.mock import patch
@@ -22,13 +23,13 @@ TestCase.maxDiff = None
 
 # When running tests, point to mock sqlite3 database instead of the default
 # macOS chat.db under ~/Library
-temp_ica_dir = os.path.join(tempfile.gettempdir(), "ica")
+temp_ica_dir = Path(tempfile.gettempdir()) / "ica"
 
-mock_contacts_db_glob = os.path.join(temp_ica_dir, "*.abcddb")
-mock_contacts_db_path = mock_contacts_db_glob.replace("*", "addressbook")
+mock_contacts_db_glob = temp_ica_dir / "*.abcddb"
+mock_contacts_db_path = mock_contacts_db_glob.with_name("addressbook.abcddb")
 contacts_db_glob_patcher = patch("ica.contact.DB_GLOB", mock_contacts_db_glob)
 
-mock_chats_db_path = os.path.join(temp_ica_dir, "chat.db")
+mock_chats_db_path = temp_ica_dir / "chat.db"
 chats_db_path_patcher = patch("ica.core.DB_PATH", mock_chats_db_path)
 
 
@@ -46,7 +47,7 @@ class ICATestCase(unittest.TestCase):
         contacts_db_glob_patcher.start()
         chats_db_path_patcher.start()
         with contextlib.suppress(OSError):
-            os.makedirs(temp_ica_dir)
+            temp_ica_dir.mkdir(parents=True, exist_ok=True)
         create_mock_db("contacts", mock_contacts_db_path)
         create_mock_db("chats", mock_chats_db_path)
 

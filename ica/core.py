@@ -4,7 +4,6 @@ import importlib.machinery
 import importlib.resources
 import importlib.util
 import os
-import os.path
 import sqlite3
 import sys
 from dataclasses import dataclass
@@ -32,7 +31,7 @@ CHAT_IDENTIFIER_DELIMITER = "|"
 
 
 # The path to the database file for the macOS Messages application
-DB_PATH = os.path.expanduser(os.path.join("~", "Library", "Messages", "chat.db"))
+DB_PATH = Path.home() / "Library" / "Messages" / "chat.db"
 
 
 # The formats supported for file output, represented as a dictionary where each

@@ -10,6 +10,7 @@ from tests.utils import ICATestCase, temp_ica_dir, use_env
 API_KEY = "abc"
 PROMPT = "test prompt"
 
+# Ensure `Path` is used consistently for file operations
 MOCK_ANALYZER_CONTENTS = Path(
     "tests/data/analyzers/generated_from_prompt.py"
 ).read_text()
