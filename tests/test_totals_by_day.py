@@ -7,7 +7,7 @@ import pandas as pd
 
 import ica.analyzers.totals_by_day as totals_by_day
 from ica import pipe_lambda
-from tests import ICATestCase
+from tests.utils import ICATestCase
 
 
 class TestTotalsByDay(ICATestCase):

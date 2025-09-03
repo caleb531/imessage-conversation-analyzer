@@ -2,7 +2,7 @@
 """test the message_totals built-in analyzer"""
 
 import ica
-from tests import ICATestCase
+from tests.utils import ICATestCase
 
 
 class TestAttributedbody(ICATestCase):

@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, patch
 import pandas as pd
 
 import ica.analyzers.most_frequent_emojis as most_frequent_emojis
-from tests import ICATestCase
+from tests.utils import ICATestCase
 
 
 class TestMostFrequentEmojis(ICATestCase):

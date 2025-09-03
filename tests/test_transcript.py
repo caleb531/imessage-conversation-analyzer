@@ -8,7 +8,7 @@ import pandas as pd
 from nose2.tools import params
 
 import ica.analyzers.transcript as transcript
-from tests import ICATestCase
+from tests.utils import ICATestCase
 
 
 class TestTranscript(ICATestCase):

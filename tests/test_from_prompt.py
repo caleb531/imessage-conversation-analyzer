@@ -5,8 +5,7 @@ from pathlib import Path
 from unittest.mock import Mock, patch
 
 import ica.analyzers.from_prompt.__main__ as from_prompt
-from tests import ICATestCase, temp_ica_dir
-from tests.utils import use_env
+from tests.utils import ICATestCase, temp_ica_dir, use_env
 
 API_KEY = "abc"
 PROMPT = "test prompt"

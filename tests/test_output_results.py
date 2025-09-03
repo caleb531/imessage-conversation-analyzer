@@ -14,7 +14,7 @@ from nose2.tools import params
 import ica
 from ica import assign_lambda
 from ica.core import prepare_df_for_output
-from tests import ICATestCase, StdoutMockWithBuffer, temp_ica_dir
+from tests.utils import ICATestCase, StdoutMockWithBuffer, temp_ica_dir
 
 
 class IndexType(Enum):

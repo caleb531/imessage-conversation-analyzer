@@ -7,7 +7,7 @@ import pandas as pd
 from freezegun import freeze_time
 
 import ica.analyzers.message_totals as message_totals
-from tests import ICATestCase
+from tests.utils import ICATestCase
 
 
 class TestMessageTotals(ICATestCase):

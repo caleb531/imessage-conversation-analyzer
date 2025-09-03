@@ -8,7 +8,7 @@ import pandas as pd
 import ica
 import ica.analyzers.attachment_totals as attachment_totals
 import ica.analyzers.totals_by_day as totals_by_day
-from tests import ICATestCase
+from tests.utils import ICATestCase
 
 
 class TestFiltering(ICATestCase):

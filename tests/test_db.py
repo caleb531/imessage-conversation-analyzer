@@ -9,7 +9,7 @@ from typing import Any, Sequence, Union
 
 import ica.contact as contact
 import ica.core as core
-from tests import (
+from tests.utils import (
     ICATestCase,
     mock_chats_db_path,
     mock_contacts_db_glob,

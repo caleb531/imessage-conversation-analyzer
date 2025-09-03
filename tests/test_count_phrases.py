@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, patch
 import pandas as pd
 
 import ica.analyzers.count_phrases as count_phrases
-from tests import ICATestCase
+from tests.utils import ICATestCase
 
 
 class TestMessageTotals(ICATestCase):

@@ -6,7 +6,7 @@ import importlib.machinery
 import importlib.util
 from unittest.mock import MagicMock, patch
 
-from tests import ICATestCase
+from tests.utils import ICATestCase
 
 
 class TestMain(ICATestCase):

@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, patch
 
 import ica.analyzers.message_totals as message_totals
 import ica.cli as cli
-from tests import ICATestCase
+from tests.utils import ICATestCase
 
 
 class TestCLI(ICATestCase):
