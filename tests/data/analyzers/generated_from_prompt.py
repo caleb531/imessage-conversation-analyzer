@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # generated_from_prompt.py
 
 import pandas as pd

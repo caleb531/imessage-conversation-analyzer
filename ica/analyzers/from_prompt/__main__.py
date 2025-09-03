@@ -88,13 +88,13 @@ def main() -> None:
     cli_parser = ica.get_cli_parser()
     cli_parser.add_argument(
         "--api-key",
-        "-a",
+        "--key",
+        "-k",
         help="API key to send to the OpenAI API.",
     )
     cli_parser.add_argument(
-        "--keep",
-        "-k",
-        action="store_true",
+        "--write",
+        "-w",
         help="Writes the generated analyzer to disk before executing it",
     )
     cli_parser.add_argument(
@@ -117,9 +117,10 @@ def main() -> None:
         print("Token usage information not available.")
     code = parse_code_from_response(response)
     # Execute the generated analyzer code by piping it to Python via stdin
-    if cli_args.keep:
-        analyzer_file_path = get_analyzer_file_path(code)
-        print(f"Writing analyzer to {analyzer_file_path}")
+    if cli_args.write:
+        # Optionally write the generated code to a file before executing it
+        analyzer_file_path = Path(cli_args.write).expanduser().resolve()
+        print(f"Writing analyzer to {cli_args.write}")
         analyzer_file_path.write_text(code)
         cmd = [sys.executable, str(analyzer_file_path)] + sys.argv[1:]
     else:

@@ -84,7 +84,9 @@ ICA includes several built-in analyzers out of the box:
    counts, and the `-r` / `--use-regex` option to enable regular expression mode
    for all phrases you specify
 7. `from_prompt`: generates a custom analyzer based on a natural language prompt
-   using AI; requires an OpenAI API key via the `--api-key` option
+   using AI; requires an OpenAI API key via the `--api-key` / `-k` option; you
+   can optionally write the generated analyzer to disk using the `--write` /
+   `-w` option
 
 #### Filtering
 

@@ -5,7 +5,7 @@ from pathlib import Path
 from unittest.mock import Mock, patch
 
 import ica.analyzers.from_prompt.__main__ as from_prompt
-from tests import ICATestCase
+from tests import ICATestCase, temp_ica_dir
 from tests.utils import use_env
 
 API_KEY = "abc"
@@ -92,4 +92,40 @@ class TestFromPrompt(ICATestCase):
                 Path("tests/data/output/txt/output_results_from_prompt_no_usage.txt")
                 .read_text()
                 .replace(r"{MODEL}", from_prompt.MODEL),
+            )
+
+    @use_env("OPENAI_API_KEY", API_KEY)
+    @patch(
+        "openai.chat.completions.create",
+        return_value=get_mock_completion_response(),
+    )
+    def test_from_prompt_keep_analyzer(self, completions_create: Mock) -> None:
+        """
+        Should write the generated analyzer to disk when the option is passed
+        """
+        out = StringIO()
+        generated_analyzer_file_name = "generated_from_prompt.py"
+        generated_analyzer_file_path = f"{temp_ica_dir}/{generated_analyzer_file_name}"
+        with (
+            redirect_stdout(out),
+            patch(
+                "sys.argv",
+                [
+                    from_prompt.__file__,
+                    "-c",
+                    "Jane Fernbrook",
+                    "--api-key",
+                    API_KEY,
+                    "--write",
+                    generated_analyzer_file_path,
+                    PROMPT,
+                ],
+            ),
+        ):
+            from_prompt.main()
+            self.assertEqual(
+                Path(generated_analyzer_file_path).read_text().rstrip(),
+                Path(f"tests/data/analyzers/{generated_analyzer_file_name}")
+                .read_text()
+                .rstrip(),
             )
