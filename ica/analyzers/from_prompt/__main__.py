@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -62,12 +63,9 @@ def parse_code_from_response(response: ChatCompletion) -> str:
     # content can be None depending on SDK types; guard to satisfy type checker
     content = response.choices[0].message.content
     code = (content or "").strip()
-    if code.startswith("````python"):
-        code = code.split("````python", 1)[-1].split("````", 1)[0].strip()
-    elif code.startswith("```python"):
-        code = code.split("```python", 1)[-1].split("```", 1)[0].strip()
-    elif code.startswith("```"):
-        code = code.split("```", 1)[-1].split("```", 1)[0].strip()
+    match = re.search(r"(`{3,4})(python)?\n(.*?)\n\1", code, re.DOTALL)
+    if match:
+        code = match.group(3).strip()
     return code
 
 
