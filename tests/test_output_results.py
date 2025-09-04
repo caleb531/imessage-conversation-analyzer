@@ -64,6 +64,11 @@ test_cases = (
 
 
 class TestOutputResults(ICATestCase):
+    """
+    Test cases for verifying the output results of analyzers, ensuring correct
+    formatting and handling of various output types.
+    """
+
     @params(
         *itertools.product(
             test_cases,

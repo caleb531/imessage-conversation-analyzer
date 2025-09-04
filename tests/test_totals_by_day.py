@@ -11,6 +11,11 @@ from tests.utils import ICATestCase
 
 
 class TestTotalsByDay(ICATestCase):
+    """
+    Test cases for the `totals_by_day` analyzer, which calculates the total
+    number of days with messages in a conversation.
+    """
+
     @patch("ica.output_results")
     @patch("sys.argv", [totals_by_day.__file__, "-c", "Jane Fernbrook", "-t", "UTC"])
     def test_totals_by_day(self, output_results: MagicMock) -> None:

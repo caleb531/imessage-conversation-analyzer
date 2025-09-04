@@ -12,6 +12,11 @@ from tests.utils import ICATestCase
 
 
 class TestCLI(ICATestCase):
+    """
+    Test cases for the CLI, ensuring correct behavior for various argument
+    combinations and error handling scenarios.
+    """
+
     def tearDown(self) -> None:
         super().tearDown()
         cli.did_user_invoke_cli_directly = False

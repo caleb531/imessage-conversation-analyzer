@@ -11,6 +11,11 @@ from tests.utils import ICATestCase
 
 
 class TestMessageTotals(ICATestCase):
+    """
+    Test cases for the `message_totals` analyzer, which calculates totals for
+    messages, reactions, and days messaged in a conversation.
+    """
+
     @patch("ica.output_results")
     @patch("sys.argv", [message_totals.__file__, "-c", "Jane Fernbrook"])
     def test_message_counts(self, output_results: MagicMock) -> None:

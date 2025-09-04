@@ -6,6 +6,12 @@ from tests.utils import ICATestCase
 
 
 class TestContact(ICATestCase):
+    """
+    Test cases for verifying contact-related functionality, such as finding
+    conversations by phone number or email, and handling errors for missing or
+    incomplete contact information.
+    """
+
     def test_find_conversation_via_phone_number_only(self) -> None:
         """
         should find conversation for contact with phone number only

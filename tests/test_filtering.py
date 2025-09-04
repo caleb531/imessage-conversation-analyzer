@@ -12,6 +12,11 @@ from tests.utils import ICATestCase
 
 
 class TestFiltering(ICATestCase):
+    """
+    Test cases for filtering analyzer results by date and person, ensuring
+    correct handling of various filtering criteria.
+    """
+
     @patch("ica.output_results")
     @patch(
         "sys.argv",

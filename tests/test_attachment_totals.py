@@ -10,6 +10,12 @@ from tests.utils import ICATestCase
 
 
 class TestAttachmentTotals(ICATestCase):
+    """
+    Test cases for the `attachment_totals` analyzer, which calculates totals for
+    various types of attachments in a conversation, such as GIFs, YouTube
+    videos, Apple Music links, and Spotify links.
+    """
+
     @patch("ica.output_results")
     @patch("sys.argv", [attachment_totals.__file__, "-c", "Jane Fernbrook"])
     def test_gif_count(self, output_results: MagicMock) -> None:

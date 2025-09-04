@@ -23,6 +23,11 @@ def get_duplicates(items: Union[Sequence[Any], Generator[Any, Any, Any]]) -> lis
 
 
 class TestDB(ICATestCase):
+    """
+    Test cases for verifying the integrity of mock databases, including checks
+    for unique IDs, timestamps, and foreign key associations.
+    """
+
     def test_db_paths(self) -> None:
         """should mock paths to databases"""
         self.assertEqual(core.DB_PATH, mock_chats_db_path)

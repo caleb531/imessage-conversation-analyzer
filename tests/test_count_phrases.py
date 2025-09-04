@@ -11,6 +11,11 @@ from tests.utils import ICATestCase
 
 
 class TestMessageTotals(ICATestCase):
+    """
+    Test cases for the `count_phrases` analyzer, which counts occurrences of
+    specific phrases, emojis, or special characters in a conversation.
+    """
+
     @patch("ica.output_results")
     @patch(
         "sys.argv",

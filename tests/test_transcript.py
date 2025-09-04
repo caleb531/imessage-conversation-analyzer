@@ -12,6 +12,11 @@ from tests.utils import ICATestCase
 
 
 class TestTranscript(ICATestCase):
+    """
+    Test cases for the `transcript` analyzer, which generates transcripts of
+    conversations.
+    """
+
     @params((1, "Jane Fernbrook"), (2, "Thomas Riverstone"))
     @patch("ica.output_results")
     def test_transcripts(

@@ -34,6 +34,11 @@ def get_mock_completion_response(
 
 
 class TestFromPrompt(ICATestCase):
+    """
+    Test cases for generating analyzers from prompts using the OpenAI API,
+    including handling of API responses and generated code.
+    """
+
     # The openai.OpenAIError raised when we mock the OpenAI API below due to the
     # API_KEY environment variable not being set
     @use_env("OPENAI_API_KEY", API_KEY)

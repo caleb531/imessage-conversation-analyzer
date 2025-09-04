@@ -10,6 +10,11 @@ from tests.utils import ICATestCase
 
 
 class TestMain(ICATestCase):
+    """
+    Test cases for the `__main__` entry point module, ensuring that the CLI is
+    invoked correctly.
+    """
+
     @patch("ica.cli.main", return_value=None)
     def test_main(self, cli_main: MagicMock) -> None:
         """should import main"""
