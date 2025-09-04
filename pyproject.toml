@@ -53,15 +53,21 @@ module = [
 ]
 ignore_missing_imports = true
 
-[tool.flake8]
-# Black compatibility
-max-line-length = 88
-extend-ignore = ["E203", "W503"]
-exclude = [".git", "build/**/*.py", "__pycache__", "*.egg-info", ".virtualenv"]
+[tool.ruff]
+include = ["**/*.py"]
 
-# Per <https://black.readthedocs.io/en/stable/guides/using_black_with_other_tools.html#profile>
-[tool.isort]
-profile = "black"
+[tool.ruff.lint]
+select = [
+    # pycodestyle
+    "E",
+    "W",
+    # pyflakes
+    "F",
+    # isort
+    "I",
+    # perflint
+    "PERF",
+]
 
 # Configuration for coverage.py (https://pypi.python.org/pypi/coverage)
 
