@@ -83,7 +83,8 @@ def get_cli_parser() -> argparse.ArgumentParser:
     return parser
 
 
-# Retrieve the file path of a module given its module path (e.g. "ica.analyzers.message_totals")
+# Retrieve the file path of a module given its module path (e.g.
+# "ica.analyzers.message_totals")
 def get_file_path_from_module_path(module_name: str) -> str:
     spec = importlib.util.find_spec(module_name)
     if spec is None or spec.origin is None or spec.origin == "namespace":
