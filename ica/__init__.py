@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# flake8: noqa
+# ruff: noqa
 
 from ica.cli import get_cli_args, get_cli_parser
 from ica.core import (
