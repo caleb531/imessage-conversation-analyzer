@@ -34,10 +34,12 @@ chats_db_path_patcher = patch("ica.core.DB_PATH", mock_chats_db_path)
 
 
 class ICATestCase(unittest.TestCase):
-    """A base class from which all other ICA test case classes inherit"""
+    """A base class from which all other ICA test case classes inherit."""
 
     def setUp(self) -> None:
-        """global setup fixture for all tests"""
+        """
+        Create temporary directory and initialize mock databases for each test.
+        """
         # If the user aborts the tests with control-C before all tests complete,
         # it can prevent the teardown code from running, thus causing an error
         # the next time tests are run because the database tables still exist;
@@ -52,19 +54,26 @@ class ICATestCase(unittest.TestCase):
         create_mock_db("chats", mock_chats_db_path)
 
     def tearDown(self) -> None:
-        """global teardown fixture for all tests"""
+        """
+        Remove temporary directory and unlink mock databases for each test.
+        """
         with contextlib.suppress(OSError):
             shutil.rmtree(temp_ica_dir)
         chats_db_path_patcher.stop()
         contacts_db_glob_patcher.stop()
 
 
-# The sys.stdout.buffer object is a readonly attribute, and not even
-# unittest.mock.patch is able to override it; however, we can subclass
-# StringIO() and add a 'buffer' object pointing to a BytesIO() object, then pass
-# an instance of this subclass to the stdlib contextlib.redirect_stdout context
-# manager without issue
 class StdoutMockWithBuffer(StringIO):
+    """
+    A mock class for standard output that provides both text and binary buffers.
+
+    The sys.stdout.buffer object is a readonly attribute, and not even
+    unittest.mock.patch is able to override it; however, we can subclass
+    StringIO() and add a 'buffer' object pointing to a BytesIO() object, then
+    pass an instance of this subclass to the stdlib contextlib.redirect_stdout
+    context manager without issue.
+    #"""
+
     def __init__(self, initial_value: str = "", newline: str = "\n") -> None:
         super().__init__(initial_value, newline)
         object.__setattr__(self, "buffer", BytesIO())
