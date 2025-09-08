@@ -20,7 +20,7 @@ class TestMostFrequentEmojis(ICATestCase):
     @patch("ica.output_results")
     @patch("sys.argv", [most_frequent_emojis.__file__, "-c", "Jane Fernbrook"])
     def test_most_frequent_emojis(self, output_results: MagicMock) -> None:
-        """should compute the most frequently-used emojis"""
+        """Should compute the most frequently-used emojis."""
         most_frequent_emojis.__package__ = "ica"
         most_frequent_emojis.main()
         df: pd.DataFrame = output_results.call_args[0][0]
@@ -36,8 +36,8 @@ class TestMostFrequentEmojis(ICATestCase):
     )
     def test_most_frequent_emojis_result_count(self, output_results: MagicMock) -> None:
         """
-        should compute the n most frequently-used emojis (where n is
-        user-specified)
+        Should compute the n most frequently-used emojis (where n is
+        user-specified).
         """
         most_frequent_emojis.__package__ = "ica"
         most_frequent_emojis.main()
@@ -56,7 +56,7 @@ class TestMostFrequentEmojis(ICATestCase):
     @patch("ica.output_results")
     @patch("sys.argv", [most_frequent_emojis.__file__, "-c", "Daniel Brightingale"])
     def test_skin_tones(self, output_results: MagicMock) -> None:
-        """should disregard skin tones when counting emojis"""
+        """Should disregard skin tones when counting emojis."""
         most_frequent_emojis.__package__ = "ica"
         most_frequent_emojis.main()
         df: pd.DataFrame = output_results.call_args[0][0]

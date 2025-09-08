@@ -84,7 +84,7 @@ class TestOutputResults(ICATestCase):
         test_case: tuple[str, pd.DataFrame, IndexType],
         output_type: tuple[str, str, str],
     ) -> None:
-        """should print a dataframe to stdout"""
+        """Should print a dataframe to stdout."""
         test_name, df, use_default_index = test_case
         format, ext, df_read_method_name = output_type
         with redirect_stdout(StringIO()) as stdout:
@@ -108,7 +108,7 @@ class TestOutputResults(ICATestCase):
         format: Optional[str],
     ) -> None:
         """
-        should print the dataframe to stdout as binary Excel data
+        Should print the dataframe to stdout as binary Excel data.
         """
         test_name, df, use_default_index = test_case
         with redirect_stdout(StdoutMockWithBuffer()) as stdout:
@@ -145,7 +145,7 @@ class TestOutputResults(ICATestCase):
         test_case: tuple[str, pd.DataFrame, IndexType],
         output_type: tuple[str, str],
     ) -> None:
-        """should write a DataFrame to a plain-text file"""
+        """Should write a DataFrame to a plain-text file."""
         test_name, df, use_default_index = test_case
         format, ext = output_type
         output_path = f"{temp_ica_dir}/{test_name}_{format}.{ext}"
@@ -175,7 +175,7 @@ class TestOutputResults(ICATestCase):
         test_case: tuple[str, pd.DataFrame, IndexType],
         output_type: tuple[str, str],
     ) -> None:
-        """should write a DataFrame to a binary file (i.e. Excel)"""
+        """Should write a DataFrame to a binary file (i.e. Excel)."""
         test_name, df, use_default_index = test_case
         format, ext = output_type
         output_path = f"{temp_ica_dir}/{test_name}_{format}.{ext}"
@@ -214,8 +214,8 @@ class TestOutputResults(ICATestCase):
         output_type: tuple[str, str],
     ) -> None:
         """
-        should write a dataframe to an explicitly-passed StringIO buffer, but
-        not print to stdout
+        Should write a dataframe to an explicitly-passed StringIO buffer, but
+        not print to stdout.
         """
         test_name, df, use_default_index = test_case
         format, ext = output_type
@@ -236,8 +236,8 @@ class TestOutputResults(ICATestCase):
 
     def test_output_results_bytes_buffer(self) -> None:
         """
-        should write a dataframe to an explicitly-passed BytesIO buffer, but not
-        print to stdout
+        Should write a dataframe to an explicitly-passed BytesIO buffer, but not
+        print to stdout.
         """
         test_name, df, use_default_index = test_cases[0]
         format = "excel"
@@ -257,7 +257,7 @@ class TestOutputResults(ICATestCase):
             )
 
     def test_output_results_invalid_format(self) -> None:
-        """should raise an error if format is invalid"""
+        """Should raise an error if format is invalid."""
         test_name, df, use_default_index = test_cases[0]
         with self.assertRaises(ica.FormatNotSupportedError):
             with redirect_stdout(StringIO()):
@@ -265,8 +265,8 @@ class TestOutputResults(ICATestCase):
 
     def test_output_results_cannot_infer_format(self) -> None:
         """
-        should fall back to default format if format cannot be inferred from
-        output path's file extension
+        Should fall back to default format if format cannot be inferred from
+        output path's file extension.
         """
         test_name, df, use_default_index = test_cases[0]
         output_path = f"{temp_ica_dir}/output.abc"
@@ -281,7 +281,7 @@ class TestOutputResults(ICATestCase):
 
     def test_output_results_empty_output_string(self) -> None:
         """
-        should print to stdout using default format if output is an empty string
+        Should print to stdout using default format if output is an empty string.
         """
         test_name, df, use_default_index = test_cases[0]
         with redirect_stdout(StringIO()) as stdout:

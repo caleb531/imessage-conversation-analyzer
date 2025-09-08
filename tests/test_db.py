@@ -29,7 +29,7 @@ class TestDB(ICATestCase):
     """
 
     def test_db_paths(self) -> None:
-        """should mock paths to databases"""
+        """Should mock paths to databases."""
         self.assertEqual(core.DB_PATH, mock_chats_db_path)
         self.assertEqual(contact.DB_GLOB, mock_contacts_db_glob)
         self.assertIn(

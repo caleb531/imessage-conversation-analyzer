@@ -19,7 +19,7 @@ class TestTotalsByDay(ICATestCase):
     @patch("ica.output_results")
     @patch("sys.argv", [totals_by_day.__file__, "-c", "Jane Fernbrook", "-t", "UTC"])
     def test_totals_by_day(self, output_results: MagicMock) -> None:
-        """should count the total number of days"""
+        """Should count the total number of days."""
         totals_by_day.main()
         df: pd.DataFrame = output_results.call_args[0][0]
         self.assertEqual(

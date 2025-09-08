@@ -22,7 +22,7 @@ class TestTranscript(ICATestCase):
     def test_transcripts(
         self, transcript_num: Any, contact_name: str, output_results: MagicMock
     ) -> None:
-        """should generate transcripts of all mock conversations"""
+        """Should generate transcripts of all mock conversations."""
         with patch("sys.argv", [transcript.__file__, "-c", contact_name, "-t", "UTC"]):
             transcript.main()
             df: pd.DataFrame = output_results.call_args[0][0]

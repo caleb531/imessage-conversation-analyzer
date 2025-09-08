@@ -19,7 +19,7 @@ class TestMessageTotals(ICATestCase):
     @patch("ica.output_results")
     @patch("sys.argv", [message_totals.__file__, "-c", "Jane Fernbrook"])
     def test_message_counts(self, output_results: MagicMock) -> None:
-        """should count the number of messages according to various criteria"""
+        """Should count the number of messages according to various criteria."""
         message_totals.main()
         df: pd.DataFrame = output_results.call_args[0][0]
         self.assertEqual(df.loc["messages"]["total"], 9)
@@ -29,7 +29,8 @@ class TestMessageTotals(ICATestCase):
     @patch("ica.output_results")
     @patch("sys.argv", [message_totals.__file__, "-c", "Jane Fernbrook"])
     def test_reaction_counts(self, output_results: MagicMock) -> None:
-        """should count the number of reactions according to various criteria"""
+        """Should count the number of reactions according to various
+        criteria."""
         message_totals.main()
         df: pd.DataFrame = output_results.call_args[0][0]
         self.assertEqual(df.loc["reactions"]["total"], 2)
@@ -40,7 +41,7 @@ class TestMessageTotals(ICATestCase):
     @patch("sys.argv", [message_totals.__file__, "-c", "Jane Fernbrook"])
     @freeze_time("2024-01-26 9:00:00")
     def test_day_counts(self, output_results: MagicMock) -> None:
-        """should count the number of days according to various criteria"""
+        """Should count the number of days according to various criteria."""
         message_totals.main()
         df: pd.DataFrame = output_results.call_args[0][0]
         self.assertEqual(df.loc["days_messaged"]["total"], 8)

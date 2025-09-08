@@ -22,7 +22,7 @@ class TestMessageTotals(ICATestCase):
         [count_phrases.__file__, "-c", "Thomas Riverstone", "reminds me"],
     )
     def test_single_phrase(self, output_results: MagicMock) -> None:
-        """should count the number of occurrences of a single phrase"""
+        """Should count the number of occurrences of a single phrase."""
         count_phrases.main()
         df: pd.DataFrame = output_results.call_args[0][0]
         phrase = sys.argv[-1]
@@ -34,7 +34,7 @@ class TestMessageTotals(ICATestCase):
         [count_phrases.__file__, "-c", "Thomas Riverstone", "hey", "reminds me"],
     )
     def test_multiple_phrases(self, output_results: MagicMock) -> None:
-        """should count the number of occurrences of multiple phrases"""
+        """Should count the number of occurrences of multiple phrases."""
         count_phrases.main()
         df: pd.DataFrame = output_results.call_args[0][0]
         phrases = sys.argv[-2:]
@@ -47,7 +47,7 @@ class TestMessageTotals(ICATestCase):
         [count_phrases.__file__, "-c", "Thomas Riverstone", "🤣", "😅"],
     )
     def test_emoji(self, output_results: MagicMock) -> None:
-        """should count the number of occurrences of the specified emoji"""
+        """Should count the number of occurrences of the specified emoji."""
         count_phrases.main()
         df: pd.DataFrame = output_results.call_args[0][0]
         phrases = sys.argv[-2:]
@@ -64,7 +64,7 @@ class TestMessageTotals(ICATestCase):
         [count_phrases.__file__, "-c", "Jane Fernbrook", " "],
     )
     def test_whitespace(self, output_results: MagicMock) -> None:
-        """should count the number of occurrences of a space character"""
+        """Should count the number of occurrences of a space character."""
         count_phrases.main()
         df: pd.DataFrame = output_results.call_args[0][0]
         phrase = sys.argv[-1]
@@ -78,7 +78,7 @@ class TestMessageTotals(ICATestCase):
         [count_phrases.__file__, "-c", "Thomas Riverstone", "!"],
     )
     def test_special_characters(self, output_results: MagicMock) -> None:
-        """should count the number of occurrences of a special character"""
+        """Should count the number of occurrences of a special character."""
         count_phrases.main()
         df: pd.DataFrame = output_results.call_args[0][0]
         phrase = sys.argv[-1]
@@ -93,8 +93,8 @@ class TestMessageTotals(ICATestCase):
     )
     def test_regex(self, output_results: MagicMock) -> None:
         """
-        should count the number of occurrences of strings matching a regular
-        expression
+        Should count the number of occurrences of strings matching a regular
+        expression.
         """
         count_phrases.main()
         df: pd.DataFrame = output_results.call_args[0][0]

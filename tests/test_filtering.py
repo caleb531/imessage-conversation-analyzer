@@ -32,7 +32,7 @@ class TestFiltering(ICATestCase):
     )
     def test_from_date(self, output_results: MagicMock) -> None:
         """
-        should filter the results to those sent at or after the specified date
+        Should filter the results to those sent at or after the specified date.
         """
         totals_by_day.main()
         df: pd.DataFrame = output_results.call_args[0][0]
@@ -63,7 +63,7 @@ class TestFiltering(ICATestCase):
     )
     def test_to_date(self, output_results: MagicMock) -> None:
         """
-        should filter the results to those sent before the specified date
+        Should filter the results to those sent before the specified date.
         """
         totals_by_day.main()
         df: pd.DataFrame = output_results.call_args[0][0]
@@ -97,7 +97,7 @@ class TestFiltering(ICATestCase):
     )
     def test_date_range(self, output_results: MagicMock) -> None:
         """
-        should filter the results to those sent between the specified dates
+        Should filter the results to those sent between the specified dates.
         """
         totals_by_day.main()
         df: pd.DataFrame = output_results.call_args[0][0]
@@ -128,7 +128,7 @@ class TestFiltering(ICATestCase):
     )
     def test_invalid_date_range(self, output_results: MagicMock) -> None:
         """
-        should filter the results to those sent between the specified dates
+        Should filter the results to those sent between the specified dates.
         """
         with self.assertRaises(ica.DateRangeInvalidError):
             totals_by_day.main()
@@ -148,8 +148,8 @@ class TestFiltering(ICATestCase):
     )
     def test_from_person_me(self, output_results: MagicMock) -> None:
         """
-        should filter the results to those sent by the person running the
-        command
+        Should filter the results to those sent by the person running the
+        command.
         """
         attachment_totals.main()
         df: pd.DataFrame = output_results.call_args[0][0]
@@ -172,7 +172,7 @@ class TestFiltering(ICATestCase):
     )
     def test_from_person_them(self, output_results: MagicMock) -> None:
         """
-        should filter the results to those sent by the other participant
+        Should filter the results to those sent by the other participant.
         """
         attachment_totals.main()
         df: pd.DataFrame = output_results.call_args[0][0]
@@ -195,8 +195,8 @@ class TestFiltering(ICATestCase):
     )
     def test_from_person_both(self, output_results: MagicMock) -> None:
         """
-        should filter the results to those sent by either participant (i.e. no
-        filtering is applied)
+        Should filter the results to those sent by either participant (i.e. no
+        filtering is applied).
         """
         attachment_totals.main()
         df: pd.DataFrame = output_results.call_args[0][0]

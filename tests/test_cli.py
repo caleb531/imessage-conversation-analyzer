@@ -23,24 +23,24 @@ class TestCLI(ICATestCase):
 
     @patch("sys.argv", [cli.__file__])
     def test_cli_no_args(self) -> None:
-        """should raise an exception if no arguments are passed to the CLI"""
+        """Should raise an exception if no arguments are passed to the CLI."""
         with redirect_stderr(StringIO()), self.assertRaises(SystemExit):
             cli.main()
 
     @patch("sys.argv", [cli.__file__, "-c", "Jane Fernbrook"])
     def test_cli_contact_but_no_analyzer(self) -> None:
-        """should raise an exception if contact is supplied but no analyzer"""
+        """Should raise an exception if contact is supplied but no analyzer."""
         with redirect_stderr(StringIO()), self.assertRaises(SystemExit):
             cli.main()
 
     @patch("sys.argv", [cli.__file__, "message_totals"])
     def test_cli_analyzer_but_no_contact(self) -> None:
-        """should raise an exception if analyzer is supplied but no contact"""
+        """Should raise an exception if analyzer is supplied but no contact."""
         with redirect_stderr(StringIO()), self.assertRaises(SystemExit):
             cli.main()
 
     def test_cli_run_built_in_analyzer(self) -> None:
-        """should run built-in analyzer by name"""
+        """Should run built-in analyzer by name."""
         cli_arg_list = ["-c", "Jane Fernbrook"]
         with patch("sys.argv", [cli.__file__, "message_totals", *cli_arg_list]):
             with redirect_stdout(StringIO()) as actual_out:
@@ -52,7 +52,7 @@ class TestCLI(ICATestCase):
         self.assertEqual(actual_out.getvalue(), expected_out.getvalue())
 
     def test_cli_run_analyzer_via_path(self) -> None:
-        """should run analyzer via file path"""
+        """Should run analyzer via file path."""
         cli_arg_list = ["-c", "Jane Fernbrook"]
         with patch(
             "sys.argv", [cli.__file__, "ica/analyzers/message_totals.py", *cli_arg_list]
@@ -67,7 +67,7 @@ class TestCLI(ICATestCase):
 
     @patch("importlib.util.spec_from_loader", return_value=None)
     def test_cli_spec_error(self, spec_from_loader: MagicMock) -> None:
-        """should raise error when spec cannot be created for analyzer"""
+        """Should raise error when spec cannot be created for analyzer."""
         cli_arg_list = ["-c", "Jane Fernbrook"]
         with patch(
             "sys.argv", [cli.__file__, "ica/analyzers/message_totals.py", *cli_arg_list]
@@ -78,7 +78,7 @@ class TestCLI(ICATestCase):
 
     @patch("sys.argv", [cli.__file__, "message_totals", "-c", "Evelyn Oakhaven"])
     def test_cli_conversation_not_found(self) -> None:
-        """should print an error message if conversation was not found"""
+        """Should print an error message if conversation was not found."""
         with redirect_stderr(StringIO()) as out, self.assertRaises(SystemExit):
             cli.main()
         self.assertEqual(
@@ -88,7 +88,7 @@ class TestCLI(ICATestCase):
 
     @patch("sys.argv", [cli.__file__, "message_totals", "-c", "Imaginary Person"])
     def test_cli_contact_not_found(self) -> None:
-        """should print an error message if contact was not found"""
+        """Should print an error message if contact was not found."""
         with redirect_stderr(StringIO()) as out, self.assertRaises(SystemExit):
             cli.main()
         self.assertEqual(
@@ -98,14 +98,14 @@ class TestCLI(ICATestCase):
     @patch("importlib.util.spec_from_loader", side_effect=KeyboardInterrupt())
     @patch("sys.argv", [cli.__file__, "message_totals", "-c", "Jane Fernbrook"])
     def test_keyboardinterrupt(self, spec_from_loader: MagicMock) -> None:
-        """should print a newline when user presses control-C"""
+        """Should print a newline when user presses control-C."""
         with redirect_stdout(StringIO()) as stdout:
             cli.main()
         self.assertEqual(stdout.getvalue(), "\n")
 
     @patch("sys.argv", [cli.__file__, "-c", "Jane Fernbrook", "message_totals"])
     def test_cli_get_cli_args(self) -> None:
-        """should call the deprecated get_cli_args() function"""
+        """Should call the deprecated get_cli_args() function."""
         # Ensure that CLI is run so did_user_invoke_cli_directly is set to True
         with redirect_stdout(StringIO()):
             cli.main()

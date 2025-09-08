@@ -17,7 +17,7 @@ class TestMain(ICATestCase):
 
     @patch("ica.cli.main", return_value=None)
     def test_main(self, cli_main: MagicMock) -> None:
-        """should import main"""
+        """Should import main."""
         # Load the module spec and create the module
         loader = importlib.machinery.SourceFileLoader("__main__", "./ica/__main__.py")
         spec = importlib.util.spec_from_loader(loader.name, loader)
