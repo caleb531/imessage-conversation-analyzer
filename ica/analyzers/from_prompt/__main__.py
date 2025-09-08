@@ -79,7 +79,7 @@ def main() -> None:
         "--api-key",
         "--key",
         "-k",
-        help="API key to send to the OpenAI API.",
+        help="API key to send to the OpenAI API",
     )
     cli_parser.add_argument(
         "--write",
@@ -88,7 +88,7 @@ def main() -> None:
     )
     cli_parser.add_argument(
         "prompt",
-        help="Prompt describing the analyzer to generate.",
+        help="Prompt describing the analyzer to generate",
     )
     cli_args = cli_parser.parse_args()
 
