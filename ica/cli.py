@@ -132,7 +132,7 @@ def main() -> None:
     did_user_invoke_cli_directly = True
 
     # parse_known_args() is slightly different from parse_args() in that the
-    # former returns a two-item tuple where the first item is the Namespace of
+    # former returns a two-item tuple, where the first item is the Namespace of
     # known arguments, and the second item is a list of any unknown arguments
     cli_args = get_cli_parser().parse_known_args()[0]
 
