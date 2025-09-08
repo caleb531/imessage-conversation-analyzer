@@ -11,6 +11,10 @@ import openai
 from openai.types.chat import ChatCompletion
 
 import ica
+from ica.analyzers.from_prompt.exceptions import (
+    EmptyResponseError,
+    ResponseMissingCodeError,
+)
 
 MODEL: Final[str] = "gpt-4.1"
 ICA_REPO: Final[str] = os.getcwd()
@@ -63,14 +67,14 @@ def parse_code_from_response(response: ChatCompletion) -> str:
     # content can be None depending on SDK types; guard to satisfy type checker
     content = response.choices[0].message.content
     if not content:
-        return ""
+        raise EmptyResponseError("No content in response from OpenAI API")
     match = re.search(
         r"(`{3,4})(python)?\n(.*?)\n\1",
         content.strip(),
         re.DOTALL,
     )
     if not match:
-        return ""
+        raise ResponseMissingCodeError("No code in response from OpenAI API")
     return match.group(3).strip()
 
 

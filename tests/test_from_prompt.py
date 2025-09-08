@@ -5,6 +5,10 @@ from pathlib import Path
 from unittest.mock import Mock, patch
 
 import ica.analyzers.from_prompt.__main__ as from_prompt
+from ica.analyzers.from_prompt.exceptions import (
+    EmptyResponseError,
+    ResponseMissingCodeError,
+)
 from tests.utils import ICATestCase, temp_ica_dir, use_env
 
 API_KEY = "abc"
@@ -134,3 +138,38 @@ class TestFromPrompt(ICATestCase):
                 .read_text()
                 .rstrip(),
             )
+
+    @use_env("OPENAI_API_KEY", API_KEY)
+    @patch(
+        "openai.chat.completions.create",
+        return_value=get_mock_completion_response(content=""),
+    )
+    @patch(
+        "sys.argv",
+        [from_prompt.__file__, "-c", "Jane Fernbrook", "--api-key", API_KEY, PROMPT],
+    )
+    def test_from_prompt_empty_response(self, completions_create: Mock) -> None:
+        """
+        Should raise an error if the OpenAI API returns an empty response
+        """
+        out = StringIO()
+        with redirect_stdout(out), self.assertRaises(EmptyResponseError):
+            from_prompt.main()
+
+    @use_env("OPENAI_API_KEY", API_KEY)
+    @patch(
+        "openai.chat.completions.create",
+        return_value=get_mock_completion_response(content="Response without code"),
+    )
+    @patch(
+        "sys.argv",
+        [from_prompt.__file__, "-c", "Jane Fernbrook", "--api-key", API_KEY, PROMPT],
+    )
+    def test_from_prompt_no_code_in_response(self, completions_create: Mock) -> None:
+        """
+        Should raise an error if the OpenAI API returns a response without any
+        code
+        """
+        out = StringIO()
+        with redirect_stdout(out), self.assertRaises(ResponseMissingCodeError):
+            from_prompt.main()
