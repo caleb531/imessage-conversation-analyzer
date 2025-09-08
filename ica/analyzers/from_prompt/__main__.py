@@ -77,7 +77,6 @@ def main() -> None:
     cli_parser = ica.get_cli_parser()
     cli_parser.add_argument(
         "--api-key",
-        "--key",
         "-k",
         help="API key to send to the OpenAI API",
     )
