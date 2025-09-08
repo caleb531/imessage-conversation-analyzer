@@ -62,11 +62,16 @@ def parse_code_from_response(response: ChatCompletion) -> str:
     """Extract the analyzer code from a GFM fenced code block in the response"""
     # content can be None depending on SDK types; guard to satisfy type checker
     content = response.choices[0].message.content
-    code = (content or "").strip()
-    match = re.search(r"(`{3,4})(python)?\n(.*?)\n\1", code, re.DOTALL)
-    if match:
-        code = match.group(3).strip()
-    return code
+    if not content:
+        return ""
+    match = re.search(
+        r"(`{3,4})(python)?\n(.*?)\n\1",
+        content.strip(),
+        re.DOTALL,
+    )
+    if not match:
+        return ""
+    return match.group(3).strip()
 
 
 def main() -> None:
