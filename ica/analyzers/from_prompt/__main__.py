@@ -69,15 +69,6 @@ def parse_code_from_response(response: ChatCompletion) -> str:
     return code
 
 
-def get_analyzer_file_path(code: str) -> Path:
-    """
-    Extract the file name of the generated analyzer from a comment on the second
-    line, then return the relevant Path object to the file to be written to disk
-    """
-    filename = code.splitlines()[0][1:].strip() if code else ""
-    return Path.cwd() / filename
-
-
 def main() -> None:
     """
     Use the OpenAI API to generate an ICA analyzer from the supplied prompt,
