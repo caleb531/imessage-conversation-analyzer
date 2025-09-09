@@ -1,5 +1,5 @@
 import types
-from contextlib import redirect_stdout
+from contextlib import redirect_stderr, redirect_stdout
 from io import StringIO
 from pathlib import Path
 from unittest.mock import Mock, patch
@@ -173,3 +173,24 @@ class TestFromPrompt(ICATestCase):
         out = StringIO()
         with redirect_stdout(out), self.assertRaises(ResponseMissingCodeError):
             from_prompt.main()
+
+    @use_env("OPENAI_API_KEY", API_KEY)
+    @patch(
+        "openai.chat.completions.create",
+        return_value=get_mock_completion_response(
+            content="```python\nraise RuntimeError()\n```"
+        ),
+    )
+    @patch(
+        "sys.argv",
+        [from_prompt.__file__, "-c", "Jane Fernbrook", "--api-key", API_KEY, PROMPT],
+    )
+    def test_from_prompt_stderr(self, completions_create: Mock) -> None:
+        """
+        Should print any runtime errors from the generated analyzer to stderr
+        """
+        out = StringIO()
+        err = StringIO()
+        with redirect_stdout(out), redirect_stderr(err):
+            from_prompt.main()
+            self.assertIn("RuntimeError", err.getvalue())
