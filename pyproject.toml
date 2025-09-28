@@ -75,6 +75,8 @@ select = [
 # Enable branch coverage
 branch = true
 source = ['ica']
+# Only check coverage for source files
+include = ["ica/**/*.py"]
 
 [tool.coverage.report]
 # Regexes for lines to exclude from consideration
@@ -84,8 +86,6 @@ exclude_lines = [
     "if __name__ == .__main__.:",
     "pass",
 ]
-# Only check coverage for source files
-include = ["ica/**/*.py"]
 
 [dependency-groups]
 dev = [
