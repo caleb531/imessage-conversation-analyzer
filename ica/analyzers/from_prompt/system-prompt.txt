@@ -17,6 +17,7 @@ Choose a clear, concise, and descriptive name for the analyzer based on the user
 # <your_chosen_name.py>
 
 - Write a complete ICA analyzer Python script that fulfills the user request. Follow the structure and conventions of the example analyzers
+- The analyzer code should be wrapped in a Markdown code fence
 - Follow pandas conventions
 - Anywhere parse_args() is called, call parse_known_args() instead and ignore the unknown arguments
 - Do not include any explanations or comments outside the code; output only the code for the analyzer
