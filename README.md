@@ -28,6 +28,12 @@ Open a Terminal and run the following:
 pip3 install imessage-conversation-analyzer
 ```
 
+You can also install ICA via uv:
+
+```sh
+uv tool install imessage-conversation-analyzer
+```
+
 ## Usage
 
 The package includes both a Command Line API for simplicity/convenience, as well
@@ -243,19 +249,29 @@ dfs = ica.get_dataframes(contact_name=my_contact_name, timezone='UTC')
 The following instructions are written for developers who want to run the
 package locally, or write their own analyzers.
 
-### 1. Set up virtualenv
+We recommends using the uv package manager for easier environment and dependency
+management ([instructions][installation-docs]).
+
+[installation-docs]: https://docs.astral.sh/uv/getting-started/installation/#installation-methods
+
+### 1. Install uv
 
 ```sh
-pip3 install virtualenv
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
+### 2. Create virtual environment and install dependencies
+
 ```sh
-virtualenv --python=python3 .virtualenv
-source .virtualenv/bin/activate
+uv sync
 ```
 
-### 2. Install project depdendencies
+### 3. Run CLI like normal
+
+When you install ICA with uv, an editable installation of the package gets
+installed into the virtual environment that uv creates for you. This allows you
+to make changes to the source code and continue to invoke `ica` like normal:
 
 ```sh
-pip install -r requirements.txt
+ica message_totals -c 'Jane Fernbrook'
 ```
