@@ -6,6 +6,7 @@ import importlib.machinery
 import importlib.util
 import sys
 from pathlib import Path
+from typing import Union
 
 from ica.exceptions import BaseAnalyzerException
 
@@ -26,12 +27,12 @@ class TypedCLIArguments(object):
 
     analyzer: str
     contact_name: str
-    timezone: str | None
-    from_date: str | None
-    to_date: str | None
-    from_person: str | None
-    format: str | None
-    output: str | None
+    timezone: Union[str, None]
+    from_date: Union[str, None]
+    to_date: Union[str, None]
+    from_person: Union[str, None]
+    format: Union[str, None]
+    output: Union[str, None]
 
 
 def get_cli_parser() -> argparse.ArgumentParser:

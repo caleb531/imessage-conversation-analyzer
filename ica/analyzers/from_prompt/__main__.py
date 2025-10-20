@@ -5,7 +5,7 @@ import re
 import subprocess
 import sys
 from pathlib import Path
-from typing import Final
+from typing import Final, Union
 
 import openai
 from openai.types.chat import ChatCompletion
@@ -80,7 +80,7 @@ def parse_code_from_response(response: ChatCompletion) -> str:
 
 class FromPromptCLIArguments(ica.TypedCLIArguments):
     api_key: str
-    write: str | None
+    write: Union[str, None]
     prompt: str
 
 
