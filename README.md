@@ -157,7 +157,7 @@ def main() -> None:
     # command; you can skip calling this if have other means of specifying the
     # contact name and output format; you can also add your own arguments this
     # way (see the count_phrases analyzer for an example of this)
-    cli_args = ica.get_cli_parser().parse_args()
+    cli_args = ica.get_cli_parser().parse_args(namespace=ica.TypedCLIArguments())
     # Retrieve the dataframes corresponding to the processed contents of the
     # database; dataframes include `messages` and `attachments`
     dfs = ica.get_dataframes(

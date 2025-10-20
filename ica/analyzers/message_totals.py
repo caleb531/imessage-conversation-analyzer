@@ -80,7 +80,7 @@ def main() -> None:
     Generate a summary of message and reaction counts, by person and in total,
     as well as other insightful metrics
     """
-    cli_args = ica.get_cli_parser().parse_args()
+    cli_args = ica.get_cli_parser().parse_args(namespace=ica.TypedCLIArguments())
     dfs = ica.get_dataframes(
         contact_name=cli_args.contact_name,
         timezone=cli_args.timezone,

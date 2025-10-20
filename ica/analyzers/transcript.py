@@ -17,7 +17,7 @@ def main() -> None:
     Generates a full, unedited transcript of every message, including
     reactions, between you and the other person (attachment files not included)
     """
-    cli_args = ica.get_cli_parser().parse_args()
+    cli_args = ica.get_cli_parser().parse_args(namespace=ica.TypedCLIArguments())
     dfs = ica.get_dataframes(
         contact_name=cli_args.contact_name,
         timezone=cli_args.timezone,

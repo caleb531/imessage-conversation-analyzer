@@ -18,6 +18,22 @@ from ica.exceptions import BaseAnalyzerException
 did_user_invoke_cli_directly = False
 
 
+class TypedCLIArguments(object):
+    """
+    A subclass of argparse.Namespace that exposes type information for all CLI
+    arguments supported by the program
+    """
+
+    analyzer: str
+    contact_name: str
+    timezone: str | None
+    from_date: str | None
+    to_date: str | None
+    from_person: str | None
+    format: str | None
+    output: str | None
+
+
 def get_cli_parser() -> argparse.ArgumentParser:
     """
     Retrieve the instance of the parser used to parse user arguments
@@ -134,7 +150,7 @@ def main() -> None:
     # parse_known_args() is slightly different from parse_args() in that the
     # former returns a two-item tuple, where the first item is the Namespace of
     # known arguments, and the second item is a list of any unknown arguments
-    cli_args = get_cli_parser().parse_known_args()[0]
+    cli_args = get_cli_parser().parse_known_args(namespace=TypedCLIArguments)[0]
 
     try:
         run_analyzer(cli_args.analyzer)

@@ -8,6 +8,18 @@ import pandas as pd
 import ica
 
 
+class CountPhrasesArgumentParser(ica.TypedCLIArguments):
+    """Additional CLI arguments specific to the count_phrases analyzer"""
+
+    phrases: list[str]
+    use_regex: bool
+    case_sensitive: bool
+
+
+# class CountPhrasesArgumentParser(ica.ICAArgumentParser):
+#     pass
+
+
 def get_phrase_counts(
     messages_df: pd.DataFrame,
     phrases: list[str],
@@ -40,7 +52,7 @@ def main() -> None:
         action="store_true",
         help="if specified, treats phrases as case-sensitive",
     )
-    cli_args = cli_parser.parse_args()
+    cli_args = cli_parser.parse_args(namespace=CountPhrasesArgumentParser())
     dfs = ica.get_dataframes(
         contact_name=cli_args.contact_name,
         timezone=cli_args.timezone,

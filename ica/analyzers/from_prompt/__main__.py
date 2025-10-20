@@ -78,6 +78,12 @@ def parse_code_from_response(response: ChatCompletion) -> str:
     return match.group(3).strip()
 
 
+class FromPromptCLIArguments(ica.TypedCLIArguments):
+    api_key: str
+    write: str | None
+    prompt: str
+
+
 def main() -> None:
     """
     Use the OpenAI API to generate an ICA analyzer from the supplied prompt,
@@ -98,7 +104,7 @@ def main() -> None:
         "prompt",
         help="Prompt describing the analyzer to generate",
     )
-    cli_args = cli_parser.parse_args()
+    cli_args = cli_parser.parse_args(namespace=FromPromptCLIArguments())
 
     openai.api_key = cli_args.api_key
     system_prompt = build_system_prompt()

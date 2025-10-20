@@ -9,6 +9,12 @@ import pandas as pd
 import ica
 
 
+class MostFrequentEmojisCLIArguments(ica.TypedCLIArguments):
+    """Additional CLI arguments specific to the most_frequent_emojis analyzer"""
+
+    result_count: int
+
+
 def get_emoji_list() -> list[str]:
     """
     Fetch a list of the most popular emoji on the Web to use as a basis for
@@ -32,7 +38,7 @@ def main() -> None:
         default=10,
         help="the number of emoji results to rank",
     )
-    cli_args = cli_parser.parse_args()
+    cli_args = cli_parser.parse_args(namespace=MostFrequentEmojisCLIArguments())
     dfs = ica.get_dataframes(
         contact_name=cli_args.contact_name,
         timezone=cli_args.timezone,
