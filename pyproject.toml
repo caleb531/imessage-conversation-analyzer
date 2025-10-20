@@ -74,9 +74,8 @@ select = [
 [tool.coverage.run]
 # Enable branch coverage
 branch = true
-source = ['ica']
 # Only check coverage for source files
-include = ["ica/**/*.py"]
+source = ['ica']
 
 [tool.coverage.report]
 # Regexes for lines to exclude from consideration
