@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """test the cli built-in analyzer"""
 
-import sys
 from contextlib import redirect_stderr, redirect_stdout
 from io import StringIO
 from unittest.mock import MagicMock, patch
