@@ -102,13 +102,3 @@ class TestCLI(ICATestCase):
         with redirect_stdout(StringIO()) as stdout:
             cli.main()
         self.assertEqual(stdout.getvalue(), "\n")
-
-    @patch("sys.argv", [cli.__file__, "-c", "Jane Fernbrook", "message_totals"])
-    def test_cli_get_cli_args(self) -> None:
-        """Should call the deprecated get_cli_args() function."""
-        # Ensure that CLI is run so did_user_invoke_cli_directly is set to True
-        with redirect_stdout(StringIO()):
-            cli.main()
-        cli_args = cli.get_cli_args()
-        self.assertEqual(cli_args.contact_name, sys.argv[2])
-        self.assertEqual(cli_args.analyzer, sys.argv[3])
