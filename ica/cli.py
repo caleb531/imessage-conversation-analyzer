@@ -110,6 +110,14 @@ def get_file_path_from_module_path(module_name: str) -> str:
     return spec.origin
 
 
+def get_cli_args() -> argparse.Namespace:
+    """
+    [DEPRECATED]: Parse user arguments from the command line; use
+    get_cli_parser().parse_args() instead
+    """
+    return get_cli_parser().parse_args()
+
+
 def run_analyzer(analyzer: str) -> None:
     """
     Load the given metric file as a Python module, and return the DataFrame
