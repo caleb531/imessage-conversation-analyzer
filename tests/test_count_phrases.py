@@ -11,7 +11,7 @@ import ica.analyzers.count_phrases as count_phrases
 from tests.utils import ICATestCase
 
 
-class TestMessageTotals(unittest.TestCase):
+class TestMessageTotals:
     """
     Test cases for the `count_phrases` analyzer, which counts occurrences of
     specific phrases, emojis, or special characters in a conversation.
@@ -27,7 +27,7 @@ class TestMessageTotals(unittest.TestCase):
         count_phrases.main()
         df: pd.DataFrame = output_results.call_args[0][0]
         phrase = sys.argv[-1]
-        self.assertEqual(df.loc[phrase]["count"], 2)
+        assert df.loc[phrase]["count"] == 2
 
     @patch("ica.output_results")
     @patch(
@@ -39,8 +39,8 @@ class TestMessageTotals(unittest.TestCase):
         count_phrases.main()
         df: pd.DataFrame = output_results.call_args[0][0]
         phrases = sys.argv[-2:]
-        self.assertEqual(df.loc[phrases[0]]["count"], 2)
-        self.assertEqual(df.loc[phrases[1]]["count"], 2)
+        assert df.loc[phrases[0]]["count"] == 2
+        assert df.loc[phrases[1]]["count"] == 2
 
     @patch("ica.output_results")
     @patch(
@@ -52,12 +52,12 @@ class TestMessageTotals(unittest.TestCase):
         count_phrases.main()
         df: pd.DataFrame = output_results.call_args[0][0]
         phrases = sys.argv[-2:]
-        self.assertEqual(df.loc[phrases[0]]["count"], 2)
-        self.assertEqual(df.loc[phrases[0]]["count_from_me"], 1)
-        self.assertEqual(df.loc[phrases[0]]["count_from_them"], 1)
-        self.assertEqual(df.loc[phrases[1]]["count"], 1)
-        self.assertEqual(df.loc[phrases[1]]["count_from_me"], 0)
-        self.assertEqual(df.loc[phrases[1]]["count_from_them"], 1)
+        assert df.loc[phrases[0]]["count"] == 2
+        assert df.loc[phrases[0]]["count_from_me"] == 1
+        assert df.loc[phrases[0]]["count_from_them"] == 1
+        assert df.loc[phrases[1]]["count"] == 1
+        assert df.loc[phrases[1]]["count_from_me"] == 0
+        assert df.loc[phrases[1]]["count_from_them"] == 1
 
     @patch("ica.output_results")
     @patch(
@@ -69,9 +69,9 @@ class TestMessageTotals(unittest.TestCase):
         count_phrases.main()
         df: pd.DataFrame = output_results.call_args[0][0]
         phrase = sys.argv[-1]
-        self.assertEqual(df.loc[phrase]["count"], 90)
-        self.assertEqual(df.loc[phrase]["count_from_me"], 43)
-        self.assertEqual(df.loc[phrase]["count_from_them"], 47)
+        assert df.loc[phrase]["count"] == 90
+        assert df.loc[phrase]["count_from_me"] == 43
+        assert df.loc[phrase]["count_from_them"] == 47
 
     @patch("ica.output_results")
     @patch(
@@ -83,9 +83,9 @@ class TestMessageTotals(unittest.TestCase):
         count_phrases.main()
         df: pd.DataFrame = output_results.call_args[0][0]
         phrase = sys.argv[-1]
-        self.assertEqual(df.loc[phrase]["count"], 10)
-        self.assertEqual(df.loc[phrase]["count_from_me"], 5)
-        self.assertEqual(df.loc[phrase]["count_from_them"], 5)
+        assert df.loc[phrase]["count"] == 10
+        assert df.loc[phrase]["count_from_me"] == 5
+        assert df.loc[phrase]["count_from_them"] == 5
 
     @patch("ica.output_results")
     @patch(
@@ -100,6 +100,6 @@ class TestMessageTotals(unittest.TestCase):
         count_phrases.main()
         df: pd.DataFrame = output_results.call_args[0][0]
         phrase = sys.argv[-1]
-        self.assertEqual(df.loc[phrase]["count"], 3)
-        self.assertEqual(df.loc[phrase]["count_from_me"], 1)
-        self.assertEqual(df.loc[phrase]["count_from_them"], 2)
+        assert df.loc[phrase]["count"] == 3
+        assert df.loc[phrase]["count_from_me"] == 1
+        assert df.loc[phrase]["count_from_them"] == 2

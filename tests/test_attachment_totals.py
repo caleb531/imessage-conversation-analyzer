@@ -10,7 +10,7 @@ import ica.analyzers.attachment_totals as attachment_totals
 from tests.utils import ICATestCase
 
 
-class TestAttachmentTotals(unittest.TestCase):
+class TestAttachmentTotals:
     """
     Test cases for the `attachment_totals` analyzer, which calculates totals for
     various types of attachments in a conversation, such as GIFs, YouTube
@@ -23,7 +23,7 @@ class TestAttachmentTotals(unittest.TestCase):
         """Should count the number of GIFs for a conversation."""
         attachment_totals.main()
         df: pd.DataFrame = output_results.call_args[0][0]
-        self.assertEqual(df.loc["gifs"]["total"], 1)
+        assert df.loc["gifs"]["total"] == 1
 
     @patch("ica.output_results")
     @patch("sys.argv", [attachment_totals.__file__, "-c", "Thomas Riverstone"])
@@ -31,7 +31,7 @@ class TestAttachmentTotals(unittest.TestCase):
         """Should count the number of YouTube videos for a conversation."""
         attachment_totals.main()
         df: pd.DataFrame = output_results.call_args[0][0]
-        self.assertEqual(df.loc["youtube_videos"]["total"], 4)
+        assert df.loc["youtube_videos"]["total"] == 4
 
     @patch("ica.output_results")
     @patch("sys.argv", [attachment_totals.__file__, "-c", "Thomas Riverstone"])
@@ -39,7 +39,7 @@ class TestAttachmentTotals(unittest.TestCase):
         """Should count the number of Apple Music links for a conversation."""
         attachment_totals.main()
         df: pd.DataFrame = output_results.call_args[0][0]
-        self.assertEqual(df.loc["apple_music"]["total"], 1)
+        assert df.loc["apple_music"]["total"] == 1
 
     @patch("ica.output_results")
     @patch("sys.argv", [attachment_totals.__file__, "-c", "Thomas Riverstone"])
@@ -47,4 +47,4 @@ class TestAttachmentTotals(unittest.TestCase):
         """Should count the number of Spotify links for a conversation."""
         attachment_totals.main()
         df: pd.DataFrame = output_results.call_args[0][0]
-        self.assertEqual(df.loc["spotify"]["total"], 1)
+        assert df.loc["spotify"]["total"] == 1

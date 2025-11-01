@@ -10,7 +10,7 @@ from unittest.mock import MagicMock, patch
 from tests.utils import ICATestCase
 
 
-class TestMain(unittest.TestCase):
+class TestMain:
     """
     Test cases for the `__main__` entry point module, ensuring that the CLI is
     invoked correctly.

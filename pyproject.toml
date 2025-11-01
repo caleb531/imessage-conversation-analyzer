@@ -48,7 +48,6 @@ module = [
     "pandas.*",
     "tabulate.*",
     "typedstream.*",
-    "nose2.*"
 ]
 ignore_missing_imports = true
 
