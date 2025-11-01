@@ -1,17 +1,15 @@
 #!/usr/bin/env python3
 """test the mocking of the database"""
-import unittest
-
 import collections
 import glob
 import sqlite3
+import unittest
 from collections.abc import Generator
 from typing import Any, Sequence, Union
 
 import ica.contact as contact
 import ica.core as core
 from tests.utils import (
-    ICATestCase,
     mock_chats_db_path,
     mock_contacts_db_glob,
     mock_contacts_db_path,

@@ -1,13 +1,10 @@
 #!/usr/bin/env python3
 """test the __main__ entry point module"""
-import unittest
 
 import importlib
 import importlib.machinery
 import importlib.util
 from unittest.mock import MagicMock, patch
-
-from tests.utils import ICATestCase
 
 
 class TestMain:

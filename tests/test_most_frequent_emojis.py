@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 """test the most_frequent_emojis built-in analyzer"""
-import unittest
 
 import json
+import unittest
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pandas as pd
 
 import ica.analyzers.most_frequent_emojis as most_frequent_emojis
-from tests.utils import ICATestCase
 
 
 class TestMostFrequentEmojis(unittest.TestCase):

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """test the count_phrases built-in analyzer"""
-import unittest
 
 import sys
 from unittest.mock import MagicMock, patch
@@ -8,7 +7,6 @@ from unittest.mock import MagicMock, patch
 import pandas as pd
 
 import ica.analyzers.count_phrases as count_phrases
-from tests.utils import ICATestCase
 
 
 class TestMessageTotals:

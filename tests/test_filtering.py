@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """test the ability to filter analyzer results by date and person"""
 import unittest
-
 from unittest.mock import MagicMock, patch
 
 import pandas as pd
@@ -9,7 +8,6 @@ import pandas as pd
 import ica
 import ica.analyzers.attachment_totals as attachment_totals
 import ica.analyzers.totals_by_day as totals_by_day
-from tests.utils import ICATestCase
 
 
 class TestFiltering(unittest.TestCase):

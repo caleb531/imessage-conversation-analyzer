@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 """test the message_totals built-in analyzer"""
-import unittest
 import pytest
 
 import ica
-from tests.utils import ICATestCase
 
 
 class TestContact:

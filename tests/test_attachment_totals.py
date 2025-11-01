@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
 """test the attachment_totals built-in analyzer"""
-import unittest
 
 from unittest.mock import MagicMock, patch
 
 import pandas as pd
 
 import ica.analyzers.attachment_totals as attachment_totals
-from tests.utils import ICATestCase
 
 
 class TestAttachmentTotals:

@@ -3,7 +3,6 @@
 import unittest
 
 import ica
-from tests.utils import ICATestCase
 
 
 class TestAttributedbody(unittest.TestCase):

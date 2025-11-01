@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 """test the cli built-in analyzer"""
-import unittest
-
 import sys
+import unittest
 from contextlib import redirect_stderr, redirect_stdout
 from io import StringIO
 from unittest.mock import MagicMock, patch
 
 import ica.analyzers.message_totals as message_totals
 import ica.cli as cli
-from tests.utils import ICATestCase
 
 
 class TestCLI(unittest.TestCase):
