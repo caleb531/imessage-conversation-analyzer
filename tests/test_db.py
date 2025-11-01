@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """test the mocking of the database"""
+import unittest
 
 import collections
 import glob
@@ -22,7 +23,7 @@ def get_duplicates(items: Union[Sequence[Any], Generator[Any, Any, Any]]) -> lis
     return [item for item, count in collections.Counter(items).items() if count > 1]
 
 
-class TestDB(ICATestCase):
+class TestDB(unittest.TestCase):
     """
     Test cases for verifying the integrity of mock databases, including checks
     for unique IDs, timestamps, and foreign key associations.

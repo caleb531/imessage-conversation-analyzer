@@ -8,7 +8,6 @@ import pandas as pd
 import pytest
 
 import ica.analyzers.transcript as transcript
-from tests.utils import ICATestCase
 
 
 class TestTranscript:
@@ -16,16 +15,6 @@ class TestTranscript:
     Test cases for the `transcript` analyzer, which generates transcripts of
     conversations.
     """
-
-    def setup_method(self) -> None:
-        """Setup for each test method - calls ICATestCase setUp logic."""
-        test_case = ICATestCase()
-        test_case.setUp()
-        self._teardown = test_case.tearDown
-
-    def teardown_method(self) -> None:
-        """Teardown for each test method - calls ICATestCase tearDown logic."""
-        self._teardown()
 
     @pytest.mark.parametrize(
         ("transcript_num", "contact_name"),

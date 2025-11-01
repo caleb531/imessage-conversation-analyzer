@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """test the message_totals built-in analyzer"""
+import unittest
 
 import ica
 from tests.utils import ICATestCase
 
 
-class TestAttributedbody(ICATestCase):
+class TestAttributedbody(unittest.TestCase):
     """
     Test cases for decoding message contents encoded in the `attributedBody`
     field.

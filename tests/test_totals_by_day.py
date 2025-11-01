@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """test the totals_by_day built-in analyzer"""
+import unittest
 
 from unittest.mock import MagicMock, patch
 
@@ -10,7 +11,7 @@ from ica import pipe_lambda
 from tests.utils import ICATestCase
 
 
-class TestTotalsByDay(ICATestCase):
+class TestTotalsByDay(unittest.TestCase):
     """
     Test cases for the `totals_by_day` analyzer, which calculates the total
     number of days with messages in a conversation.

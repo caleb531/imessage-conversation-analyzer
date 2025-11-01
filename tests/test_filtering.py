@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """test the ability to filter analyzer results by date and person"""
+import unittest
 
 from unittest.mock import MagicMock, patch
 
@@ -11,7 +12,7 @@ import ica.analyzers.totals_by_day as totals_by_day
 from tests.utils import ICATestCase
 
 
-class TestFiltering(ICATestCase):
+class TestFiltering(unittest.TestCase):
     """
     Test cases for filtering analyzer results by date and person, ensuring
     correct handling of various filtering criteria.

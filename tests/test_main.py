@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """test the __main__ entry point module"""
+import unittest
 
 import importlib
 import importlib.machinery
@@ -9,7 +10,7 @@ from unittest.mock import MagicMock, patch
 from tests.utils import ICATestCase
 
 
-class TestMain(ICATestCase):
+class TestMain(unittest.TestCase):
     """
     Test cases for the `__main__` entry point module, ensuring that the CLI is
     invoked correctly.

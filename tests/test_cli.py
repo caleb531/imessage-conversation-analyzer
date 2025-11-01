@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """test the cli built-in analyzer"""
+import unittest
 
 import sys
 from contextlib import redirect_stderr, redirect_stdout
@@ -11,7 +12,7 @@ import ica.cli as cli
 from tests.utils import ICATestCase
 
 
-class TestCLI(ICATestCase):
+class TestCLI(unittest.TestCase):
     """
     Test cases for the CLI, ensuring correct behavior for various argument
     combinations and error handling scenarios.

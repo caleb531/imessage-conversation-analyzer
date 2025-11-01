@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """test the count_phrases built-in analyzer"""
+import unittest
 
 import sys
 from unittest.mock import MagicMock, patch
@@ -10,7 +11,7 @@ import ica.analyzers.count_phrases as count_phrases
 from tests.utils import ICATestCase
 
 
-class TestMessageTotals(ICATestCase):
+class TestMessageTotals(unittest.TestCase):
     """
     Test cases for the `count_phrases` analyzer, which counts occurrences of
     specific phrases, emojis, or special characters in a conversation.

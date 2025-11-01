@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """test the attachment_totals built-in analyzer"""
+import unittest
 
 from unittest.mock import MagicMock, patch
 
@@ -9,7 +10,7 @@ import ica.analyzers.attachment_totals as attachment_totals
 from tests.utils import ICATestCase
 
 
-class TestAttachmentTotals(ICATestCase):
+class TestAttachmentTotals(unittest.TestCase):
     """
     Test cases for the `attachment_totals` analyzer, which calculates totals for
     various types of attachments in a conversation, such as GIFs, YouTube

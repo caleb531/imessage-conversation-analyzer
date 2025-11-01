@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """test the most_frequent_emojis built-in analyzer"""
+import unittest
 
 import json
 from pathlib import Path
@@ -11,7 +12,7 @@ import ica.analyzers.most_frequent_emojis as most_frequent_emojis
 from tests.utils import ICATestCase
 
 
-class TestMostFrequentEmojis(ICATestCase):
+class TestMostFrequentEmojis(unittest.TestCase):
     """
     Test cases for the `most_frequent_emojis` analyzer, which computes the most
     frequently-used emojis in a conversation.

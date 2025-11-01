@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """test the message_totals built-in analyzer"""
+import unittest
 
 import ica
 from tests.utils import ICATestCase
 
 
-class TestContact(ICATestCase):
+class TestContact(unittest.TestCase):
     """
     Test cases for verifying contact-related functionality, such as finding
     conversations by phone number or email, and handling errors for missing or

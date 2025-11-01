@@ -69,18 +69,6 @@ class TestOutputResults:
     formatting and handling of various output types.
     """
 
-    def setup_method(self) -> None:
-        """Setup for each test method."""
-        from tests.utils import ICATestCase
-
-        test_case = ICATestCase()
-        test_case.setUp()
-        self._teardown = test_case.tearDown
-
-    def teardown_method(self) -> None:
-        """Teardown for each test method."""
-        self._teardown()
-
     @pytest.mark.parametrize(
         ("test_case", "output_type"),
         list(
@@ -169,9 +157,12 @@ class TestOutputResults:
             format=format,
             output=output_path,
         )
-        assert Path(output_path).read_text() + "\n" == Path(
-            f"tests/data/output/{ext}/output_results_{test_name}.{ext}"
-        ).read_text()
+        assert (
+            Path(output_path).read_text() + "\n"
+            == Path(
+                f"tests/data/output/{ext}/output_results_{test_name}.{ext}"
+            ).read_text()
+        )
 
     @pytest.mark.parametrize(
         ("test_case", "output_type"),
@@ -242,9 +233,12 @@ class TestOutputResults:
                 output=out,
             )
             assert stdout.getvalue() == ""
-            assert out.getvalue() + "\n" == Path(
-                f"tests/data/output/{ext}/output_results_{test_name}.{ext}"
-            ).read_text()
+            assert (
+                out.getvalue() + "\n"
+                == Path(
+                    f"tests/data/output/{ext}/output_results_{test_name}.{ext}"
+                ).read_text()
+            )
 
     def test_output_results_bytes_buffer(self) -> None:
         """
@@ -285,9 +279,10 @@ class TestOutputResults:
             df,
             output=output_path,
         )
-        assert Path(output_path).read_text() + "\n" == Path(
-            f"tests/data/output/txt/output_results_{test_name}.txt"
-        ).read_text()
+        assert (
+            Path(output_path).read_text() + "\n"
+            == Path(f"tests/data/output/txt/output_results_{test_name}.txt").read_text()
+        )
 
     def test_output_results_empty_output_string(self) -> None:
         """
@@ -299,6 +294,9 @@ class TestOutputResults:
                 df,
                 output="",
             )
-            assert stdout.getvalue() == Path(
-                f"tests/data/output/txt/output_results_{test_name}.txt"
-            ).read_text()
+            assert (
+                stdout.getvalue()
+                == Path(
+                    f"tests/data/output/txt/output_results_{test_name}.txt"
+                ).read_text()
+            )
