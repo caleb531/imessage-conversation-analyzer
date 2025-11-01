@@ -29,10 +29,9 @@ jobs:
     - name: Check lockfile
       run: uv lock --check
 
-    - name: Test with nose2
+    - name: Test with pytest
       run: |
-        uv run coverage run -m nose2
-        uv run coverage lcov -o cover/coverage.lcov
+        uv run -m pytest --cov --cov-report=lcov:cover/coverage.lcov
 
     - name: Coveralls
       uses: coverallsapp/github-action@master
