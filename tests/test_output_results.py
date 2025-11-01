@@ -63,240 +63,229 @@ test_cases = (
 )
 
 
-class TestOutputResults:
-    """
-    Test cases for verifying the output results of analyzers, ensuring correct
-    formatting and handling of various output types.
-    """
-
-    @pytest.mark.parametrize(
-        ("test_case", "output_type"),
-        list(
-            itertools.product(
-                test_cases,
-                (
-                    (None, "txt", "read_table"),
-                    ("csv", "csv", "read_csv"),
-                    ("markdown", "md", "read_table"),
-                ),
-            )
-        ),
-    )
-    def test_output_results(
-        self,
-        test_case: tuple[str, pd.DataFrame, IndexType],
-        output_type: tuple[str, str, str],
-    ) -> None:
-        """Should print a dataframe to stdout."""
-        test_name, df, use_default_index = test_case
-        format, ext, df_read_method_name = output_type
-        with redirect_stdout(StringIO()) as stdout:
-            ica.output_results(df, format=format)
-            assert (
-                stdout.getvalue()
-                == Path(
-                    f"tests/data/output/{ext}/output_results_{test_name}.{ext}"
-                ).read_text()
-            )
-
-    @pytest.mark.parametrize(
-        ("test_case", "format"),
-        list(itertools.product(test_cases, ("excel",))),
-    )
-    def test_output_results_bytes(
-        self,
-        test_case: tuple[str, pd.DataFrame, IndexType],
-        format: Optional[str],
-    ) -> None:
-        """
-        Should print the dataframe to stdout as binary Excel data.
-        """
-        test_name, df, use_default_index = test_case
-        with redirect_stdout(StdoutMockWithBuffer()) as stdout:
-            ica.output_results(
-                df,
-                format=format,
-            )
-            assert stdout.getvalue() == ""
-            expected_df = prepare_df_for_output(df)
-            actual_df = prepare_df_for_output(
-                pd.read_excel(
-                    stdout.buffer,
-                    index_col=None if use_default_index.value else 0,
-                )
-            )
-            assert expected_df.to_dict(orient="index") == actual_df.to_dict(
-                orient="index"
-            )
-
-    @pytest.mark.parametrize(
-        ("test_case", "output_type"),
-        list(
-            itertools.product(
-                test_cases,
-                (
-                    (None, "csv"),
-                    ("csv", "csv"),
-                    (None, "md"),
-                    ("markdown", "md"),
-                ),
-            )
-        ),
-    )
-    def test_output_results_file_plaintext(
-        self,
-        test_case: tuple[str, pd.DataFrame, IndexType],
-        output_type: tuple[str, str],
-    ) -> None:
-        """Should write a DataFrame to a plain-text file."""
-        test_name, df, use_default_index = test_case
-        format, ext = output_type
-        output_path = f"{temp_ica_dir}/{test_name}_{format}.{ext}"
-        ica.output_results(
-            df,
-            format=format,
-            output=output_path,
+@pytest.mark.parametrize(
+    ("test_case", "output_type"),
+    list(
+        itertools.product(
+            test_cases,
+            (
+                (None, "txt", "read_table"),
+                ("csv", "csv", "read_csv"),
+                ("markdown", "md", "read_table"),
+            ),
         )
+    ),
+)
+def test_output_results(
+    test_case: tuple[str, pd.DataFrame, IndexType],
+    output_type: tuple[str, str, str],
+) -> None:
+    """Should print a dataframe to stdout."""
+    test_name, df, use_default_index = test_case
+    format, ext, df_read_method_name = output_type
+    with redirect_stdout(StringIO()) as stdout:
+        ica.output_results(df, format=format)
         assert (
-            Path(output_path).read_text() + "\n"
+            stdout.getvalue()
             == Path(
                 f"tests/data/output/{ext}/output_results_{test_name}.{ext}"
             ).read_text()
         )
 
-    @pytest.mark.parametrize(
-        ("test_case", "output_type"),
-        list(
-            itertools.product(
-                test_cases,
-                (
-                    ("excel", "xlsx"),
-                    (None, "xlsx"),
-                ),
-            )
-        ),
-    )
-    def test_output_results_file_binary(
-        self,
-        test_case: tuple[str, pd.DataFrame, IndexType],
-        output_type: tuple[str, str],
-    ) -> None:
-        """Should write a DataFrame to a binary file (i.e. Excel)."""
-        test_name, df, use_default_index = test_case
-        format, ext = output_type
-        output_path = f"{temp_ica_dir}/{test_name}_{format}.{ext}"
+
+@pytest.mark.parametrize(
+    ("test_case", "format"),
+    list(itertools.product(test_cases, ("excel",))),
+)
+def test_output_results_bytes(
+    test_case: tuple[str, pd.DataFrame, IndexType],
+    format: Optional[str],
+) -> None:
+    """
+    Should print the dataframe to stdout as binary Excel data.
+    """
+    test_name, df, use_default_index = test_case
+    with redirect_stdout(StdoutMockWithBuffer()) as stdout:
         ica.output_results(
             df,
             format=format,
-            output=output_path,
         )
+        assert stdout.getvalue() == ""
         expected_df = prepare_df_for_output(df)
-        actual_df: pd.DataFrame = prepare_df_for_output(
+        actual_df = prepare_df_for_output(
             pd.read_excel(
-                output_path,
+                stdout.buffer,
                 index_col=None if use_default_index.value else 0,
-                parse_dates=True,
-                date_format="ISO8601",
             )
         )
-        assert actual_df.to_dict(orient="index") == expected_df.to_dict(orient="index")
+        assert expected_df.to_dict(orient="index") == actual_df.to_dict(orient="index")
 
-    @pytest.mark.parametrize(
-        ("test_case", "output_type"),
-        list(
-            itertools.product(
-                test_cases,
-                (
-                    (None, "txt"),
-                    ("csv", "csv"),
-                    ("markdown", "md"),
-                ),
-            )
-        ),
+
+@pytest.mark.parametrize(
+    ("test_case", "output_type"),
+    list(
+        itertools.product(
+            test_cases,
+            (
+                (None, "csv"),
+                ("csv", "csv"),
+                (None, "md"),
+                ("markdown", "md"),
+            ),
+        )
+    ),
+)
+def test_output_results_file_plaintext(
+    test_case: tuple[str, pd.DataFrame, IndexType],
+    output_type: tuple[str, str],
+) -> None:
+    """Should write a DataFrame to a plain-text file."""
+    test_name, df, use_default_index = test_case
+    format, ext = output_type
+    output_path = f"{temp_ica_dir}/{test_name}_{format}.{ext}"
+    ica.output_results(
+        df,
+        format=format,
+        output=output_path,
     )
-    def test_output_results_string_buffer(
-        self,
-        test_case: tuple[str, pd.DataFrame, IndexType],
-        output_type: tuple[str, str],
-    ) -> None:
-        """
-        Should write a dataframe to an explicitly-passed StringIO buffer, but
-        not print to stdout.
-        """
-        test_name, df, use_default_index = test_case
-        format, ext = output_type
-        out = StringIO()
-        with redirect_stdout(StringIO()) as stdout:
-            ica.output_results(
-                df,
-                format=format,
-                output=out,
-            )
-            assert stdout.getvalue() == ""
-            assert (
-                out.getvalue() + "\n"
-                == Path(
-                    f"tests/data/output/{ext}/output_results_{test_name}.{ext}"
-                ).read_text()
-            )
+    assert (
+        Path(output_path).read_text() + "\n"
+        == Path(f"tests/data/output/{ext}/output_results_{test_name}.{ext}").read_text()
+    )
 
-    def test_output_results_bytes_buffer(self) -> None:
-        """
-        Should write a dataframe to an explicitly-passed BytesIO buffer, but not
-        print to stdout.
-        """
-        test_name, df, use_default_index = test_cases[0]
-        format = "excel"
-        out = BytesIO()
-        with redirect_stdout(StringIO()) as stdout:
-            ica.output_results(
-                df,
-                format=format,
-                output=out,
-            )
-            assert stdout.getvalue() == ""
-            expected_df = prepare_df_for_output(df)
-            actual_df = prepare_df_for_output(pd.read_excel(out))
-            assert expected_df.to_dict(orient="index") == actual_df.to_dict(
-                orient="index"
-            )
 
-    def test_output_results_invalid_format(self) -> None:
-        """Should raise an error if format is invalid."""
-        test_name, df, use_default_index = test_cases[0]
-        with pytest.raises(ica.FormatNotSupportedError):
-            with redirect_stdout(StringIO()):
-                ica.output_results(df, format="abc")
+@pytest.mark.parametrize(
+    ("test_case", "output_type"),
+    list(
+        itertools.product(
+            test_cases,
+            (
+                ("excel", "xlsx"),
+                (None, "xlsx"),
+            ),
+        )
+    ),
+)
+def test_output_results_file_binary(
+    test_case: tuple[str, pd.DataFrame, IndexType],
+    output_type: tuple[str, str],
+) -> None:
+    """Should write a DataFrame to a binary file (i.e. Excel)."""
+    test_name, df, use_default_index = test_case
+    format, ext = output_type
+    output_path = f"{temp_ica_dir}/{test_name}_{format}.{ext}"
+    ica.output_results(
+        df,
+        format=format,
+        output=output_path,
+    )
+    expected_df = prepare_df_for_output(df)
+    actual_df: pd.DataFrame = prepare_df_for_output(
+        pd.read_excel(
+            output_path,
+            index_col=None if use_default_index.value else 0,
+            parse_dates=True,
+            date_format="ISO8601",
+        )
+    )
+    assert actual_df.to_dict(orient="index") == expected_df.to_dict(orient="index")
 
-    def test_output_results_cannot_infer_format(self) -> None:
-        """
-        Should fall back to default format if format cannot be inferred from
-        output path's file extension.
-        """
-        test_name, df, use_default_index = test_cases[0]
-        output_path = f"{temp_ica_dir}/output.abc"
+
+@pytest.mark.parametrize(
+    ("test_case", "output_type"),
+    list(
+        itertools.product(
+            test_cases,
+            (
+                (None, "txt"),
+                ("csv", "csv"),
+                ("markdown", "md"),
+            ),
+        )
+    ),
+)
+def test_output_results_string_buffer(
+    test_case: tuple[str, pd.DataFrame, IndexType],
+    output_type: tuple[str, str],
+) -> None:
+    """
+    Should write a dataframe to an explicitly-passed StringIO buffer, but
+    not print to stdout.
+    """
+    test_name, df, use_default_index = test_case
+    format, ext = output_type
+    out = StringIO()
+    with redirect_stdout(StringIO()) as stdout:
         ica.output_results(
             df,
-            output=output_path,
+            format=format,
+            output=out,
         )
+        assert stdout.getvalue() == ""
         assert (
-            Path(output_path).read_text() + "\n"
-            == Path(f"tests/data/output/txt/output_results_{test_name}.txt").read_text()
+            out.getvalue() + "\n"
+            == Path(
+                f"tests/data/output/{ext}/output_results_{test_name}.{ext}"
+            ).read_text()
         )
 
-    def test_output_results_empty_output_string(self) -> None:
-        """
-        Should print to stdout using default format if output is an empty string.
-        """
-        test_name, df, use_default_index = test_cases[0]
-        with redirect_stdout(StringIO()) as stdout:
-            ica.output_results(
-                df,
-                output="",
-            )
-            assert (
-                stdout.getvalue()
-                == Path(
-                    f"tests/data/output/txt/output_results_{test_name}.txt"
-                ).read_text()
-            )
+
+def test_output_results_bytes_buffer() -> None:
+    """
+    Should write a dataframe to an explicitly-passed BytesIO buffer, but not
+    print to stdout.
+    """
+    test_name, df, use_default_index = test_cases[0]
+    format = "excel"
+    out = BytesIO()
+    with redirect_stdout(StringIO()) as stdout:
+        ica.output_results(
+            df,
+            format=format,
+            output=out,
+        )
+        assert stdout.getvalue() == ""
+        expected_df = prepare_df_for_output(df)
+        actual_df = prepare_df_for_output(pd.read_excel(out))
+        assert expected_df.to_dict(orient="index") == actual_df.to_dict(orient="index")
+
+
+def test_output_results_invalid_format() -> None:
+    """Should raise an error if format is invalid."""
+    test_name, df, use_default_index = test_cases[0]
+    with pytest.raises(ica.FormatNotSupportedError):
+        with redirect_stdout(StringIO()):
+            ica.output_results(df, format="abc")
+
+
+def test_output_results_cannot_infer_format() -> None:
+    """
+    Should fall back to default format if format cannot be inferred from
+    output path's file extension.
+    """
+    test_name, df, use_default_index = test_cases[0]
+    output_path = f"{temp_ica_dir}/output.abc"
+    ica.output_results(
+        df,
+        output=output_path,
+    )
+    assert (
+        Path(output_path).read_text() + "\n"
+        == Path(f"tests/data/output/txt/output_results_{test_name}.txt").read_text()
+    )
+
+
+def test_output_results_empty_output_string() -> None:
+    """
+    Should print to stdout using default format if output is an empty string.
+    """
+    test_name, df, use_default_index = test_cases[0]
+    with redirect_stdout(StringIO()) as stdout:
+        ica.output_results(
+            df,
+            output="",
+        )
+        assert (
+            stdout.getvalue()
+            == Path(f"tests/data/output/txt/output_results_{test_name}.txt").read_text()
+        )

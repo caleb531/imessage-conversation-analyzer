@@ -9,25 +9,19 @@ import ica.analyzers.totals_by_day as totals_by_day
 from ica import pipe_lambda
 
 
-class TestTotalsByDay:
-    """
-    Test cases for the `totals_by_day` analyzer, which calculates the total
-    number of days with messages in a conversation.
-    """
-
-    @patch("ica.output_results")
-    @patch("sys.argv", [totals_by_day.__file__, "-c", "Jane Fernbrook", "-t", "UTC"])
-    def test_totals_by_day(self, output_results: MagicMock) -> None:
-        """Should count the total number of days."""
-        totals_by_day.main()
-        df: pd.DataFrame = output_results.call_args[0][0]
-        assert df.to_dict(orient="index") == (
-            pd.read_json("tests/data/totals_by_day.json", orient="index")
-            # ICA provides timezone-aware date/times, however the date/time
-            # objects parsed from the JSON are missing timezone information
-            # (i.e. they are timezone-naive); therefore, we must add the missing
-            # timezone information (note that this does not perform any
-            # conversions)
-            .pipe(pipe_lambda(lambda df: df.set_index(df.index.tz_localize("UTC"))))
-            .to_dict(orient="index")
-        )
+@patch("ica.output_results")
+@patch("sys.argv", [totals_by_day.__file__, "-c", "Jane Fernbrook", "-t", "UTC"])
+def test_totals_by_day(output_results: MagicMock) -> None:
+    """Should count the total number of days."""
+    totals_by_day.main()
+    df: pd.DataFrame = output_results.call_args[0][0]
+    assert df.to_dict(orient="index") == (
+        pd.read_json("tests/data/totals_by_day.json", orient="index")
+        # ICA provides timezone-aware date/times, however the date/time
+        # objects parsed from the JSON are missing timezone information
+        # (i.e. they are timezone-naive); therefore, we must add the missing
+        # timezone information (note that this does not perform any
+        # conversions)
+        .pipe(pipe_lambda(lambda df: df.set_index(df.index.tz_localize("UTC"))))
+        .to_dict(orient="index")
+    )
