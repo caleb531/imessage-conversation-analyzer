@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """test the message_totals built-in analyzer"""
+
 import pytest
 
 import ica

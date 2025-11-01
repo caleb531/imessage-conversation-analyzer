@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """test the mocking of the database"""
+
 import collections
 import glob
 import sqlite3

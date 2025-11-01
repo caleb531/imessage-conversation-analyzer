@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """test the cli built-in analyzer"""
+
 import sys
 import unittest
 from contextlib import redirect_stderr, redirect_stdout

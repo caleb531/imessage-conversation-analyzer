@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """test the ability to filter analyzer results by date and person"""
+
 import unittest
 from unittest.mock import MagicMock, patch
 
