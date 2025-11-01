@@ -2,33 +2,43 @@
 """test the transcript built-in analyzer"""
 
 from typing import Any
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pandas as pd
-from nose2.tools import params
+import pytest
 
 import ica.analyzers.transcript as transcript
 from tests.utils import ICATestCase
 
 
-class TestTranscript(ICATestCase):
+class TestTranscript:
     """
     Test cases for the `transcript` analyzer, which generates transcripts of
     conversations.
     """
 
-    @params((1, "Jane Fernbrook"), (2, "Thomas Riverstone"))
-    @patch("ica.output_results")
-    def test_transcripts(
-        self, transcript_num: Any, contact_name: str, output_results: MagicMock
-    ) -> None:
+    def setup_method(self) -> None:
+        """Setup for each test method - calls ICATestCase setUp logic."""
+        test_case = ICATestCase()
+        test_case.setUp()
+        self._teardown = test_case.tearDown
+
+    def teardown_method(self) -> None:
+        """Teardown for each test method - calls ICATestCase tearDown logic."""
+        self._teardown()
+
+    @pytest.mark.parametrize(
+        ("transcript_num", "contact_name"),
+        [(1, "Jane Fernbrook"), (2, "Thomas Riverstone")],
+    )
+    def test_transcripts(self, transcript_num: Any, contact_name: str) -> None:
         """Should generate transcripts of all mock conversations."""
-        with patch("sys.argv", [transcript.__file__, "-c", contact_name, "-t", "UTC"]):
+        with (
+            patch("ica.output_results") as output_results,
+            patch("sys.argv", [transcript.__file__, "-c", contact_name, "-t", "UTC"]),
+        ):
             transcript.main()
             df: pd.DataFrame = output_results.call_args[0][0]
-            self.assertListEqual(
-                df.to_dict(orient="records"),
-                pd.read_json(f"tests/data/transcript-{transcript_num}.json").to_dict(
-                    orient="records"
-                ),
-            )
+            assert df.to_dict(orient="records") == pd.read_json(
+                f"tests/data/transcript-{transcript_num}.json"
+            ).to_dict(orient="records")

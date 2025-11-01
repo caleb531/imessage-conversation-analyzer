@@ -68,6 +68,14 @@ select = [
     "PERF",
 ]
 
+# Configuration for pytest (https://docs.pytest.org/)
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
 # Configuration for coverage.py (https://pypi.python.org/pypi/coverage)
 
 [tool.coverage.run]
@@ -90,6 +98,7 @@ dev = [
     "coverage==7.6.10",
     "freezegun==1.5.1",
     "mypy==1.14.1",
-    "nose2==0.15.1",
+    "pytest>=8.4.2",
+    "pytest-cov>=6.3.0",
     "ruff>=0.12.0",
 ]

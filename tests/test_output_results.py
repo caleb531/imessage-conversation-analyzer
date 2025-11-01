@@ -9,12 +9,12 @@ from pathlib import Path
 from typing import Optional
 
 import pandas as pd
-from nose2.tools import params
+import pytest
 
 import ica
 from ica import assign_lambda
 from ica.core import prepare_df_for_output
-from tests.utils import ICATestCase, StdoutMockWithBuffer, temp_ica_dir
+from tests.utils import StdoutMockWithBuffer, temp_ica_dir
 
 
 class IndexType(Enum):
@@ -63,21 +63,36 @@ test_cases = (
 )
 
 
-class TestOutputResults(ICATestCase):
+class TestOutputResults:
     """
     Test cases for verifying the output results of analyzers, ensuring correct
     formatting and handling of various output types.
     """
 
-    @params(
-        *itertools.product(
-            test_cases,
-            (
-                (None, "txt", "read_table"),
-                ("csv", "csv", "read_csv"),
-                ("markdown", "md", "read_table"),
-            ),
-        )
+    def setup_method(self) -> None:
+        """Setup for each test method."""
+        from tests.utils import ICATestCase
+
+        test_case = ICATestCase()
+        test_case.setUp()
+        self._teardown = test_case.tearDown
+
+    def teardown_method(self) -> None:
+        """Teardown for each test method."""
+        self._teardown()
+
+    @pytest.mark.parametrize(
+        ("test_case", "output_type"),
+        list(
+            itertools.product(
+                test_cases,
+                (
+                    (None, "txt", "read_table"),
+                    ("csv", "csv", "read_csv"),
+                    ("markdown", "md", "read_table"),
+                ),
+            )
+        ),
     )
     def test_output_results(
         self,
@@ -89,18 +104,16 @@ class TestOutputResults(ICATestCase):
         format, ext, df_read_method_name = output_type
         with redirect_stdout(StringIO()) as stdout:
             ica.output_results(df, format=format)
-            self.assertEqual(
-                stdout.getvalue(),
-                Path(
+            assert (
+                stdout.getvalue()
+                == Path(
                     f"tests/data/output/{ext}/output_results_{test_name}.{ext}"
-                ).read_text(),
+                ).read_text()
             )
 
-    @params(
-        *itertools.product(
-            test_cases,
-            ("excel",),
-        )
+    @pytest.mark.parametrize(
+        ("test_case", "format"),
+        list(itertools.product(test_cases, ("excel",))),
     )
     def test_output_results_bytes(
         self,
@@ -116,7 +129,7 @@ class TestOutputResults(ICATestCase):
                 df,
                 format=format,
             )
-            self.assertEqual(stdout.getvalue(), "")
+            assert stdout.getvalue() == ""
             expected_df = prepare_df_for_output(df)
             actual_df = prepare_df_for_output(
                 pd.read_excel(
@@ -124,21 +137,23 @@ class TestOutputResults(ICATestCase):
                     index_col=None if use_default_index.value else 0,
                 )
             )
-            self.assertEqual(
-                expected_df.to_dict(orient="index"),
-                actual_df.to_dict(orient="index"),
+            assert expected_df.to_dict(orient="index") == actual_df.to_dict(
+                orient="index"
             )
 
-    @params(
-        *itertools.product(
-            test_cases,
-            (
-                (None, "csv"),
-                ("csv", "csv"),
-                (None, "md"),
-                ("markdown", "md"),
-            ),
-        )
+    @pytest.mark.parametrize(
+        ("test_case", "output_type"),
+        list(
+            itertools.product(
+                test_cases,
+                (
+                    (None, "csv"),
+                    ("csv", "csv"),
+                    (None, "md"),
+                    ("markdown", "md"),
+                ),
+            )
+        ),
     )
     def test_output_results_file_plaintext(
         self,
@@ -154,21 +169,21 @@ class TestOutputResults(ICATestCase):
             format=format,
             output=output_path,
         )
-        self.assertEqual(
-            Path(output_path).read_text() + "\n",
-            Path(
-                f"tests/data/output/{ext}/output_results_{test_name}.{ext}"
-            ).read_text(),
-        )
+        assert Path(output_path).read_text() + "\n" == Path(
+            f"tests/data/output/{ext}/output_results_{test_name}.{ext}"
+        ).read_text()
 
-    @params(
-        *itertools.product(
-            test_cases,
-            (
-                ("excel", "xlsx"),
-                (None, "xlsx"),
-            ),
-        )
+    @pytest.mark.parametrize(
+        ("test_case", "output_type"),
+        list(
+            itertools.product(
+                test_cases,
+                (
+                    ("excel", "xlsx"),
+                    (None, "xlsx"),
+                ),
+            )
+        ),
     )
     def test_output_results_file_binary(
         self,
@@ -193,20 +208,20 @@ class TestOutputResults(ICATestCase):
                 date_format="ISO8601",
             )
         )
-        self.assertEqual(
-            actual_df.to_dict(orient="index"),
-            expected_df.to_dict(orient="index"),
-        )
+        assert actual_df.to_dict(orient="index") == expected_df.to_dict(orient="index")
 
-    @params(
-        *itertools.product(
-            test_cases,
-            (
-                (None, "txt"),
-                ("csv", "csv"),
-                ("markdown", "md"),
-            ),
-        )
+    @pytest.mark.parametrize(
+        ("test_case", "output_type"),
+        list(
+            itertools.product(
+                test_cases,
+                (
+                    (None, "txt"),
+                    ("csv", "csv"),
+                    ("markdown", "md"),
+                ),
+            )
+        ),
     )
     def test_output_results_string_buffer(
         self,
@@ -226,13 +241,10 @@ class TestOutputResults(ICATestCase):
                 format=format,
                 output=out,
             )
-            self.assertEqual(stdout.getvalue(), "")
-            self.assertEqual(
-                out.getvalue() + "\n",
-                Path(
-                    f"tests/data/output/{ext}/output_results_{test_name}.{ext}"
-                ).read_text(),
-            )
+            assert stdout.getvalue() == ""
+            assert out.getvalue() + "\n" == Path(
+                f"tests/data/output/{ext}/output_results_{test_name}.{ext}"
+            ).read_text()
 
     def test_output_results_bytes_buffer(self) -> None:
         """
@@ -248,18 +260,17 @@ class TestOutputResults(ICATestCase):
                 format=format,
                 output=out,
             )
-            self.assertEqual(stdout.getvalue(), "")
+            assert stdout.getvalue() == ""
             expected_df = prepare_df_for_output(df)
             actual_df = prepare_df_for_output(pd.read_excel(out))
-            self.assertEqual(
-                expected_df.to_dict(orient="index"),
-                actual_df.to_dict(orient="index"),
+            assert expected_df.to_dict(orient="index") == actual_df.to_dict(
+                orient="index"
             )
 
     def test_output_results_invalid_format(self) -> None:
         """Should raise an error if format is invalid."""
         test_name, df, use_default_index = test_cases[0]
-        with self.assertRaises(ica.FormatNotSupportedError):
+        with pytest.raises(ica.FormatNotSupportedError):
             with redirect_stdout(StringIO()):
                 ica.output_results(df, format="abc")
 
@@ -274,10 +285,9 @@ class TestOutputResults(ICATestCase):
             df,
             output=output_path,
         )
-        self.assertEqual(
-            Path(output_path).read_text() + "\n",
-            Path(f"tests/data/output/txt/output_results_{test_name}.txt").read_text(),
-        )
+        assert Path(output_path).read_text() + "\n" == Path(
+            f"tests/data/output/txt/output_results_{test_name}.txt"
+        ).read_text()
 
     def test_output_results_empty_output_string(self) -> None:
         """
@@ -289,9 +299,6 @@ class TestOutputResults(ICATestCase):
                 df,
                 output="",
             )
-            self.assertEqual(
-                stdout.getvalue(),
-                Path(
-                    f"tests/data/output/txt/output_results_{test_name}.txt"
-                ).read_text(),
-            )
+            assert stdout.getvalue() == Path(
+                f"tests/data/output/txt/output_results_{test_name}.txt"
+            ).read_text()
