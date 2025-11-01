@@ -67,14 +67,6 @@ select = [
     "PERF",
 ]
 
-# Configuration for pytest (https://docs.pytest.org/)
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-python_files = ["test_*.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
-
 # Configuration for coverage.py (https://pypi.python.org/pypi/coverage)
 
 [tool.coverage.run]
