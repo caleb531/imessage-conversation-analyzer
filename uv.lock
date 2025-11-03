@@ -140,7 +140,6 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "coverage" },
     { name = "freezegun" },
     { name = "mypy" },
     { name = "pytest" },
@@ -161,7 +160,6 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "coverage", specifier = "==7.6.10" },
     { name = "freezegun", specifier = "==1.5.1" },
     { name = "mypy", specifier = "==1.14.1" },
     { name = "pytest", specifier = ">=8.4.2" },
