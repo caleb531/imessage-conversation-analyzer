@@ -30,8 +30,7 @@ jobs:
       run: uv lock --check
 
     - name: Test with pytest
-      run: |
-        uv run -m pytest --cov --cov-report=lcov:cover/coverage.lcov
+      run: uv run -m pytest --cov --cov-report=lcov:cover/coverage.lcov --cov-report=term-missing
 
     - name: Coveralls
       uses: coverallsapp/github-action@master
