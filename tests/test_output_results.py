@@ -12,7 +12,6 @@ import pandas as pd
 import pytest
 
 import ica
-from ica import assign_lambda
 from ica.core import prepare_df_for_output
 from tests.utils import StdoutMockWithBuffer, temp_ica_dir
 
@@ -56,7 +55,7 @@ test_cases = (
                 "total": [12, 45, 56],
             },
         )
-        .assign(date=assign_lambda(lambda df: pd.to_datetime(df["date"])))
+        .assign(date=lambda df: pd.to_datetime(df["date"]))
         .set_index("date"),
         IndexType.USE_CUSTOM_INDEX,
     ),

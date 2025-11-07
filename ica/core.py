@@ -136,17 +136,15 @@ def get_messages_dataframe(
         # first, we must add the missing timezone information, then we must
         # convert the datetime to the specified timezone
         .assign(
-            datetime=assign_lambda(
-                lambda df: df["datetime"].dt.tz_localize("UTC").dt.tz_convert(timezone)
-            )
+            datetime=lambda df: df["datetime"]
+            .dt.tz_localize("UTC")
+            .dt.tz_convert(timezone)
         )
         # Decode any 'attributedBody' values and merge them into the 'text'
         # column
         .assign(
-            text=assign_lambda(
-                lambda df: df["text"].fillna(
-                    df["attributedBody"].apply(decode_message_attributedbody)
-                )
+            text=lambda df: df["text"].fillna(
+                df["attributedBody"].apply(decode_message_attributedbody)
             )
         )
         # Remove 'attributedBody' column now that it has been merged into the
@@ -154,15 +152,13 @@ def get_messages_dataframe(
         .drop("attributedBody", axis="columns")
         # Use a regex-based heuristic to determine which messages are reactions
         .assign(
-            is_reaction=assign_lambda(
-                lambda df: df["text"].str.match(
-                    r"^(Loved|Liked|Disliked|Laughed at|Emphasized|Questioned|Reacted)"
-                    r" (“(.*?)”|an \w+|(.*?) to “(.*?)”)$"
-                )
+            is_reaction=lambda df: df["text"].str.match(
+                r"^(Loved|Liked|Disliked|Laughed at|Emphasized|Questioned|Reacted)"
+                r" (“(.*?)”|an \w+|(.*?) to “(.*?)”)$"
             )
         )
         # Convert 'is_from_me' values from integers to proper booleans
-        .assign(is_from_me=assign_lambda(lambda df: df["is_from_me"].astype(bool)))
+        .assign(is_from_me=lambda df: df["is_from_me"].astype(bool))
     )
 
 
@@ -182,22 +178,12 @@ def filter_dataframe(
         raise DateRangeInvalidError("Date range is backwards")
 
     return (
-        df.pipe(
-            pipe_lambda(
-                lambda df: df[df["is_from_me"].eq(True)] if from_person == "me" else df
-            )
-        )
+        df.pipe(lambda df: df[df["is_from_me"].eq(True)] if from_person == "me" else df)
         .pipe(
-            pipe_lambda(
-                lambda df: (
-                    df[df["is_from_me"].eq(False)] if from_person == "them" else df
-                )
-            )
+            lambda df: (df[df["is_from_me"].eq(False)] if from_person == "them" else df)
         )
-        .pipe(
-            pipe_lambda(lambda df: df[df["datetime"] >= from_date] if from_date else df)
-        )
-        .pipe(pipe_lambda(lambda df: df[df["datetime"] <= to_date] if to_date else df))
+        .pipe(lambda df: df[df["datetime"] >= from_date] if from_date else df)
+        .pipe(lambda df: df[df["datetime"] <= to_date] if to_date else df)
     )
 
 
@@ -225,9 +211,9 @@ def get_attachments_dataframe(
         # Expose the date/time of the message alongside each attachment record,
         # for convenience
         .assign(
-            datetime=assign_lambda(
-                lambda df: df["datetime"].dt.tz_localize("UTC").dt.tz_convert(timezone)
-            )
+            datetime=lambda df: df["datetime"]
+            .dt.tz_localize("UTC")
+            .dt.tz_convert(timezone)
         )
     )
 
@@ -299,12 +285,10 @@ def make_dataframe_tz_naive(df: pd.DataFrame) -> pd.DataFrame:
     timezone-naive, including all columns and the index
     """
     return df.pipe(
-        pipe_lambda(
-            lambda df: (
-                df.set_index(df.index.tz_localize(None))
-                if isinstance(df.index, pd.DatetimeIndex)
-                else df
-            )
+        lambda df: (
+            df.set_index(df.index.tz_localize(None))
+            if isinstance(df.index, pd.DatetimeIndex)
+            else df
         )
     ).assign(
         **{
@@ -333,14 +317,10 @@ def prepare_df_for_output(
         .rename_axis(prettify_header_name(df.index.name), axis="index")
         # Make all indices start from 1 instead of 0, but only if the index is
         # the default (rather than a custom column)
-        .pipe(
-            pipe_lambda(
-                lambda df: df.set_index(df.index + 1 if not df.index.name else df.index)
-            )
-        )
+        .pipe(lambda df: df.set_index(df.index + 1 if not df.index.name else df.index))
         # Make dataframe timestamps timezone-naive (which is required for
         # exporting to Excel)
-        .pipe(pipe_lambda(lambda df: make_dataframe_tz_naive(df)))
+        .pipe(lambda df: make_dataframe_tz_naive(df))
     )
 
 

@@ -6,7 +6,6 @@ from typing import Union
 import pandas as pd
 
 import ica
-from ica import assign_lambda
 
 # The format to use for all date strings
 DATE_FORMAT = "%Y-%m-%d"
@@ -39,15 +38,11 @@ def get_sums_by_day(dfs: ica.DataFrameNamespace) -> pd.DataFrame:
         # Count all "text" column values by converting them to integers (always
         # 1), because resampling the DataFrame will remove all non-numeric
         # columns
-        .assign(
-            text=assign_lambda(
-                lambda df: df["text"].apply(pd.to_numeric, errors="coerce").isna()
-            )
-        )
+        .assign(text=lambda df: df["text"].apply(pd.to_numeric, errors="coerce").isna())
         .resample("D", on="datetime")
         .sum()
         .rename_axis("date", axis="index")
-        .assign(is_from_them=assign_lambda(lambda df: df["text"] - df["is_from_me"]))
+        .assign(is_from_them=lambda df: df["text"] - df["is_from_me"])
     )
 
 

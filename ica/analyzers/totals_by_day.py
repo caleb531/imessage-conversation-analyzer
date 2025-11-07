@@ -2,7 +2,6 @@
 import pandas as pd
 
 import ica
-from ica import assign_lambda, pipe_lambda
 
 # The format to use for all date strings
 DATE_FORMAT = "%Y-%m-%d"
@@ -28,21 +27,17 @@ def main() -> None:
             # (always 1), because resampling the DataFrame will remove all
             # non-numeric columns
             .assign(
-                text=assign_lambda(
-                    lambda df: df["text"].apply(pd.to_numeric, errors="coerce").isna()
-                )
+                text=lambda df: df["text"].apply(pd.to_numeric, errors="coerce").isna()
             )
             .resample("D", on="datetime")
             .sum()
             .rename_axis("date", axis="index")
             # Filter out any rows for dates where neither person sent a message
-            .pipe(pipe_lambda(lambda df: df[df["text"] != 0]))
+            .pipe(lambda df: df[df["text"] != 0])
             # Add a column for the by-day number of messages from the other
             # person, for convenience (even though it can technically be derived
             # from the existing columns)
-            .assign(
-                is_from_them=assign_lambda(lambda df: df["text"] - df["is_from_me"])
-            )
+            .assign(is_from_them=lambda df: df["text"] - df["is_from_me"])
             # Do not include reaction data for brevity
             .drop(columns=["is_reaction"])
             # Rename columns to be more intuitive

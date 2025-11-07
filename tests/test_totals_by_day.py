@@ -6,7 +6,6 @@ from unittest.mock import MagicMock, patch
 import pandas as pd
 
 import ica.analyzers.totals_by_day as totals_by_day
-from ica import pipe_lambda
 
 
 @patch("ica.output_results")
@@ -22,6 +21,6 @@ def test_totals_by_day(output_results: MagicMock) -> None:
         # (i.e. they are timezone-naive); therefore, we must add the missing
         # timezone information (note that this does not perform any
         # conversions)
-        .pipe(pipe_lambda(lambda df: df.set_index(df.index.tz_localize("UTC"))))
+        .pipe(lambda df: df.set_index(df.index.tz_localize("UTC")))
         .to_dict(orient="index")
     )
