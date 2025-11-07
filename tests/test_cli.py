@@ -66,8 +66,9 @@ def test_cli_run_analyzer_via_path() -> None:
     assert actual_out.getvalue() == expected_out.getvalue()
 
 
+@patch("importlib.util.find_spec", return_value=None)
 @patch("importlib.util.spec_from_loader", return_value=None)
-def test_cli_spec_error(spec_from_loader: MagicMock) -> None:
+def test_cli_spec_error(find_spec: MagicMock, spec_from_loader: MagicMock) -> None:
     """Should raise error when spec cannot be created for analyzer."""
     cli_arg_list = ["-c", "Jane Fernbrook"]
     with patch(
@@ -75,6 +76,7 @@ def test_cli_spec_error(spec_from_loader: MagicMock) -> None:
     ):
         with pytest.raises(ImportError):
             cli.main()
+        find_spec.assert_called_once()
         spec_from_loader.assert_called_once()
 
 
