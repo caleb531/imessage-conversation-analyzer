@@ -84,11 +84,13 @@ def pipe_lambda(
     df_lambda: Callable[[pd.DataFrame], pd.DataFrame],
 ) -> Callable[[pd.DataFrame], pd.DataFrame]:
     """
-    If you pass a lambda to the DataFrame pipe() method, the type of the
-    dataframe parameter and the return type of the lambda will both be `Any`;
-    this breaks type-safety for the lambda itself and for subsequent chained
-    methods, but to work around this, we can introduce a wrapper function which,
-    when wrapped around the lambda, can enforce the proper type within mypy
+    [DEPRECATED]: Previously, If you were to pass a lambda to the DataFrame
+    pipe() method, the type of the dataframe parameter and the return type of
+    the lambda would both be `Any`; this broke type-safety for the lambda itself
+    and for subsequent chained methods, but to work around this, we introduced a
+    wrapper function which, when wrapped around the lambda, can enforce the
+    proper type within mypy; however, recent versions of mypy and pandas no
+    longer exhibit this behavior, hence we are deprecating this function
     """
     return df_lambda
 
@@ -97,11 +99,13 @@ def assign_lambda(
     df_lambda: Callable[[pd.DataFrame], pd.Series],
 ) -> Callable[[pd.DataFrame], pd.Series]:
     """
-    If you pass a lambda to the DataFrame assign() method, the type of the
-    dataframe parameter and the return type of the lambda will both be `Any`;
-    this breaks type-safety for the lambda itself and for subsequent chained
-    methods, but to work around this, we can introduce a wrapper function which,
-    when wrapped around the lambda, can enforce the proper type within mypy
+    [DEPRECATED]: Previously, if you were to pass a lambda to the DataFrame
+    assign() method, the type of the dataframe parameter and the return type of
+    the lambda would both be `Any`; this broke type-safety for the lambda itself
+    and for subsequent chained methods, but to work around this, we introduced a
+    wrapper function which, when wrapped around the lambda, can enforce the
+    proper type within mypy; however, recent versions of mypy and pandas no
+    longer exhibit this behavior, hence we are deprecating this function
     """
     return df_lambda
 
