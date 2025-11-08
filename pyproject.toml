@@ -86,8 +86,8 @@ exclude_lines = [
 
 [dependency-groups]
 dev = [
-    "freezegun==1.5.1",
-    "mypy==1.14.1",
+    "freezegun>=1.5.1",
+    "mypy>=1.14.1",
     "pytest>=8.4.2",
     "pytest-cov>=6.3.0",
     "ruff>=0.12.0",
