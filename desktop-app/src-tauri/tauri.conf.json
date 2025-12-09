@@ -33,7 +33,11 @@
       "icons/icon.ico"
     ],
     "externalBin": [
-      "bin/ica-sidecar"
+      "ica-sidecar"
+    ],
+    "resources": [
+      "_internal",
+      "ica-sidecar-aarch64-apple-darwin"
     ]
   }
 }
