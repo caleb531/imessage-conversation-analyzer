@@ -7,6 +7,8 @@
     "dev": "pnpm build:sidecar && vite dev",
     "build": "vite build",
     "build:sidecar": "./scripts/build-sidecar.sh",
+    "clean": "pnpm clean:sidecar && rm -rf build .svelte-kit package",
+    "clean:sidecar": "rm -rf src-tauri/_internal src-tauri/ica-sidecar src-tauri/ica-sidecar-*",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
