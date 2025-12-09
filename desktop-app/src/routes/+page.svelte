@@ -2,19 +2,10 @@
   import { invoke } from "@tauri-apps/api/core";
   import { runIcaSidecar } from "../lib/sidecar";
 
-  let name = $state("");
-  let greetMsg = $state("");
-  let sidecarArgs = $state("--help");
-  let sidecarOutput = $state("");
-  let sidecarError = $state("");
-  let sidecarExitCode = $state<number | null>(null);
-  let sidecarRunning = $state(false);
-
-  async function greet(event: Event) {
-    event.preventDefault();
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    greetMsg = await invoke("greet", { name });
-  }
+  let icaArgs = $state("--help");
+  let icaOutput = $state("");
+  let icaError = $state("");
+  let icaRunning = $state(false);
 
   function splitArgs(input: string): string[] {
     // Support very small subset of shell quoting for convenience in the UI.
@@ -27,88 +18,50 @@
 
   async function runSidecar(event: Event) {
     event.preventDefault();
-    sidecarRunning = true;
-    sidecarOutput = "";
-    sidecarError = "";
-    sidecarExitCode = null;
+    icaRunning = true;
+    icaOutput = "";
+    icaError = "";
 
     try {
-      const args = sidecarArgs.trim() ? splitArgs(sidecarArgs) : [];
+      const args = icaArgs.trim() ? splitArgs(icaArgs) : [];
       const result = await runIcaSidecar(args);
-      sidecarExitCode = result.code;
-      sidecarOutput = result.stdout.trimEnd();
-      sidecarError = result.stderr.trimEnd();
+      icaOutput = result.stdout.trimEnd();
+      icaError = result.stderr.trimEnd();
     } catch (error) {
-      sidecarExitCode = null;
-      sidecarError = error instanceof Error ? error.message : String(error);
+      icaError = error instanceof Error ? error.message : String(error);
     } finally {
-      sidecarRunning = false;
+      icaRunning = false;
     }
   }
 </script>
 
 <main class="container">
-  <h1>Welcome to Tauri + Svelte</h1>
-
-  <div class="row">
-    <a href="https://vite.dev" target="_blank">
-      <img src="/vite.svg" class="logo vite" alt="Vite Logo" />
-    </a>
-    <a href="https://tauri.app" target="_blank">
-      <img src="/tauri.svg" class="logo tauri" alt="Tauri Logo" />
-    </a>
-    <a href="https://svelte.dev" target="_blank">
-      <img src="/svelte.svg" class="logo svelte-kit" alt="SvelteKit Logo" />
-    </a>
-  </div>
-  <p>Click on the Tauri, Vite, and SvelteKit logos to learn more.</p>
-
-  <form class="row" onsubmit={greet}>
-    <input id="greet-input" placeholder="Enter a name..." bind:value={name} />
-    <button type="submit">Greet</button>
-  </form>
-  <p>{greetMsg}</p>
-
   <section class="section">
-    <h2>Run Packaged CLI</h2>
+    <h1>iMessage Conversation Analyzer</h1>
     <form class="column" onsubmit={runSidecar}>
-      <label for="sidecar-args">Arguments</label>
+      <label for="sidecar-args">CLI Arguments</label>
       <input
         id="sidecar-args"
         placeholder="--help"
-        bind:value={sidecarArgs}
+        bind:value={icaArgs}
         autocomplete="off"
       />
-      <button type="submit" disabled={sidecarRunning}>
-        {sidecarRunning ? "Running…" : "Run ica-sidecar"}
+      <button type="submit" disabled={icaRunning}>
+        {icaRunning ? "Running…" : "Run ica-sidecar"}
       </button>
     </form>
 
-    {#if sidecarExitCode !== null}
-      <p class="status">Exit code: {sidecarExitCode}</p>
+    {#if icaOutput}
+      <pre>{icaOutput}</pre>
     {/if}
 
-    {#if sidecarOutput}
-      <h3>Stdout</h3>
-      <pre>{sidecarOutput}</pre>
-    {/if}
-
-    {#if sidecarError}
-      <h3>Stderr</h3>
-      <pre class="error-log">{sidecarError}</pre>
+    {#if icaError}
+      <pre class="error-log">{icaError}</pre>
     {/if}
   </section>
 </main>
 
 <style>
-.logo.vite:hover {
-  filter: drop-shadow(0 0 2em #747bff);
-}
-
-.logo.svelte-kit:hover {
-  filter: drop-shadow(0 0 2em #ff3e00);
-}
-
 :root {
   font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
   font-size: 16px;
@@ -132,41 +85,6 @@
   flex-direction: column;
   justify-content: center;
   text-align: center;
-}
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: 0.75s;
-}
-
-.logo.tauri:hover {
-  filter: drop-shadow(0 0 2em #24c8db);
-}
-
-.row {
-  display: flex;
-  justify-content: center;
-}
-
-.column {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 0.75rem;
-  max-width: 30rem;
-  margin: 0 auto;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-
-a:hover {
-  color: #535bf2;
 }
 
 h1 {
@@ -204,17 +122,8 @@ button {
   outline: none;
 }
 
-#greet-input {
-  margin-right: 5px;
-}
-
 .section {
   margin-top: 3rem;
-}
-
-.status {
-  margin-top: 1rem;
-  font-weight: 600;
 }
 
 pre {
@@ -238,10 +147,6 @@ pre {
   :root {
     color: #f6f6f6;
     background-color: #2f2f2f;
-  }
-
-  a:hover {
-    color: #24c8db;
   }
 
   input,

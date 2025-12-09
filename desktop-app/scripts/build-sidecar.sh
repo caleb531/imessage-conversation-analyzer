@@ -46,6 +46,7 @@ uv run pyinstaller \
   --collect-submodules ica.analyzers \
   --add-data "$PROJECT_ROOT/ica/analyzers:ica/analyzers" \
   --add-data "$PROJECT_ROOT/ica/queries:ica/queries" \
+  --add-data "$PROJECT_ROOT/ica/data:ica/data" \
   --distpath "$OUTPUT_DIR" \
   --workpath "$BUILD_DIR" \
   --specpath "$BUILD_DIR" \
