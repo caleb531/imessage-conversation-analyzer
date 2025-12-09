@@ -1,5 +1,4 @@
 import { execa } from "execa";
-import { rm } from "node:fs/promises";
 import { resolve } from "node:path";
 import type { Plugin } from "vite";
 
@@ -31,17 +30,10 @@ function createSidecarBuildRunner() {
   async function runBuild() {
     if (!buildPromise) {
       const runPromise = (async () => {
-        try {
-          await execa(scriptPath, {
-            cwd: projectRoot,
-            stdio: "inherit",
-          });
-        } finally {
-          await Promise.all([
-            rm(tauriDebugRuntime, { recursive: true, force: true }),
-            rm(tauriReleaseRuntime, { recursive: true, force: true }),
-          ]);
-        }
+        await execa(scriptPath, {
+          cwd: projectRoot,
+          stdio: "inherit",
+        });
       })();
 
       buildPromise = runPromise.finally(() => {
