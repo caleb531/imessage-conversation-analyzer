@@ -9,3 +9,6 @@ node_modules
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 src-tauri/bin/
+src-tauri/_internal/
+src-tauri/ica-sidecar
+src-tauri/ica-sidecar-*/
