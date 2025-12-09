@@ -1,6 +1,6 @@
 import { Command } from "@tauri-apps/plugin-shell";
 
-export type SidecarResult = {
+export interface SidecarResult {
   code: number | null;
   signal: number | null;
   stdout: string;
@@ -12,11 +12,5 @@ export type SidecarResult = {
  */
 export async function runIcaSidecar(args: string[] = []): Promise<SidecarResult> {
   const command = Command.sidecar("ica-sidecar", args);
-  const { code, signal, stdout, stderr } = await command.execute();
-  return {
-    code,
-    signal,
-    stdout,
-    stderr,
-  };
+  return command.execute();
 }

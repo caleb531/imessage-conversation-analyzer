@@ -8,7 +8,7 @@
     "build": "vite build",
     "build:sidecar": "./scripts/build-sidecar.sh",
     "clean": "pnpm clean:sidecar && rm -rf build .svelte-kit package",
-    "clean:sidecar": "rm -rf src-tauri/_internal src-tauri/ica-sidecar src-tauri/ica-sidecar-*",
+    "clean:sidecar": "rm -rf src-tauri/_internal src-tauri/ica-sidecar src-tauri/ica-sidecar-* src-tauri/target/debug/_internal",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
@@ -25,9 +25,11 @@
     "@sveltejs/kit": "^2.9.0",
     "@sveltejs/vite-plugin-svelte": "^5.0.0",
     "@tauri-apps/cli": "^2",
+    "@types/node": "^24.10.2",
     "execa": "^9.6.1",
     "svelte": "^5.0.0",
     "svelte-check": "^4.0.0",
+    "tsx": "^4.21.0",
     "typescript": "~5.6.2",
     "vite": "^6.0.3"
   }
