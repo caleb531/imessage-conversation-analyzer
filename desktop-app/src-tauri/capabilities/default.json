@@ -10,7 +10,7 @@
       "identifier": "shell:allow-execute",
       "allow": [
         {
-          "name": "bin/ica-sidecar",
+          "name": "ica-sidecar",
           "sidecar": true,
           "args": true
         }
@@ -20,7 +20,7 @@
       "identifier": "shell:allow-spawn",
       "allow": [
         {
-          "name": "bin/ica-sidecar",
+          "name": "ica-sidecar",
           "sidecar": true,
           "args": true
         }

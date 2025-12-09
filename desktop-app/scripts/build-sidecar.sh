@@ -8,22 +8,25 @@ OUTPUT_DIR="$DESKTOP_APP_DIR/src-tauri/bin"
 BUILD_DIR="$PROJECT_ROOT/build/pyinstaller"
 
 TARGET_TRIPLE=$(rustc -vV | awk '/^host: / { print $2 }')
-SIDE_CAR_BASE="$OUTPUT_DIR/ica-sidecar"
-SIDE_CAR_TARGET="$OUTPUT_DIR/ica-sidecar-$TARGET_TRIPLE"
+SIDE_CAR_TARGET_DIR="$OUTPUT_DIR/ica-sidecar-$TARGET_TRIPLE"
+SIDE_CAR_EXTERNAL_EXE="$DESKTOP_APP_DIR/src-tauri/ica-sidecar"
+SIDE_CAR_RUNTIME_DIR="$DESKTOP_APP_DIR/src-tauri/_internal"
+SIDE_CAR_ENTRY="ica-sidecar"
+SIDE_CAR_SUFFIXED_DIR="$DESKTOP_APP_DIR/src-tauri/${SIDE_CAR_ENTRY}-${TARGET_TRIPLE}"
 
 mkdir -p "$OUTPUT_DIR"
 mkdir -p "$BUILD_DIR"
 
 needs_rebuild=false
 
-if [[ ! -f "$SIDE_CAR_BASE" || ! -f "$SIDE_CAR_TARGET" ]]; then
+if [[ ! -f "$SIDE_CAR_EXTERNAL_EXE" || ! -d "$SIDE_CAR_RUNTIME_DIR" || ! -d "$SIDE_CAR_TARGET_DIR" || ! -d "$SIDE_CAR_SUFFIXED_DIR" ]]; then
   needs_rebuild=true
 else
-  if [[ "$PROJECT_ROOT/pyproject.toml" -nt "$SIDE_CAR_BASE" || "$PROJECT_ROOT/uv.lock" -nt "$SIDE_CAR_BASE" ]]; then
+  if [[ "$PROJECT_ROOT/pyproject.toml" -nt "$SIDE_CAR_EXTERNAL_EXE" || "$PROJECT_ROOT/uv.lock" -nt "$SIDE_CAR_EXTERNAL_EXE" ]]; then
     needs_rebuild=true
-  elif [[ "$SCRIPT_DIR/build-sidecar.sh" -nt "$SIDE_CAR_BASE" ]]; then
+  elif [[ "$SCRIPT_DIR/build-sidecar.sh" -nt "$SIDE_CAR_EXTERNAL_EXE" ]]; then
     needs_rebuild=true
-  elif find "$PROJECT_ROOT/ica" -type f ! -path '*/__pycache__/*' -newer "$SIDE_CAR_BASE" -print -quit | grep -q .; then
+  elif find "$PROJECT_ROOT/ica" -type f ! -path '*/__pycache__/*' -newer "$SIDE_CAR_EXTERNAL_EXE" -print -quit | grep -q .; then
     needs_rebuild=true
   fi
 fi
@@ -33,13 +36,13 @@ if [[ $needs_rebuild == false ]]; then
   exit 0
 fi
 
-rm -f "$SIDE_CAR_BASE" "$SIDE_CAR_TARGET"
+rm -rf "$SIDE_CAR_RUNTIME_DIR" "$SIDE_CAR_TARGET_DIR" "$SIDE_CAR_EXTERNAL_EXE" "$SIDE_CAR_SUFFIXED_DIR" "$OUTPUT_DIR/_internal"
 
 cd "$PROJECT_ROOT"
 
 uv run pyinstaller \
   --name ica-sidecar \
-  --onefile \
+  --onedir \
   --distpath "$OUTPUT_DIR" \
   --workpath "$BUILD_DIR" \
   --specpath "$BUILD_DIR" \
@@ -50,8 +53,11 @@ uv run pyinstaller \
   --exclude-module pandas.io.formats.style \
   ica/__main__.py
 
-mv "$SIDE_CAR_BASE" "$SIDE_CAR_TARGET"
+mv "$OUTPUT_DIR/$SIDE_CAR_ENTRY" "$SIDE_CAR_TARGET_DIR"
 
-# Provide an unsuffixed binary for Tauri's externalBin lookup while keeping
-# the target-specific filename available for packaging.
-cp "$SIDE_CAR_TARGET" "$SIDE_CAR_BASE"
+# Surface the executable and Python runtime alongside the Tauri app so the shell
+# plugin loads the sidecar without searching inside architecture-specific
+# directories at runtime.
+cp "$SIDE_CAR_TARGET_DIR/$SIDE_CAR_ENTRY" "$SIDE_CAR_EXTERNAL_EXE"
+cp -R "$SIDE_CAR_TARGET_DIR/_internal" "$SIDE_CAR_RUNTIME_DIR"
+cp -R "$SIDE_CAR_TARGET_DIR" "$SIDE_CAR_SUFFIXED_DIR"
