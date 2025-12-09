@@ -1,8 +1,8 @@
 import { Command } from "@tauri-apps/plugin-shell";
 
 export type SidecarResult = {
-  code: number;
-  signal: string | null;
+  code: number | null;
+  signal: number | null;
   stdout: string;
   stderr: string;
 };
@@ -11,7 +11,7 @@ export type SidecarResult = {
  * Runs the packaged Python CLI as a Tauri sidecar and captures its output.
  */
 export async function runIcaSidecar(args: string[] = []): Promise<SidecarResult> {
-  const command = Command.sidecar("bin/ica-sidecar", args);
+  const command = Command.sidecar("ica-sidecar", args);
   const { code, signal, stdout, stderr } = await command.execute();
   return {
     code,
