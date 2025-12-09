@@ -43,6 +43,9 @@ cd "$PROJECT_ROOT"
 uv run pyinstaller \
   --name ica-sidecar \
   --onedir \
+  --collect-submodules ica.analyzers \
+  --add-data "$PROJECT_ROOT/ica/analyzers:ica/analyzers" \
+  --add-data "$PROJECT_ROOT/ica/queries:ica/queries" \
   --distpath "$OUTPUT_DIR" \
   --workpath "$BUILD_DIR" \
   --specpath "$BUILD_DIR" \
