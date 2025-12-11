@@ -1,2 +1,3 @@
 onlyBuiltDependencies:
+  - bits-ui
   - esbuild
