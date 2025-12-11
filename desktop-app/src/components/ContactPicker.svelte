@@ -5,7 +5,6 @@
     import '../styles/contact-picker.css';
 
     let { selectedContact = $bindable<string | undefined>() } = $props();
-    let contactNames = $state<string[]>([]);
     let contactsLoading = $state(true);
     let contactsError = $state('');
     let searchTerm = $state('');
@@ -20,12 +19,10 @@
         contactsError = '';
         try {
             const names = await fetchContactNames();
-            contactNames = names;
             updateComboboxItems(names);
             updateFilteredItems();
         } catch (error) {
             contactsError = error instanceof Error ? error.message : String(error);
-            contactNames = [];
             updateComboboxItems([]);
             updateFilteredItems();
             ensureSelection();
