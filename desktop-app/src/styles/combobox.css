@@ -1,0 +1,241 @@
+.contacts-section {
+  margin: 2rem auto 3rem;
+  max-width: 640px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  text-align: left;
+}
+
+.contacts-section h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.contact-status {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #444444;
+}
+
+.contact-status--error {
+  color: #8b0000;
+}
+
+.contact-status--empty {
+  color: #666666;
+  font-style: italic;
+}
+
+.contact-status--selection {
+  color: #2f4f4f;
+  font-weight: 600;
+}
+
+.contact-retry {
+  align-self: flex-start;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.5em 1.1em;
+  font-size: 0.95rem;
+  font-weight: 500;
+  background-color: #396cd8;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.contact-retry:hover {
+  background-color: #2f56ad;
+}
+
+.contact-retry:active {
+  background-color: #244181;
+}
+
+.contact-retry:focus-visible {
+  outline: 2px solid #244181;
+  outline-offset: 2px;
+}
+
+.contact-combobox__container {
+  display: flex;
+  justify-content: center;
+}
+
+.contact-combobox__field {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.5rem;
+  align-items: center;
+  width: min(100%, 480px);
+}
+
+.contact-combobox__input {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #d0d0d0;
+  padding: 0.6em 1em;
+  font-size: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.contact-combobox__input:focus {
+  border-color: #396cd8;
+  box-shadow: 0 0 0 3px rgba(57, 108, 216, 0.2);
+  outline: none;
+}
+
+.contact-combobox__trigger {
+  border-radius: 8px;
+  border: 1px solid #d0d0d0;
+  background-color: #ffffff;
+  padding: 0.6em 0.9em;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.contact-combobox__trigger[data-state="open"] {
+  border-color: #396cd8;
+  background-color: #eef3ff;
+}
+
+.contact-combobox__trigger:hover {
+  border-color: #396cd8;
+}
+
+.contact-combobox__trigger:focus-visible {
+  outline: 2px solid #396cd8;
+  outline-offset: 2px;
+}
+
+.contact-combobox__content {
+  border-radius: 10px;
+  border: 1px solid #d0d0d0;
+  background-color: #ffffff;
+  box-shadow: 0 10px 35px rgba(15, 15, 15, 0.18);
+  width: var(--bits-combobox-anchor-width);
+  max-height: min(320px, var(--bits-combobox-content-available-height));
+  overflow: hidden;
+}
+
+.contact-combobox__viewport {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  max-height: inherit;
+  overflow-y: auto;
+}
+
+.contact-combobox__item {
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.6em 0.9em;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.contact-combobox__item[data-highlighted] {
+  background-color: #eef3ff;
+  color: #1f3f8f;
+}
+
+.contact-combobox__item[data-selected] {
+  background-color: #396cd8;
+  color: #ffffff;
+}
+
+.contact-combobox__check {
+  font-size: 0.9rem;
+}
+
+.contact-combobox__empty {
+  display: block;
+  padding: 0.75rem;
+  font-size: 0.9rem;
+  color: #666666;
+  text-align: center;
+}
+
+@media (prefers-color-scheme: dark) {
+  .contacts-section h2 {
+    color: #f0f0f0;
+  }
+
+  .contact-status {
+    color: #d5d5d5;
+  }
+
+  .contact-status--error {
+    color: #ffb3b3;
+  }
+
+  .contact-status--empty {
+    color: #9c9c9c;
+  }
+
+  .contact-status--selection {
+    color: #9fd5ff;
+  }
+
+  .contact-retry {
+    background-color: #2d4fa8;
+    color: #ffffff;
+  }
+
+  .contact-retry:hover {
+    background-color: #233f85;
+  }
+
+  .contact-retry:active {
+    background-color: #1b2f63;
+  }
+
+  .contact-combobox__input {
+    background-color: rgba(15, 15, 15, 0.7);
+    border-color: #3d3d3d;
+    color: #f5f5f5;
+  }
+
+  .contact-combobox__input:focus {
+    border-color: #6e8ff5;
+    box-shadow: 0 0 0 3px rgba(65, 110, 229, 0.25);
+  }
+
+  .contact-combobox__trigger {
+    background-color: rgba(15, 15, 15, 0.7);
+    border-color: #3d3d3d;
+    color: #f5f5f5;
+  }
+
+  .contact-combobox__trigger[data-state="open"] {
+    border-color: #6e8ff5;
+    background-color: rgba(65, 110, 229, 0.25);
+  }
+
+  .contact-combobox__content {
+    background-color: #171717;
+    border-color: #2d2d2d;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.4);
+  }
+
+  .contact-combobox__item[data-highlighted] {
+    background-color: rgba(65, 110, 229, 0.3);
+    color: #dbe4ff;
+  }
+
+  .contact-combobox__item[data-selected] {
+    background-color: #6e8ff5;
+    color: #0f0f0f;
+  }
+
+  .contact-combobox__empty {
+    color: #9c9c9c;
+  }
+}
