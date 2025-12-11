@@ -1,6 +1,6 @@
 <script lang="ts">
+    import { Button, Combobox } from 'bits-ui';
     import { onMount } from 'svelte';
-    import { Combobox } from 'bits-ui';
     import { fetchContactNames } from '../lib/contacts';
     import '../styles/contact-picker.css';
 
@@ -90,9 +90,9 @@
         <p class="contact-picker-status">Loading contacts…</p>
     {:else if contactsError}
         <p class="contact-picker-status contact-picker-status--error">{contactsError}</p>
-        <button type="button" class="contact-picker-retry" onclick={loadContacts}>
+        <Button.Root type="button" class="contact-picker-retry" onclick={loadContacts}>
             Try again
-        </button>
+        </Button.Root>
     {:else}
         <div class="contact-picker__container">
             <Combobox.Root
