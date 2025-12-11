@@ -1,13 +1,5 @@
 {
-  "python.languageServer": "None",
   "editor.formatOnSave": true,
-  "python.analysis.extraPaths": [".virtualenv"],
-  "[python]": {
-    "editor.defaultFormatter": "charliermarsh.ruff",
-    "editor.codeActionsOnSave": {
-      "source.organizeImports": "explicit"
-    }
-  },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "rust-analyzer.linkedProjects": ["desktop-app/src-tauri/Cargo.toml"],
   "[rust]": {
