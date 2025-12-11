@@ -1,79 +1,77 @@
-
 h1 {
-  text-align: center;
+    text-align: center;
 }
 
 input,
 [data-button-root] {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  color: #0f0f0f;
-  background-color: #ffffff;
-  transition: border-color 0.25s;
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    border: 1px solid transparent;
+    padding: 0.6em 1.2em;
+    font-size: 1em;
+    font-weight: 500;
+    font-family: inherit;
+    color: #0f0f0f;
+    background-color: #ffffff;
+    transition: border-color 0.25s;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
 }
 [data-button-root] {
-  cursor: pointer;
+    cursor: pointer;
 }
 
 [data-button-root]:hover {
-  border-color: #396cd8;
+    border-color: #396cd8;
 }
 [data-button-root]:active {
-  border-color: #396cd8;
-  background-color: #e8e8e8;
+    border-color: #396cd8;
+    background-color: #e8e8e8;
 }
 
 input,
 [data-button-root] {
-  outline: none;
+    outline: none;
 }
 
 pre {
-  text-align: left;
-  white-space: pre-wrap;
-  word-break: break-word;
-  background-color: #ffffff;
-  padding: 1rem;
-  border-radius: 8px;
-  border: 1px solid #d0d0d0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    white-space: pre-wrap;
+    word-break: break-word;
+    background-color: #ffffff;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #d0d0d0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .error-log {
-  color: #8b0000;
-  background-color: #ffeeee;
-  border-color: #ffb3b3;
+    color: #8b0000;
+    background-color: #ffeeee;
+    border-color: #ffb3b3;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    color: #f6f6f6;
-    background-color: #2f2f2f;
-  }
+    :root {
+        color: #f6f6f6;
+        background-color: #2f2f2f;
+    }
 
-  input,
-  [data-button-root] {
-    color: #ffffff;
-    background-color: #0f0f0f98;
-  }
-  [data-button-root]:active {
-    background-color: #0f0f0f69;
-  }
+    input,
+    [data-button-root] {
+        color: #ffffff;
+        background-color: #0f0f0f98;
+    }
+    [data-button-root]:active {
+        background-color: #0f0f0f69;
+    }
 
-  pre {
-    background-color: #101010;
-    border-color: #2b2b2b;
-  }
+    pre {
+        background-color: #101010;
+        border-color: #2b2b2b;
+    }
 
-  .error-log {
-    color: #ffb3b3;
-    background-color: #340101;
-    border-color: #7a1e1e;
-  }
+    .error-log {
+        color: #ffb3b3;
+        background-color: #340101;
+        border-color: #7a1e1e;
+    }
 }
-

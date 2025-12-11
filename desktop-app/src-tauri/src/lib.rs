@@ -3,8 +3,8 @@
 #[cfg(target_os = "macos")]
 use {
     block::ConcreteBlock,
+    objc::runtime::{Object, BOOL, YES},
     objc::{class, msg_send, sel, sel_impl},
-    objc::runtime::{BOOL, YES, Object},
     std::{
         ffi::{CStr, CString},
         os::raw::c_char,
@@ -82,7 +82,8 @@ fn fetch_contact_names() -> Result<Vec<String>, String> {
         let mut ns_keys = Vec::with_capacity(key_strings.len());
         for key in key_strings {
             let c_string = CString::new(key).map_err(|_| format!("Invalid key: {key}"))?;
-            let ns_key: *mut Object = msg_send![class!(NSString), stringWithUTF8String: c_string.as_ptr()];
+            let ns_key: *mut Object =
+                msg_send![class!(NSString), stringWithUTF8String: c_string.as_ptr()];
             if ns_key.is_null() {
                 return Err(format!("Failed to create NSString for {key}."));
             }
@@ -90,7 +91,8 @@ fn fetch_contact_names() -> Result<Vec<String>, String> {
             ns_keys.push(ns_key);
         }
 
-        let keys_array: *mut Object = msg_send![class!(NSArray), arrayWithObjects: ns_keys.as_ptr() count: ns_keys.len()];
+        let keys_array: *mut Object =
+            msg_send![class!(NSArray), arrayWithObjects: ns_keys.as_ptr() count: ns_keys.len()];
         if keys_array.is_null() {
             return Err("Failed to create fetch request keys.".into());
         }
@@ -168,7 +170,10 @@ fn ensure_contacts_access(store: *mut Object) -> Result<(), String> {
                 Some(ns_error_to_string(error))
             };
 
-            let mut guard = state_clone.0.lock().expect("poisoned contacts access mutex");
+            let mut guard = state_clone
+                .0
+                .lock()
+                .expect("poisoned contacts access mutex");
             *guard = Some((granted == YES, error_message));
             state_clone.1.notify_one();
         });
@@ -176,7 +181,10 @@ fn ensure_contacts_access(store: *mut Object) -> Result<(), String> {
 
         let _: () = msg_send![store, requestAccessForEntityType: CN_ENTITY_TYPE_CONTACTS completionHandler: &*completion];
 
-        let mut guard = state.0.lock().map_err(|_| "Failed to request contacts access.".to_string())?;
+        let mut guard = state
+            .0
+            .lock()
+            .map_err(|_| "Failed to request contacts access.".to_string())?;
         while guard.is_none() {
             guard = state
                 .1
