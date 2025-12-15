@@ -1,3 +1,4 @@
 onlyBuiltDependencies:
-    - bits-ui
-    - esbuild
+  - '@parcel/watcher'
+  - bits-ui
+  - esbuild
