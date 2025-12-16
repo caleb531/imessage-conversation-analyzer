@@ -4,8 +4,8 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "dev": "vite dev",
-    "build": "vite build",
+    "dev": "tauri dev",
+    "build": "tauri build",
     "build:sidecar": "./scripts/build-sidecar.sh",
     "clean": "pnpm clean:sidecar && rm -rf build .svelte-kit package",
     "clean:sidecar": "rm -rf src-tauri/_internal src-tauri/ica-sidecar src-tauri/ica-sidecar-* src-tauri/target",
