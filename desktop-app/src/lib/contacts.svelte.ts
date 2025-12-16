@@ -1,12 +1,13 @@
+import { invoke } from '@tauri-apps/api/core';
 import { load } from '@tauri-apps/plugin-store';
-import { get, writable } from 'svelte/store';
 
 export type ContactValue = string | null;
 
-const selectedContact = writable<ContactValue | undefined>(undefined);
+export const selectedContact = $state<{ value: ContactValue }>({ value: null });
 
-let storePromise: Promise<Awaited<ReturnType<typeof load>>> | null = null;
+let storePromise: Promise<Awaited<ReturnType<typeof load>>> | undefined;
 let initPromise: Promise<void> | null = null;
+let hasLoaded = false;
 
 async function getStore() {
     if (!storePromise) {
@@ -18,26 +19,29 @@ async function getStore() {
 async function initialiseSelectedContact() {
     const store = await getStore();
     const stored = await store.get<string>('selectedContact');
-    selectedContact.set(stored ?? null);
+    selectedContact.value = stored ?? null;
+    hasLoaded = true;
 }
 
-export function ensureSelectedContactLoaded() {
+export async function ensureSelectedContactLoaded() {
+    if (hasLoaded) {
+        return;
+    }
     if (!initPromise) {
         initPromise = initialiseSelectedContact().catch((error) => {
             initPromise = null;
             throw error;
         });
     }
-    return initPromise;
+    await initPromise;
 }
 
 export async function getSelectedContact() {
     await ensureSelectedContactLoaded();
-    const current = get(selectedContact);
-    return current ?? null;
+    return selectedContact.value;
 }
 
-export async function setSelectedContact(contact: ContactValue) {
+export async function setSelectedContact(contact: ContactValue | undefined) {
     const store = await getStore();
     if (contact) {
         await store.set('selectedContact', contact);
@@ -45,7 +49,8 @@ export async function setSelectedContact(contact: ContactValue) {
         await store.delete('selectedContact');
     }
     await store.save();
-    selectedContact.set(contact);
+    selectedContact.value = contact ?? null;
+    hasLoaded = true;
 }
 
 export async function clearSelectedContact() {
@@ -53,9 +58,12 @@ export async function clearSelectedContact() {
 }
 
 export async function refreshSelectedContact() {
+    hasLoaded = false;
     initPromise = null;
     await ensureSelectedContactLoaded();
-    return getSelectedContact();
+    return selectedContact.value;
 }
 
-export { selectedContact };
+export async function fetchContactNames(): Promise<string[]> {
+    return invoke<string[]>('get_contact_names');
+}

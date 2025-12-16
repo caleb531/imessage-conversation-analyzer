@@ -2,13 +2,12 @@
     import { goto } from '$app/navigation';
     import { Button, InlineNotification } from 'carbon-components-svelte';
     import { onMount } from 'svelte';
-    import { get } from 'svelte/store';
     import ContactPicker from '../../components/ContactPicker.svelte';
     import {
         ensureSelectedContactLoaded,
-        selectedContact as selectedContactStore,
+        selectedContact,
         setSelectedContact
-    } from '../../lib/contactStore';
+    } from '../../lib/contacts.svelte';
 
     let contactSelection = $state<string | undefined>(undefined);
     let buttonDisabled = $state(false);
@@ -19,7 +18,7 @@
 
     onMount(async () => {
         await ensureSelectedContactLoaded();
-        contactSelection = get(selectedContactStore) ?? undefined;
+        contactSelection = selectedContact.value ?? undefined;
     });
 
     async function handleSubmit(event: Event) {
