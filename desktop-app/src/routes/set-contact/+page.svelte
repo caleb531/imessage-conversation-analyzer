@@ -11,8 +11,11 @@
     } from '../../lib/contactStore';
 
     let contactSelection = $state<string | undefined>(undefined);
-    let savingContact = $state(false);
+    let buttonDisabled = $state(false);
+    let buttonLabel = $state('Save contact');
     let saveError = $state('');
+    // Duration to show success message (in milliseconds) before navigating away
+    let successMessageDelay = 750;
 
     onMount(async () => {
         await ensureSelectedContactLoaded();
@@ -23,30 +26,33 @@
         event.preventDefault();
         saveError = '';
         if (!contactSelection) {
-            saveError = 'Select a contact before continuing.';
+            saveError = 'You must select a contact before continuing.';
             return;
         }
-        savingContact = true;
+        buttonDisabled = true;
+        buttonLabel = 'Saving…';
         try {
             await setSelectedContact(contactSelection);
+            buttonLabel = 'Saved contact!';
+            await new Promise((resolve) => setTimeout(resolve, successMessageDelay));
             await goto('/call-cli');
         } catch (error) {
             saveError = error instanceof Error ? error.message : String(error);
-        } finally {
-            savingContact = false;
+            buttonLabel = 'Save contact';
+            buttonDisabled = false;
         }
     }
 </script>
 
 <section class="set-contact">
-    <h1>Choose a contact</h1>
     <form class="set-contact__form" onsubmit={handleSubmit}>
+        <h2>Choose a contact</h2>
         <ContactPicker bind:selectedContact={contactSelection} />
         {#if saveError}
-            <InlineNotification kind="error" title="Cannot save contact" subtitle={saveError} />
+            <InlineNotification kind="error" title="Error" subtitle={saveError} />
         {/if}
-        <Button type="submit" disabled={savingContact}>
-            {savingContact ? 'Saving…' : 'Save contact'}
+        <Button type="submit" disabled={buttonDisabled}>
+            {buttonLabel}
         </Button>
     </form>
 </section>
@@ -55,15 +61,7 @@
     .set-contact {
         display: flex;
         flex-direction: column;
-        gap: 1.5rem;
         max-width: 32rem;
         margin: 0 auto;
-    }
-
-    .set-contact__form {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 1.5rem;
     }
 </style>
