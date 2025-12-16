@@ -27,6 +27,10 @@ main {
 section {
     margin: 2rem 0;
 }
+form {
+    max-width: 400px;
+    margin: 0 auto;
+}
 
 .bx--btn {
     margin: 1rem 0;
