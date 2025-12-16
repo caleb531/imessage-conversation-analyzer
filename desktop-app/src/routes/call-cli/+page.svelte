@@ -1,45 +1,39 @@
 <script lang="ts">
-    import { goto } from '$app/navigation';
     import { Button, CodeSnippet, InlineNotification, TextInput } from 'carbon-components-svelte';
-    import { onMount } from 'svelte';
-    import { ensureSelectedContactLoaded, selectedContact } from '../../lib/contacts.svelte';
-    import { runIcaSidecar } from '../../lib/sidecar';
+    import { invokeIcaCsv, MissingContactError, type IcaCsvHeader } from '../../lib/cli';
 
-    let icaArgs = $state('--help');
-    let icaOutput = $state('');
+    let icaArgs = $state('message_totals');
+    let icaRows = $state<Array<Record<string, unknown>>>([]);
+    let icaHeaders = $state<IcaCsvHeader[]>([]);
+    let icaStderr = $state('');
     let icaError = $state('');
     let icaRunning = $state(false);
-    let showMissingContact = $state(false);
+    let resolvedArgs = $state<string[]>([]);
 
-    onMount(async () => {
-        await ensureSelectedContactLoaded();
-        if (!selectedContact.value) {
-            showMissingContact = true;
-            await goto('/set-contact');
-        }
-    });
-
-    function splitArgs(input: string): string[] {
-        // Support very small subset of shell quoting for convenience in the UI.
-        return (
-            input
-                .match(/(?:"[^"]*"|'[^']*'|\S+)/g)
-                ?.map((token) => token.replace(/^["']|["']$/g, '')) ?? []
-        );
+    function formatRows(rows: Array<Record<string, unknown>>) {
+        return JSON.stringify(rows, null, 2);
     }
 
     async function runSidecar(event: Event) {
         event.preventDefault();
         icaRunning = true;
-        icaOutput = '';
         icaError = '';
+        icaRows = [];
+        icaHeaders = [];
+        icaStderr = '';
+        resolvedArgs = [];
         try {
-            const args = icaArgs.trim() ? splitArgs(icaArgs) : [];
-            const result = await runIcaSidecar(args);
-            icaOutput = result.stdout.trimEnd();
-            icaError = result.stderr.trimEnd();
+            const result = await invokeIcaCsv(icaArgs);
+            resolvedArgs = result.args;
+            icaRows = result.rows;
+            icaHeaders = result.headers;
+            icaStderr = result.stderr;
         } catch (error) {
-            icaError = error instanceof Error ? error.message : String(error);
+            if (error instanceof MissingContactError) {
+                icaError = error.message;
+            } else {
+                icaError = error instanceof Error ? error.message : String(error);
+            }
         } finally {
             icaRunning = false;
         }
@@ -49,17 +43,10 @@
 <section class="call-cli">
     <form class="call-cli__form" onsubmit={runSidecar}>
         <h2>Call ICA CLI</h2>
-        {#if showMissingContact}
-            <InlineNotification
-                kind="error"
-                title="No contact selected"
-                subtitle="Choose a contact before running the sidecar."
-            />
-        {/if}
         <TextInput
             labelText="CLI arguments"
             id="sidecar-args"
-            placeholder="--help"
+            placeholder="message_totals"
             bind:value={icaArgs}
             autocomplete="off"
         />
@@ -68,12 +55,24 @@
         </Button>
     </form>
 
-    {#if icaOutput}
-        <CodeSnippet type="multi">{icaOutput}</CodeSnippet>
+    {#if resolvedArgs.length}
+        <CodeSnippet type="multi">{resolvedArgs.join(' ')}</CodeSnippet>
+    {/if}
+
+    {#if icaHeaders.length}
+        <CodeSnippet type="multi">{JSON.stringify(icaHeaders, null, 2)}</CodeSnippet>
+    {/if}
+
+    {#if icaRows.length}
+        <CodeSnippet type="multi">{formatRows(icaRows)}</CodeSnippet>
+    {/if}
+
+    {#if icaStderr}
+        <pre class="call-cli__error-log">{icaStderr}</pre>
     {/if}
 
     {#if icaError}
-        <pre class="call-cli__error-log">{icaError}</pre>
+        <InlineNotification kind="error" title="ICA error" subtitle={icaError} />
     {/if}
 </section>
 
