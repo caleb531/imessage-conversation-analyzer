@@ -22,6 +22,7 @@
 
 <Header platformName="iMessage Conversation Analyzer">
     <HeaderNav>
+        <HeaderNavItem href="/message-totals">Message Totals</HeaderNavItem>
         <HeaderNavItem href="/call-cli">Call CLI</HeaderNavItem>
     </HeaderNav>
     <HeaderUtilities>

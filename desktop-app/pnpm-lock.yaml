@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@svar-ui/svelte-grid':
+        specifier: ^2.4.0
+        version: 2.4.0
       '@tauri-apps/api':
         specifier: ^2
         version: 2.9.1
@@ -23,6 +26,12 @@ importers:
       carbon-components-svelte:
         specifier: ^0.85.1
         version: 0.85.4
+      papaparse:
+        specifier: ^5.4.1
+        version: 5.5.3
+      string-argv:
+        specifier: ^0.3.2
+        version: 0.3.2
     devDependencies:
       '@eslint/js':
         specifier: ^9.39.1
@@ -42,6 +51,9 @@ importers:
       '@types/node':
         specifier: ^24.10.2
         version: 24.10.2
+      '@types/papaparse':
+        specifier: ^5.3.14
+        version: 5.5.2
       eslint:
         specifier: ^9.39.1
         version: 9.39.1
@@ -678,6 +690,42 @@ packages:
   '@standard-schema/spec@1.0.0':
     resolution: {integrity: sha512-m2bOd0f2RT9k8QJx1JN85cZYyH1RqFBdlwtkSlf4tBDYLCiiZnv1fIIwacK6cqwXavOydf0NPToMQgpKq+dVlA==}
 
+  '@svar-ui/core-locales@2.4.0':
+    resolution: {integrity: sha512-FXB4MtqbZw4TNdPfELsMum6y5Tgu0PRA7a6upJjLWDYJjlcYEcyT49iJONb30gPIL7HgJkUylJnz6iNuNA3Icw==}
+
+  '@svar-ui/grid-data-provider@2.4.0':
+    resolution: {integrity: sha512-Rm0Zbwj3/ZZLTdpmJXX/lGKafL2sqZuikOh/8KXNty7RXjx6WqryjaAkX6t0cl8lnhPjV/awC4R4+uYRW4UbEQ==}
+
+  '@svar-ui/grid-locales@2.4.0':
+    resolution: {integrity: sha512-UnhsQYzDAplMES08QXupa7/1BdBXyCujnTuQaIKZcDf/PGRiSFo3I3iNCk6UdJ5Tnj4si9CqB8/wcIp2YyAHSg==}
+
+  '@svar-ui/grid-store@2.4.0':
+    resolution: {integrity: sha512-GJyVC+5G+aA8EfcoKMwrHVP2/OK7bUUbp9ofyZTGUAyuXO9tkxRnfquvk+nTA1ybOfbFCY8rSsJTEHYcgXQCTw==}
+
+  '@svar-ui/lib-data-provider@1.7.1':
+    resolution: {integrity: sha512-5Bi9ywngcMTKpGtan0s7q8ivd84Bp0ZnRP+5bLZg6oiRB7YMyN5D5X+apc3CWDAnG4zZn3en4YwS2qc/aHIIuQ==}
+
+  '@svar-ui/lib-dom@0.11.1':
+    resolution: {integrity: sha512-4wgerhDVttvrQ9t6OjHur34Of+VVr2VygA16HHGcWHytgdnOuGgfZb5PeBEhCJw/pO3RKfJvBHbaMIzL4IR//g==}
+
+  '@svar-ui/lib-state@1.9.6':
+    resolution: {integrity: sha512-twoHa8wZvzdxtES68s6Wnp4Xi1WivScNaFFK6sJ6WDgqVYOzJw0ZhVVrdwHQgieLITTKl/DYh/U3nuqtMetKYw==}
+
+  '@svar-ui/lib-svelte@0.5.2':
+    resolution: {integrity: sha512-i+hHMT3zctaGbRpyMDREt9im7YfLpvGwFYvH1ntEp/kYAwUrR/sxMJlEEKIid+Yg2EeMUstGxmYQbkWoMpPG7A==}
+
+  '@svar-ui/svelte-core@2.4.0':
+    resolution: {integrity: sha512-lJI34dVoqSk79/Ggwv8FupU7iDP4jKlbD+F1xtuITi/S4iC3AeU0o3QiVC7duN6oLlshvDesq8Ms7cPihP54Aw==}
+
+  '@svar-ui/svelte-grid@2.4.0':
+    resolution: {integrity: sha512-Lljd6NhqonjXBg66nRNjbjjaXWAyJ8xr3s1UxX6dHsyye72Y2YK9dcpoBWleusy4MBBnvNRwrpnsgR/jevl1Ww==}
+
+  '@svar-ui/svelte-menu@2.4.0':
+    resolution: {integrity: sha512-fmc3z2CmJiwsGS8J1XJ2hFasO+uIMNOR72oqCbRVZaMnPkXumH4mLWYlvG/TB6voSz1ZqvYd7nVnwbBEdbeiXw==}
+
+  '@svar-ui/svelte-toolbar@2.4.0':
+    resolution: {integrity: sha512-d4dFYNXW8OaEwsVAfBLNipUVgZzM60yWRMjpGgMwJiezwEa2VArWSsMHPnFhF3k6I0Il+5S1fR5JEo0MA0ludA==}
+
   '@sveltejs/acorn-typescript@1.0.8':
     resolution: {integrity: sha512-esgN+54+q0NjB0Y/4BomT9samII7jGwNy/2a3wNZbT2A2RpmXsXwUt24LvLhx6jUq2gVk4cWEvcRO6MFQbOfNA==}
     peerDependencies:
@@ -810,6 +858,9 @@ packages:
 
   '@types/node@24.10.2':
     resolution: {integrity: sha512-WOhQTZ4G8xZ1tjJTvKOpyEVSGgOTvJAfDK3FNFgELyaTpzhdgHVHeqW8V+UJvzF5BT+/B54T/1S2K6gd9c7bbA==}
+
+  '@types/papaparse@5.5.2':
+    resolution: {integrity: sha512-gFnFp/JMzLHCwRf7tQHrNnfhN4eYBVYYI897CGX4MY1tzY9l2aLkVyx2IlKZ/SAqDbB3I1AOZW5gTMGGsqWliA==}
 
   '@typescript-eslint/eslint-plugin@8.49.0':
     resolution: {integrity: sha512-JXij0vzIaTtCwu6SxTh8qBc66kmf1xs7pI4UOiMDFVct6q86G0Zs7KRcEoJgY3Cav3x5Tq0MF5jwgpgLqgKG3A==}
@@ -1283,6 +1334,9 @@ packages:
     resolution: {integrity: sha512-LaNjtRWUBY++zB5nE/NwcaoMylSPk+S+ZHNB1TzdbMJMny6dynpAGt7X/tl/QYq3TIeE6nxHppbo2LGymrG5Pw==}
     engines: {node: '>=10'}
 
+  papaparse@5.5.3:
+    resolution: {integrity: sha512-5QvjGxYVjxO59MGU2lHVYpRWBBtKHnlIAcSe1uNFCkkptUh63NFRj0FJQm7nR67puEruUci/ZkjmEFrjCAyP4A==}
+
   parent-module@1.0.1:
     resolution: {integrity: sha512-GQ2EWRpQV8/o+Aw8YqtfZZPfNRWZYkbidE9k5rpl/hC3vtHHBfGm2Ifi6qWV+coDGkrUKZAxE3Lot5kcsRlh+g==}
     engines: {node: '>=6'}
@@ -1533,6 +1587,10 @@ packages:
   source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
     engines: {node: '>=0.10.0'}
+
+  string-argv@0.3.2:
+    resolution: {integrity: sha512-aqD2Q0144Z+/RqG52NeHEkZauTAUWJO8c6yTftGJKO3Tja5tUgIfmIl6kExvhtxSDP7fXB6DvzkfMpCd/F3G+Q==}
+    engines: {node: '>=0.6.19'}
 
   strip-final-newline@4.0.0:
     resolution: {integrity: sha512-aulFJcD6YK8V1G7iRB5tigAP4TsHBZZrOV8pjV++zdUwmeV8uzbY7yn6h9MswN62adStNZFuCIx4haBnRuMDaw==}
@@ -2082,6 +2140,59 @@ snapshots:
 
   '@standard-schema/spec@1.0.0': {}
 
+  '@svar-ui/core-locales@2.4.0': {}
+
+  '@svar-ui/grid-data-provider@2.4.0':
+    dependencies:
+      '@svar-ui/lib-data-provider': 1.7.1
+
+  '@svar-ui/grid-locales@2.4.0': {}
+
+  '@svar-ui/grid-store@2.4.0':
+    dependencies:
+      '@svar-ui/lib-dom': 0.11.1
+      '@svar-ui/lib-state': 1.9.6
+
+  '@svar-ui/lib-data-provider@1.7.1':
+    dependencies:
+      '@svar-ui/lib-state': 1.9.6
+
+  '@svar-ui/lib-dom@0.11.1': {}
+
+  '@svar-ui/lib-state@1.9.6': {}
+
+  '@svar-ui/lib-svelte@0.5.2':
+    dependencies:
+      '@svar-ui/lib-state': 1.9.6
+
+  '@svar-ui/svelte-core@2.4.0':
+    dependencies:
+      '@svar-ui/core-locales': 2.4.0
+      '@svar-ui/lib-dom': 0.11.1
+      '@svar-ui/lib-svelte': 0.5.2
+
+  '@svar-ui/svelte-grid@2.4.0':
+    dependencies:
+      '@svar-ui/grid-data-provider': 2.4.0
+      '@svar-ui/grid-locales': 2.4.0
+      '@svar-ui/grid-store': 2.4.0
+      '@svar-ui/lib-dom': 0.11.1
+      '@svar-ui/lib-state': 1.9.6
+      '@svar-ui/lib-svelte': 0.5.2
+      '@svar-ui/svelte-core': 2.4.0
+      '@svar-ui/svelte-menu': 2.4.0
+      '@svar-ui/svelte-toolbar': 2.4.0
+
+  '@svar-ui/svelte-menu@2.4.0':
+    dependencies:
+      '@svar-ui/lib-dom': 0.11.1
+      '@svar-ui/svelte-core': 2.4.0
+
+  '@svar-ui/svelte-toolbar@2.4.0':
+    dependencies:
+      '@svar-ui/lib-dom': 0.11.1
+      '@svar-ui/svelte-core': 2.4.0
+
   '@sveltejs/acorn-typescript@1.0.8(acorn@8.15.0)':
     dependencies:
       acorn: 8.15.0
@@ -2201,6 +2312,10 @@ snapshots:
   '@types/node@24.10.2':
     dependencies:
       undici-types: 7.16.0
+
+  '@types/papaparse@5.5.2':
+    dependencies:
+      '@types/node': 24.10.2
 
   '@typescript-eslint/eslint-plugin@8.49.0(@typescript-eslint/parser@8.49.0(eslint@9.39.1)(typescript@5.6.3))(eslint@9.39.1)(typescript@5.6.3)':
     dependencies:
@@ -2735,6 +2850,8 @@ snapshots:
     dependencies:
       p-limit: 3.1.0
 
+  papaparse@5.5.3: {}
+
   parent-module@1.0.1:
     dependencies:
       callsites: 3.1.0
@@ -2953,6 +3070,8 @@ snapshots:
       totalist: 3.0.1
 
   source-map-js@1.2.1: {}
+
+  string-argv@0.3.2: {}
 
   strip-final-newline@4.0.0: {}
 
