@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Button, ComboBox, Loading } from 'carbon-components-svelte';
     import { onMount } from 'svelte';
-    import { fetchContactNames } from '../lib/contacts';
+    import { fetchContactNames } from '../lib/contacts.svelte';
     import '../styles/contact-picker.css';
 
     type ContactItem = {

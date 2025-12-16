@@ -2,11 +2,7 @@
     import { goto } from '$app/navigation';
     import { Button, CodeSnippet, InlineNotification, TextInput } from 'carbon-components-svelte';
     import { onMount } from 'svelte';
-    import { get } from 'svelte/store';
-    import {
-        ensureSelectedContactLoaded,
-        selectedContact as selectedContactStore
-    } from '../../lib/contactStore';
+    import { ensureSelectedContactLoaded, selectedContact } from '../../lib/contacts.svelte';
     import { runIcaSidecar } from '../../lib/sidecar';
 
     let icaArgs = $state('--help');
@@ -17,8 +13,7 @@
 
     onMount(async () => {
         await ensureSelectedContactLoaded();
-        const currentContact = get(selectedContactStore);
-        if (!currentContact) {
+        if (!selectedContact.value) {
             showMissingContact = true;
             await goto('/set-contact');
         }

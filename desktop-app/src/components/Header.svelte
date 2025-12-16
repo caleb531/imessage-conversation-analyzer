@@ -7,34 +7,16 @@
         Link
     } from 'carbon-components-svelte';
     import { onMount } from 'svelte';
-    import { get } from 'svelte/store';
-    import {
-        ensureSelectedContactLoaded,
-        selectedContact as selectedContactStore
-    } from '../lib/contactStore';
+    import { ensureSelectedContactLoaded, selectedContact } from '../lib/contacts.svelte';
     import '../styles/header.css';
-
-    let selectedContact = $state<string | null>(null);
-
-    const hasContact = $derived(Boolean(selectedContact));
-    const contactLabel = $derived(selectedContact ?? 'No selected contact');
+    const hasContact = $derived(Boolean(selectedContact.value));
+    const contactLabel = $derived(selectedContact.value ?? 'No selected contact');
     const actionLabel = $derived(hasContact ? 'Change contact' : 'Set contact');
 
     onMount(() => {
-        let unsubscribe: (() => void) | undefined;
-        ensureSelectedContactLoaded()
-            .then(() => {
-                selectedContact = get(selectedContactStore) ?? null;
-                unsubscribe = selectedContactStore.subscribe((value) => {
-                    selectedContact = value ?? null;
-                });
-            })
-            .catch((error) => {
-                console.error('Failed to load selected contact', error);
-            });
-        return () => {
-            unsubscribe?.();
-        };
+        ensureSelectedContactLoaded().catch((error) => {
+            console.error('Failed to load selected contact', error);
+        });
     });
 </script>
 
