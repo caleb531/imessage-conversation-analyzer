@@ -52,15 +52,15 @@
 </script>
 
 <section class="call-cli">
-    <h1>Run ICA sidecar</h1>
-    {#if showMissingContact}
-        <InlineNotification
-            kind="error"
-            title="No contact selected"
-            subtitle="Choose a contact before running the sidecar."
-        />
-    {/if}
     <form class="call-cli__form" onsubmit={runSidecar}>
+        <h2>Call ICA CLI</h2>
+        {#if showMissingContact}
+            <InlineNotification
+                kind="error"
+                title="No contact selected"
+                subtitle="Choose a contact before running the sidecar."
+            />
+        {/if}
         <TextInput
             labelText="CLI arguments"
             id="sidecar-args"
@@ -69,7 +69,7 @@
             autocomplete="off"
         />
         <Button type="submit" disabled={icaRunning}>
-            {icaRunning ? 'Running…' : 'Run ica-sidecar'}
+            {icaRunning ? 'Running…' : 'Call CLI'}
         </Button>
     </form>
 
@@ -86,15 +86,8 @@
     .call-cli {
         display: flex;
         flex-direction: column;
-        gap: 1.5rem;
         max-width: 48rem;
         margin: 0 auto;
-    }
-
-    .call-cli__form {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
     }
 
     .call-cli__error-log {
