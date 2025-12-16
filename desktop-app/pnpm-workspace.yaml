@@ -1,4 +1,4 @@
 onlyBuiltDependencies:
   - '@parcel/watcher'
-  - bits-ui
+  - carbon-components-svelte
   - esbuild
