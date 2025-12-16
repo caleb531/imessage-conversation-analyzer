@@ -1,6 +1,7 @@
 <script lang="ts">
     import { Button, ComboBox } from 'carbon-components-svelte';
     import { onMount } from 'svelte';
+    import { fetchContactNames } from '../lib/contacts';
     import '../styles/contact-picker.css';
 
     type ContactItem = {
@@ -29,18 +30,7 @@
         contactsLoading = true;
         contactsError = '';
         try {
-            const names = [
-                'Alice Johnson',
-                'Bob Smith',
-                'Bethany Lee',
-                'Brooke Miller',
-                'Charlie Davis',
-                'Diana Evans',
-                'Ethan Harris',
-                'Fiona Garcia',
-                'George Brown',
-                'Hannah Wilson'
-            ];
+            const names = await fetchContactNames();
             updateComboboxItems(names);
         } catch (error) {
             contactsError = error instanceof Error ? error.message : String(error);
