@@ -25,6 +25,9 @@ main {
     flex-direction: column;
     justify-content: center;
 }
+.bx--header ~ .bx--content {
+    margin: 0;
+}
 section {
     margin: 2rem 0;
 }
