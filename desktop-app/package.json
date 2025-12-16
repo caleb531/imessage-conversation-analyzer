@@ -21,6 +21,7 @@
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-opener": "^2",
     "@tauri-apps/plugin-shell": "^2",
+    "@tauri-apps/plugin-store": "~2.4.1",
     "carbon-components-svelte": "^0.85.1"
   },
   "devDependencies": {

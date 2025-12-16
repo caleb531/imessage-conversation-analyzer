@@ -1,7 +1,3 @@
-# Tauri + SvelteKit + TypeScript
+# iMessage Conversation Analyzer for Mac
 
-This template should help get you started developing with Tauri, SvelteKit and TypeScript in Vite.
-
-## Recommended IDE Setup
-
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer).
+This is a desktop application built with SvelteKit and Carbon Components Svelte that allows users to analyze their iMessage conversations. The app provides a user-friendly interface to select contacts and run analysis using the iMessage Conversation Analyzer (ICA) sidecar.

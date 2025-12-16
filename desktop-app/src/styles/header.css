@@ -1,0 +1,8 @@
+header.bx--header {
+    position: static;
+    height: auto;
+    padding: 12px 20px;
+}
+nav.bx--header__nav {
+    display: block;
+}
