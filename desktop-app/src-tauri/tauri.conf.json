@@ -4,9 +4,9 @@
   "version": "0.1.0",
   "identifier": "com.calebevans.imessage-conversation-analyzer",
   "build": {
-    "beforeDevCommand": "pnpm dev",
+    "beforeDevCommand": "vite dev",
     "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "pnpm build",
+    "beforeBuildCommand": "vite build",
     "frontendDist": "../build"
   },
   "app": {
