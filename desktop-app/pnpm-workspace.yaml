@@ -1,5 +1,0 @@
-onlyBuiltDependencies:
-  - '@carbon/layout'
-  - '@parcel/watcher'
-  - carbon-components-svelte
-  - esbuild
