@@ -1,8 +1,7 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
-    import { Button } from 'bits-ui';
-    import { runIcaSidecar } from '../lib/sidecar';
+    import { Button, CodeSnippet, TextInput } from 'carbon-components-svelte';
     import ContactPicker from '../components/ContactPicker.svelte';
+    import { runIcaSidecar } from '../lib/sidecar';
     import '../styles/page.css';
 
     let icaArgs = $state('--help');
@@ -39,20 +38,27 @@
 </script>
 
 <h1>iMessage Conversation Analyzer</h1>
-<section class="contacts-section" aria-labelledby="contacts-label">
-    <h2 id="contacts-label">Choose a contact</h2>
+<section class="contacts-section">
+    <h2>Choose a contact</h2>
     <ContactPicker bind:selectedContact />
 </section>
-<form class="column" onsubmit={runSidecar}>
-    <label for="sidecar-args">CLI Arguments</label>
-    <input id="sidecar-args" placeholder="--help" bind:value={icaArgs} autocomplete="off" />
-    <Button.Root type="submit" disabled={icaRunning}>
-        {icaRunning ? 'Running…' : 'Run ica-sidecar'}
-    </Button.Root>
-</form>
+<section>
+    <form class="column" onsubmit={runSidecar}>
+        <TextInput
+            labelText="CLI Arguments"
+            id="sidecar-args"
+            placeholder="--help"
+            bind:value={icaArgs}
+            autocomplete="off"
+        />
+        <Button type="submit" disabled={icaRunning}>
+            {icaRunning ? 'Running…' : 'Run ica-sidecar'}
+        </Button>
+    </form>
+</section>
 
 {#if icaOutput}
-    <pre>{icaOutput}</pre>
+    <CodeSnippet type="multi">{icaOutput}</CodeSnippet>
 {/if}
 
 {#if icaError}
