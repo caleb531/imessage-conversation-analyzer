@@ -40,10 +40,12 @@
 <h1>iMessage Conversation Analyzer</h1>
 <section class="contacts-section">
     <h2>Choose a contact</h2>
-    <ContactPicker bind:selectedContact />
+    <form onsubmit={(event) => event.preventDefault()}>
+        <ContactPicker bind:selectedContact />
+    </form>
 </section>
 <section>
-    <form class="column" onsubmit={runSidecar}>
+    <form onsubmit={runSidecar}>
         <TextInput
             labelText="CLI Arguments"
             id="sidecar-args"
