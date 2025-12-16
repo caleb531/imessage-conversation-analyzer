@@ -22,7 +22,10 @@
     "@tauri-apps/plugin-opener": "^2",
     "@tauri-apps/plugin-shell": "^2",
     "@tauri-apps/plugin-store": "~2.4.1",
-    "carbon-components-svelte": "^0.85.1"
+    "@svar-ui/svelte-grid": "^2.4.0",
+    "carbon-components-svelte": "^0.85.1",
+    "papaparse": "^5.4.1",
+    "string-argv": "^0.3.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
@@ -31,6 +34,7 @@
     "@sveltejs/vite-plugin-svelte": "^5.0.0",
     "@tauri-apps/cli": "^2",
     "@types/node": "^24.10.2",
+    "@types/papaparse": "^5.3.14",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-svelte": "^3.13.1",
