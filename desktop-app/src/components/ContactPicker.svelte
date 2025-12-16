@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Button, ComboBox } from 'carbon-components-svelte';
+    import { Button, ComboBox, Loading } from 'carbon-components-svelte';
     import { onMount } from 'svelte';
     import { fetchContactNames } from '../lib/contacts';
     import '../styles/contact-picker.css';
@@ -57,7 +57,7 @@
 
 <article class="contact-picker">
     {#if contactsLoading}
-        <p class="contact-picker-status">Loading contacts…</p>
+        <p class="contact-picker-status"><Loading /></p>
     {:else if contactsError}
         <p class="contact-picker-status contact-picker-status--error">{contactsError}</p>
         <Button kind="secondary" type="button" class="contact-picker-retry" on:click={loadContacts}>
