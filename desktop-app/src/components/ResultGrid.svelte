@@ -4,6 +4,7 @@
     import { InlineNotification, Loading } from 'carbon-components-svelte';
     import { onMount } from 'svelte';
     import '../styles/result-grid.css';
+    import DateCell from './DateCell.svelte';
     import NumberCell from './NumberCell.svelte';
 
     interface Props {
@@ -26,6 +27,26 @@
     let rows = $state<Array<Record<string, unknown>>>([]);
     let columns = $state<GridColumn[]>([]);
 
+    const cellFormatters = [
+        {
+            pattern: /^\d+$/,
+            component: NumberCell
+        },
+        {
+            pattern: /^\d{4}-\d{2}-\d{2}$/,
+            component: DateCell
+        }
+    ];
+
+    function getValueFormatter(value: string | number) {
+        for (const formatter of cellFormatters) {
+            if (formatter.pattern.test(String(value))) {
+                return formatter.component;
+            }
+        }
+        return null;
+    }
+
     function createColumns(
         headers: IcaCsvHeader[],
         dataRows: Array<Record<string, unknown>>
@@ -36,13 +57,13 @@
         const sample = dataRows[0] ?? {};
         return headers.map((header, index) => {
             const value = sample[header.id];
-            const isNumeric = typeof value === 'number';
+            const ValueFormatter = getValueFormatter(value as string | number);
             return {
                 id: header.id,
                 header: header.original,
                 flexgrow: 1,
                 width: 120,
-                ...(isNumeric ? { cell: NumberCell } : {})
+                ...(ValueFormatter ? { cell: ValueFormatter } : {})
             } satisfies GridColumn;
         });
     }
