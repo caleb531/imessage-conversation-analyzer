@@ -34,23 +34,3 @@
         </div>
     </HeaderUtilities>
 </Header>
-
-<style>
-    .app-header__contact {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        gap: 0.25rem;
-    }
-
-    .app-header__contact-name {
-        font-size: 0.875rem;
-        line-height: 1.25rem;
-    }
-
-    :global(.app-header__contact-link) {
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-    }
-</style>
