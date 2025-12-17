@@ -55,12 +55,3 @@
         </Button>
     </form>
 </section>
-
-<style>
-    .set-contact {
-        display: flex;
-        flex-direction: column;
-        max-width: 32rem;
-        margin: 0 auto;
-    }
-</style>

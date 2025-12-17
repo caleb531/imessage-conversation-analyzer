@@ -1,0 +1,21 @@
+.result-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.result-grid__loading {
+    display: flex;
+    justify-content: center;
+    padding: 3rem 0;
+}
+
+.wx-willow-dark-theme {
+    background: none !important;
+}
+.wx-table-box {
+    border-bottom-width: 0 !important;
+}
+.wx-data {
+    border-bottom: var(--wx-table-border);
+}
