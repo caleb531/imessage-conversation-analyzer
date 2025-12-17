@@ -12,9 +12,9 @@
   "app": {
     "windows": [
       {
-        "title": "imessage-conversation-analyzer",
-        "width": 800,
-        "height": 600
+        "title": "iMessage Conversation Analyzer",
+        "width": 1024,
+        "height": 768
       }
     ],
     "security": {
