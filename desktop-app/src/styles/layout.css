@@ -25,11 +25,22 @@ main {
     flex-direction: column;
     justify-content: center;
 }
+body,
+.bx--header ~ .bx--content,
+section,
+.wx-willow-dark-theme {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    height: 1px;
+}
 .bx--header ~ .bx--content {
     margin: 0;
+    padding: 0;
 }
 section {
-    margin: 2rem 0;
+    margin: 0;
+    margin-top: 2rem;
 }
 section header {
     text-align: center;

@@ -3,6 +3,7 @@
     import { Grid, WillowDark } from '@svar-ui/svelte-grid';
     import { InlineNotification, Loading } from 'carbon-components-svelte';
     import { onMount } from 'svelte';
+    import '../styles/result-grid.css';
     import NumberCell from './NumberCell.svelte';
 
     interface Props {
@@ -93,22 +94,3 @@
         <p>No data available.</p>
     {/if}
 </section>
-
-<style>
-    .result-grid {
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
-        padding-bottom: 2rem;
-    }
-
-    .result-grid__loading {
-        display: flex;
-        justify-content: center;
-        padding: 3rem 0;
-    }
-
-    :global(.sv-grid) {
-        min-height: 24rem;
-    }
-</style>
