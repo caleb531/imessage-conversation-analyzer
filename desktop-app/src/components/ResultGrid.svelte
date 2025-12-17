@@ -3,6 +3,7 @@
     import { Grid, WillowDark } from '@svar-ui/svelte-grid';
     import { InlineNotification, Loading } from 'carbon-components-svelte';
     import { onMount } from 'svelte';
+    import NumberCell from './NumberCell.svelte';
 
     interface Props {
         title: string;
@@ -17,7 +18,6 @@
         header: string;
         width?: number;
         flexgrow?: number;
-        align?: 'start' | 'center' | 'end';
     }
 
     let loading = $state(true);
@@ -36,14 +36,12 @@
         return headers.map((header, index) => {
             const value = sample[header.id];
             const isNumeric = typeof value === 'number';
-            // Give the first column more space as it's usually the label/key
-            const isPrimaryColumn = index === 0;
             return {
                 id: header.id,
                 header: header.original,
-                flexgrow: isPrimaryColumn ? 2 : 1,
-                width: isPrimaryColumn ? 220 : 120,
-                align: isNumeric ? 'end' : 'start'
+                flexgrow: 1,
+                width: 120,
+                ...(isNumeric ? { cell: NumberCell } : {})
             } satisfies GridColumn;
         });
     }
