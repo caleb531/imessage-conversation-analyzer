@@ -23,7 +23,7 @@
 <Header platformName="iMessage Conversation Analyzer">
     <HeaderNav>
         <HeaderNavItem href="/message-totals">Message Totals</HeaderNavItem>
-        <HeaderNavItem href="/call-cli">Call CLI</HeaderNavItem>
+        <HeaderNavItem href="/most-frequent-emojis">Most Frequent Emojis</HeaderNavItem>
     </HeaderNav>
     <HeaderUtilities>
         <div class="app-header__contact">
