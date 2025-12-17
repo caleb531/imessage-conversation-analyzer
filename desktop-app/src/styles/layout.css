@@ -31,6 +31,9 @@ main {
 section {
     margin: 2rem 0;
 }
+section header {
+    text-align: center;
+}
 form {
     display: flex;
     flex-direction: column;
