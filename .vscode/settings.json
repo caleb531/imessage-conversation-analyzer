@@ -22,5 +22,35 @@
     }
   },
   "workbench.editor.labelFormat": "short",
-  "eslint.validate": ["javascript", "typescript", "svelte"]
+  "eslint.validate": ["javascript", "typescript", "svelte"],
+  "files.exclude": {
+    "**/.DS_Store": true,
+    "**/__pycache__": true,
+    "**/*.py[cod]": true,
+    "build": true,
+    "dist": true,
+    "**/*.egg-info": true,
+    "cover": true,
+    "htmlcov": true,
+    ".coverage": true,
+    "coverage.xml": true,
+    "nosetests.xml": true,
+    ".venv": true,
+    ".virtualenv": true,
+    "desktop-app/node_modules": true,
+    "desktop-app/build": true,
+    "desktop-app/.svelte-kit": true,
+    "desktop-app/package": true,
+    "desktop-app/.env": true,
+    "desktop-app/.env.*": true,
+    "desktop-app/.env.example": false,
+    "desktop-app/vite.config.js.timestamp-*": true,
+    "desktop-app/vite.config.ts.timestamp-*": true,
+    "desktop-app/src-tauri/bin": true,
+    "desktop-app/src-tauri/_internal": true,
+    "desktop-app/src-tauri/ica-sidecar": true,
+    "desktop-app/src-tauri/ica-sidecar-*": true,
+    "desktop-app/src-tauri/target": true,
+    "desktop-app/src-tauri/gen/schemas": true
+  }
 }
