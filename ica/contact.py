@@ -63,7 +63,7 @@ def get_chat_identifiers(contact_name: str) -> list[str]:
     for db_path in glob.iglob(str(DB_GLOB)):
         with sqlite3.connect(f"file:{db_path}?mode=ro", uri=True) as connection:
             rows = pd.read_sql_query(
-                sql=importlib.resources.files(__package__)
+                sql=importlib.resources.files("ica")
                 .joinpath(os.path.join("queries", "contact.sql"))
                 .read_text(),
                 con=connection,

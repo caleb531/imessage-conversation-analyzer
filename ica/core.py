@@ -11,7 +11,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from io import BytesIO, StringIO
 from pathlib import Path
-from typing import Callable, Optional, Union
+from typing import Callable, Hashable, Optional, Union
 
 import pandas as pd
 import tzlocal
@@ -127,7 +127,7 @@ def get_messages_dataframe(
         timezone = tzlocal.get_localzone().key
     return (
         pd.read_sql_query(
-            sql=importlib.resources.files(__package__)
+            sql=importlib.resources.files("ica")
             .joinpath(os.path.join("queries", "messages.sql"))
             .read_text(),
             con=connection,
@@ -204,7 +204,7 @@ def get_attachments_dataframe(
     """
     return (
         pd.read_sql_query(
-            sql=importlib.resources.files(__package__)
+            sql=importlib.resources.files("ica")
             .joinpath(os.path.join("queries", "attachments.sql"))
             .read_text(),
             con=connection,
@@ -261,7 +261,7 @@ def get_dataframes(
         return dfs
 
 
-def prettify_header_name(header_name: Union[str, int]) -> Union[str, int]:
+def prettify_header_name(header_name: Hashable) -> Hashable:
     """
     Format the given header name to be more human-readable (e.g. "foo_bar" =>
     "Foo Bar")
