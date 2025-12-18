@@ -6,7 +6,7 @@ from ica.core import (
     DataFrameNamespace,
     get_dataframes,
     output_results,
-    create_temp_sql_db,
+    get_sql_connection,
     execute_sql_query,
 )
 from ica.exceptions import (

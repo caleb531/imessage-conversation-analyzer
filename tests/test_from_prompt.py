@@ -46,12 +46,12 @@ def mock_dependencies() -> Generator[dict[str, Any], None, None]:
     with (
         patch("ica.output_results") as mock_output_results,
         patch("ica.execute_sql_query") as mock_execute_sql_query,
-        patch("ica.create_temp_sql_db") as mock_create_temp_sql_db,
+        patch("ica.get_sql_connection") as mock_get_sql_connection,
         patch("ica.get_dataframes") as mock_get_dataframes,
     ):
-        # Setup context manager for create_temp_sql_db
+        # Setup context manager for get_sql_connection
         mock_db_con = MagicMock()
-        mock_create_temp_sql_db.return_value.__enter__.return_value = mock_db_con
+        mock_get_sql_connection.return_value.__enter__.return_value = mock_db_con
 
         # Setup output_results to print the expected table
         def side_effect(*args: Any, **kwargs: Any) -> None:
@@ -65,7 +65,7 @@ def mock_dependencies() -> Generator[dict[str, Any], None, None]:
         yield {
             "output_results": mock_output_results,
             "execute_sql_query": mock_execute_sql_query,
-            "create_temp_sql_db": mock_create_temp_sql_db,
+            "get_sql_connection": mock_get_sql_connection,
             "get_dataframes": mock_get_dataframes,
             "db_con": mock_db_con,
         }

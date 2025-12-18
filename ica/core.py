@@ -363,7 +363,7 @@ def output_results(
 
 
 @contextmanager
-def create_temp_sql_db(
+def get_sql_connection(
     dfs: DataFrameNamespace,
 ) -> Generator[sqlite3.Connection, None, None]:
     """
@@ -380,7 +380,7 @@ def create_temp_sql_db(
 def execute_sql_query(query: str, con: sqlite3.Connection) -> pd.DataFrame:
     """
     Execute the given arbitrary SQL query, provided a connection to the
-    in-memory SQLite database created by ica.create_temp_sql_db()
+    in-memory SQLite database created by ica.get_sql_connection()
     """
     return pd.read_sql_query(
         sql=query,

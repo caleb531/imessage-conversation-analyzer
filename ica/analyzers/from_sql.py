@@ -22,7 +22,7 @@ def main() -> None:
     )
 
     # Execute the query and output the resulting dataframe
-    with ica.create_temp_sql_db(dfs) as con:
+    with ica.get_sql_connection(dfs) as con:
         try:
             result_df = ica.execute_sql_query(cli_args.query, con)
             ica.output_results(
