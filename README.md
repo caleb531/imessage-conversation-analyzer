@@ -89,6 +89,8 @@ ICA includes several built-in analyzers out of the box:
    reactions); use the `-s` / `--case-sensitive` option for case-sensitive
    counts, and the `-r` / `--use-regex` option to enable regular expression mode
    for all phrases you specify
+7. `from_sql`: execute an arbitrary SQL query against the conversation data
+   (messages and attachments), using an in-memory SQLite database
 
 #### Filtering
 
@@ -241,6 +243,34 @@ The equivalent option for the Python API is the `timezone` parameter to
 ```python
 dfs = ica.get_dataframes(contact_name=my_contact_name, timezone='UTC')
 ```
+
+### Data Schema
+
+All analyzers (including the built-in `from_sql` analyzer and any custom
+analyzers you write) have access to the following dataframes/tables. An object
+with these dataframes are returned by the `ica.get_dataframes()` function in the
+Python API.
+
+#### `messages`
+
+| Column | Type | Description |
+| :--- | :--- | :--- |
+| `ROWID` | Integer | The unique identifier of the message |
+| `text` | String | The content of the message |
+| `datetime` | Datetime | The timestamp of the message whose timezone is based on the `timezone` parameter you pass to `get_dataframes()` (defaults to the system's local timezone) |
+| `is_from_me` | Boolean | Whether the message was sent by you (`True`) or the other person (`False`) |
+| `is_reaction` | Boolean | Whether the message is a reaction (e.g. "Loved ...") |
+
+#### `attachments`
+
+| Column | Type | Description |
+| :--- | :--- | :--- |
+| `ROWID` | Integer | The unique identifier of the attachment |
+| `filename` | String | The filename of the attachment |
+| `mime_type` | String | The MIME type of the attachment (e.g. `image/jpeg`) |
+| `message_id` | Integer | The `ROWID` of the associated message |
+| `datetime` | Datetime | The localized timestamp of the message |
+| `is_from_me` | Boolean | Whether the attachment was sent by you (`True`) or the other person (`False`) |
 
 ## Developer Setup
 
