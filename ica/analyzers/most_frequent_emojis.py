@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 
-import importlib.resources
-import json
-import re
-
+import emoji
 import pandas as pd
 
 import ica
@@ -13,19 +10,6 @@ class MostFrequentEmojisCLIArguments(ica.TypedCLIArguments):
     """Additional CLI arguments specific to the most_frequent_emojis analyzer"""
 
     result_count: int
-
-
-def get_emoji_list() -> list[str]:
-    """
-    Fetch a list of the most popular emoji on the Web to use as a basis for
-    computing this metric
-    """
-    return json.loads(
-        importlib.resources.files("ica")
-        .joinpath("data")
-        .joinpath("emojis.json")
-        .read_text()
-    )
 
 
 # Output the occurrences of specific emojis
@@ -50,17 +34,25 @@ def main() -> None:
         from_person=cli_args.from_person,
     )
 
-    emojis = get_emoji_list()
     text = dfs.messages[dfs.messages["is_reaction"].eq(False)].get("text")
-    emoji_patt = re.compile(
-        f"({'|'.join(re.escape(emoji) for emoji in reversed(emojis))})"
-    )
-    matches = (
-        text.str.findall(emoji_patt).apply(pd.Series).stack().reset_index(drop=True)
-    )
+    # Join all messages into one large string for faster processing
+    full_text = text.str.cat(sep=" ")
+
+    # Use emoji library to find all emojis
+    found_emojis = emoji.emoji_list(full_text)
+
+    # Filter out skin tones
+    skin_tones = ["🏻", "🏼", "🏽", "🏾", "🏿"]
+    cleaned_emojis = []
+    for item in found_emojis:
+        e = item["emoji"]
+        for tone in skin_tones:
+            e = e.replace(tone, "")
+        cleaned_emojis.append(e)
+
     ica.output_results(
         (
-            pd.DataFrame({"emoji": matches.value_counts()})
+            pd.DataFrame({"emoji": pd.Series(cleaned_emojis).value_counts()})
             .rename({"emoji": "count"}, axis="columns")
             .rename_axis("emoji", axis="index")
             .head(cli_args.result_count)

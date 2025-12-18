@@ -21,6 +21,7 @@ dependencies = [
     "phonenumbers",
     "tzlocal",
     "openai>=1.102.0",
+    "emoji>=2.15.0",
 ]
 
 [project.urls]
