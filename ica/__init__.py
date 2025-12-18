@@ -4,10 +4,8 @@
 from ica.cli import get_cli_args, get_cli_parser, TypedCLIArguments
 from ica.core import (
     DataFrameNamespace,
-    assign_lambda,
     get_dataframes,
     output_results,
-    pipe_lambda,
     create_temp_sql_db,
     execute_sql_query,
 )
