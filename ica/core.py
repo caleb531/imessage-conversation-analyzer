@@ -233,7 +233,7 @@ def get_dataframes(
     Return all dataframes for a specific macOS Messages conversation
     """
     chat_identifiers = contact.get_chat_identifiers(contact_name)
-    with sqlite3.connect(DB_PATH) as connection:
+    with sqlite3.connect(f"file:{DB_PATH}?mode=ro", uri=True) as connection:
         dfs = DataFrameNamespace(
             messages=get_messages_dataframe(connection, chat_identifiers, timezone),
             attachments=get_attachments_dataframe(
