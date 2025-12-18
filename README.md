@@ -227,7 +227,7 @@ results to other processes, or whatever you need to do!
 
 By default, all dates and times are in the local timezone of the system on which
 ICA is run. If you'd like to change this, you can pass the `--timezone` / `-t`
-option to the CLI with an IANA timezone name.
+option to the CLI with an [IANA timezone name][iana].
 
 ```sh
 ica totals_by_day -c 'Daniel Brightingale' -t UTC
@@ -236,6 +236,8 @@ ica totals_by_day -c 'Daniel Brightingale' -t UTC
 ```sh
 ica totals_by_day -c 'Daniel Brightingale' -t America/New_York
 ```
+
+[iana]: https://data.iana.org/time-zones/tzdb-2021a/zone1970.tab
 
 The equivalent option for the Python API is the `timezone` parameter to
 `ica.get_dataframes`:
