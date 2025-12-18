@@ -6,6 +6,8 @@ import importlib.util
 import os
 import sqlite3
 import sys
+from collections.abc import Generator
+from contextlib import contextmanager
 from dataclasses import dataclass
 from io import BytesIO, StringIO
 from pathlib import Path
@@ -388,3 +390,30 @@ def output_results(
         sys.stdout.buffer.write(output.getvalue())
     elif output_not_specified and type(output) is StringIO:
         print(output.getvalue(), flush=True)
+
+
+@contextmanager
+def create_temp_sql_db(
+    dfs: DataFrameNamespace,
+) -> Generator[sqlite3.Connection, None, None]:
+    """
+    Create an in-memory SQLite database containing all ICA dataframes, and
+    return a connection to that database
+    """
+    with sqlite3.connect(":memory:") as connection:
+        dfs.messages.to_sql("messages", connection, index=False)
+        dfs.attachments.to_sql("attachments", connection, index=False)
+        yield connection
+
+
+# Execute an arbitrary SQL query against the database of all ICA dataframes
+def execute_sql_query(query: str, con: sqlite3.Connection) -> pd.DataFrame:
+    """
+    Execute the given arbitrary SQL query, provided a connection to the
+    in-memory SQLite database created by ica.create_temp_sql_db()
+    """
+    return pd.read_sql_query(
+        sql=query,
+        con=con,
+        parse_dates={"datetime": "ISO8601"},
+    )

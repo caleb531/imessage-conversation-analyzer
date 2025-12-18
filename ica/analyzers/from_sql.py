@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 
-import sqlite3
 import sys
-
-import pandas as pd
 
 import ica
 
@@ -24,27 +21,15 @@ def main() -> None:
         from_person=cli_args.from_person,
     )
 
-    # Create an in-memory SQLite database and load the dataframes into it
-    with sqlite3.connect(":memory:") as conn:
-        # Write dataframes to SQLite; we convert datetime columns to strings or
-        # let to_sql handle them (it usually handles them well), but for
-        # consistency with how one might query, ensuring they are accessible is
-        # key. The pandas to_sql() method handles datetimes by converting to
-        # timestamp strings usually.
-
-        dfs.messages.to_sql("messages", conn, index=False)
-        dfs.attachments.to_sql("attachments", conn, index=False)
-
-        # Execute the query and output the resulting dataframe
+    # Execute the query and output the resulting dataframe
+    with ica.create_temp_sql_db(dfs) as con:
         try:
-            result_df = pd.read_sql_query(cli_args.query, conn)
+            result_df = ica.execute_sql_query(cli_args.query, con)
             ica.output_results(
-                result_df,
-                format=cli_args.format,
-                output=cli_args.output,
+                result_df, format=cli_args.format, output=cli_args.output
             )
-        except Exception as e:
-            print(f"Error executing query: {e}", file=sys.stderr)
+        except Exception as error:
+            print(f"Error executing query: {error}", file=sys.stderr)
 
 
 if __name__ == "__main__":
