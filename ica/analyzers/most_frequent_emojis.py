@@ -21,7 +21,10 @@ def get_emoji_list() -> list[str]:
     computing this metric
     """
     return json.loads(
-        importlib.resources.files("ica").joinpath("emojis.json").read_text()
+        importlib.resources.files("ica")
+        .joinpath("data")
+        .joinpath("emojis.json")
+        .read_text()
     )
 
 
