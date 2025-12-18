@@ -186,9 +186,7 @@ def test_from_prompt_keep_sql(
         ),
     ):
         from_prompt.main()
-        assert (
-            Path(generated_sql_file_path).read_text().strip() == MOCK_SQL_QUERY
-        )
+        assert Path(generated_sql_file_path).read_text().strip() == MOCK_SQL_QUERY
 
 
 @patch(
