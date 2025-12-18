@@ -367,8 +367,8 @@ def create_temp_sql_db(
     dfs: DataFrameNamespace,
 ) -> Generator[sqlite3.Connection, None, None]:
     """
-    Create an in-memory SQLite database containing all ICA dataframes, and
-    return a connection to that database
+    Create an in-memory SQLite database containing all ICA dataframes, and yield
+    a connection to that database
     """
     with sqlite3.connect(":memory:") as connection:
         dfs.messages.to_sql("messages", connection, index=False)
