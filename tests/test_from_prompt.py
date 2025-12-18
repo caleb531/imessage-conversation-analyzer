@@ -19,7 +19,7 @@ PROMPT = "test prompt"
 
 # Ensure `Path` is used consistently for file operations
 MOCK_SQL_QUERY = (
-    Path("tests/data/analyzers/generated_from_prompt.sql").read_text().strip()
+    Path("tests/data/queries/generated_from_prompt.sql").read_text().strip()
 )
 
 
