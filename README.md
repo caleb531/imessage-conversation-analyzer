@@ -247,7 +247,7 @@ dfs = ica.get_dataframes(contact_name=my_contact_name, timezone='UTC')
 The following instructions are written for developers who want to run the
 package locally, or write their own analyzers.
 
-We recommends using the uv package manager for easier environment and dependency
+We recommend using the uv package manager for easier environment and dependency
 management ([instructions][installation-docs]).
 
 [installation-docs]: https://docs.astral.sh/uv/getting-started/installation/#installation-methods
