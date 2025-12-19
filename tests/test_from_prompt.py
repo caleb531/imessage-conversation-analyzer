@@ -105,7 +105,7 @@ def test_from_prompt_with_usage(
 
         # Verify SQL execution
         mock_dependencies["execute_sql_query"].assert_called_once_with(
-            MOCK_SQL_QUERY, mock_dependencies["db_con"]
+            MOCK_SQL_QUERY, con=mock_dependencies["db_con"]
         )
         mock_dependencies["output_results"].assert_called_once()
 
@@ -144,7 +144,7 @@ def test_from_prompt_no_usage(
 
         # Verify SQL execution
         mock_dependencies["execute_sql_query"].assert_called_once_with(
-            MOCK_SQL_QUERY, mock_dependencies["db_con"]
+            MOCK_SQL_QUERY, con=mock_dependencies["db_con"]
         )
 
         assert out.getvalue() == (

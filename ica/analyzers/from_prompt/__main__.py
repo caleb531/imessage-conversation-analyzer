@@ -122,7 +122,7 @@ def main() -> None:
     # Execute the query and output the resulting dataframe
     with ica.get_sql_connection(dfs) as con:
         try:
-            result_df = ica.execute_sql_query(query, con)
+            result_df = ica.execute_sql_query(query, con=con)
             ica.output_results(
                 result_df, format=cli_args.format, output=cli_args.output
             )

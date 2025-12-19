@@ -83,7 +83,7 @@ def decode_message_attributedbody(data: bytes) -> str:
 
 
 def get_messages_dataframe(
-    connection: sqlite3.Connection,
+    con: sqlite3.Connection,
     chat_identifiers: list[str],
     timezone: Optional[str] = None,
 ) -> pd.DataFrame:
@@ -100,7 +100,7 @@ def get_messages_dataframe(
             sql=importlib.resources.files("ica")
             .joinpath(os.path.join("queries", "messages.sql"))
             .read_text(),
-            con=connection,
+            con=con,
             params={
                 "chat_identifiers": get_chat_identifier_str(chat_identifiers),
                 "chat_identifier_delimiter": CHAT_IDENTIFIER_DELIMITER,
@@ -164,7 +164,7 @@ def filter_dataframe(
 
 
 def get_attachments_dataframe(
-    connection: sqlite3.Connection,
+    con: sqlite3.Connection,
     chat_identifiers: list[str],
     timezone: Optional[str] = None,
 ) -> pd.DataFrame:
@@ -177,7 +177,7 @@ def get_attachments_dataframe(
             sql=importlib.resources.files("ica")
             .joinpath(os.path.join("queries", "attachments.sql"))
             .read_text(),
-            con=connection,
+            con=con,
             params={
                 "chat_identifiers": get_chat_identifier_str(chat_identifiers),
                 "chat_identifier_delimiter": CHAT_IDENTIFIER_DELIMITER,
@@ -205,12 +205,10 @@ def get_dataframes(
     Return all dataframes for a specific macOS Messages conversation
     """
     chat_identifiers = contact.get_chat_identifiers(contact_name)
-    with sqlite3.connect(f"file:{DB_PATH}?mode=ro", uri=True) as connection:
+    with sqlite3.connect(f"file:{DB_PATH}?mode=ro", uri=True) as con:
         dfs = DataFrameNamespace(
-            messages=get_messages_dataframe(connection, chat_identifiers, timezone),
-            attachments=get_attachments_dataframe(
-                connection, chat_identifiers, timezone
-            ),
+            messages=get_messages_dataframe(con, chat_identifiers, timezone),
+            attachments=get_attachments_dataframe(con, chat_identifiers, timezone),
         )
         if dfs.messages.empty:
             raise ConversationNotFoundError(
@@ -370,10 +368,10 @@ def get_sql_connection(
     Create an in-memory SQLite database containing all ICA dataframes, and yield
     a connection to that database
     """
-    with sqlite3.connect(":memory:") as connection:
-        dfs.messages.to_sql("messages", connection, index=False)
-        dfs.attachments.to_sql("attachments", connection, index=False)
-        yield connection
+    with sqlite3.connect(":memory:") as con:
+        dfs.messages.to_sql("messages", con, index=False)
+        dfs.attachments.to_sql("attachments", con, index=False)
+        yield con
 
 
 # Execute an arbitrary SQL query against the database of all ICA dataframes

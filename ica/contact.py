@@ -61,12 +61,12 @@ def get_chat_identifiers(contact_name: str) -> list[str]:
     # contacts (e.g. On My Mac, iCloud, etc.); we must query each of these
     # databases and combine the separate results into a single result set
     for db_path in glob.iglob(str(DB_GLOB)):
-        with sqlite3.connect(f"file:{db_path}?mode=ro", uri=True) as connection:
+        with sqlite3.connect(f"file:{db_path}?mode=ro", uri=True) as con:
             rows = pd.read_sql_query(
                 sql=importlib.resources.files("ica")
                 .joinpath(os.path.join("queries", "contact.sql"))
                 .read_text(),
-                con=connection,
+                con=con,
                 params={"contact_name": contact_name},
             )
             # Combine the results
