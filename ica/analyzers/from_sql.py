@@ -21,7 +21,7 @@ def main() -> None:
         from_person=cli_args.from_person,
     )
 
-    # Execute the query and output the resulting dataframe
+    # Execute the query and print the resulting dataframe to stdout
     with ica.get_sql_connection(dfs) as con:
         try:
             result_df = ica.execute_sql_query(cli_args.query, con)
