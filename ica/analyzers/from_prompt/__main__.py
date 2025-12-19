@@ -74,6 +74,7 @@ def main() -> None:
     cli_parser.add_argument(
         "--api-key",
         "-k",
+        required=True,
         help="API key to send to the OpenAI API",
     )
     cli_parser.add_argument(
