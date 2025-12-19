@@ -26,7 +26,9 @@ def main() -> None:
         try:
             result_df = ica.execute_sql_query(cli_args.query, con)
             ica.output_results(
-                result_df, format=cli_args.format, output=cli_args.output
+                result_df,
+                format=cli_args.format,
+                output=cli_args.output,
             )
         except Exception as error:
             print(f"Error executing query: {error}", file=sys.stderr)
