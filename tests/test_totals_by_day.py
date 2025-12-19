@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """test the totals_by_day built-in analyzer"""
 
+import json
+from pathlib import Path
 from unittest.mock import MagicMock, patch
-
-import pandas as pd
 
 import ica.analyzers.totals_by_day as totals_by_day
 
@@ -13,14 +13,13 @@ import ica.analyzers.totals_by_day as totals_by_day
 def test_totals_by_day(output_results: MagicMock) -> None:
     """Should count the total number of days."""
     totals_by_day.main()
-    df: pd.DataFrame = output_results.call_args[0][0]
-    assert df.to_dict(orient="index") == (
-        pd.read_json("tests/data/totals_by_day.json", orient="index")
-        # ICA provides timezone-aware date/times, however the date/time
-        # objects parsed from the JSON are missing timezone information
-        # (i.e. they are timezone-naive); therefore, we must add the missing
-        # timezone information (note that this does not perform any
-        # conversions)
-        .pipe(lambda df: df.set_index(df.index.tz_localize("UTC")))
-        .to_dict(orient="index")
-    )
+    rel = output_results.call_args[0][0]
+    data = [dict(zip(rel.columns, row)) for row in rel.fetchall()]
+    result = {
+        item["date"]: {k: v for k, v in item.items() if k != "date"} for item in data
+    }
+
+    expected_raw = json.loads(Path("tests/data/totals_by_day.json").read_text())
+    expected = {k[:10]: v for k, v in expected_raw.items()}
+
+    assert result == expected

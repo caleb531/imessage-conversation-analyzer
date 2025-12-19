@@ -10,16 +10,20 @@ def test_find_conversation_via_phone_number_only() -> None:
     """
     Should find conversation for contact with phone number only.
     """
-    dfs = ica.get_dataframes(contact_name="Daniel Brightingale")
-    assert len(dfs.messages) > 0
+    data = ica.get_conversation_data(contact_name="Daniel Brightingale")
+    res = data.messages.count("ROWID").fetchone()
+    assert res is not None
+    assert res[0] > 0
 
 
 def test_find_conversation_via_email_address_only() -> None:
     """
     Should find conversation for contact with email address only.
     """
-    dfs = ica.get_dataframes(contact_name="Thomas Riverstone")
-    assert len(dfs.messages) > 0
+    data = ica.get_conversation_data(contact_name="Thomas Riverstone")
+    res = data.messages.count("ROWID").fetchone()
+    assert res is not None
+    assert res[0] > 0
 
 
 def test_has_contact_info_but_no_conversation() -> None:
@@ -28,7 +32,7 @@ def test_has_contact_info_but_no_conversation() -> None:
     conversation.
     """
     with pytest.raises(ica.ConversationNotFoundError):
-        ica.get_dataframes(contact_name="Evelyn Oakhaven")
+        ica.get_conversation_data(contact_name="Evelyn Oakhaven")
 
 
 def test_missing_contact_info() -> None:
@@ -37,10 +41,10 @@ def test_missing_contact_info() -> None:
     info.
     """
     with pytest.raises(ica.ContactNotFoundError):
-        ica.get_dataframes(contact_name="Matthew Whisperton")
+        ica.get_conversation_data(contact_name="Matthew Whisperton")
 
 
 def test_contact_not_found_error() -> None:
     """Should raise a ContactNotFoundError when a contact is not found."""
     with pytest.raises(ica.ContactNotFoundError):
-        ica.get_dataframes(contact_name="Imaginary Person")
+        ica.get_conversation_data(contact_name="Imaginary Person")

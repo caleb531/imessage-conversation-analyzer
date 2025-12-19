@@ -1,15 +1,30 @@
 #!/usr/bin/env python3
 
-
-import pandas as pd
-
 import ica
 
 
 # Count the number of occurrences of the given regular expression pattern within
-# the provided Series
-def count_occurrences(series: pd.Series, pattern: str) -> int:
-    return series.str.count(pattern).sum()
+# the provided Relation
+def count_occurrences(data: ica.ConversationData, pattern: str) -> int:
+    # Filter out reactions first
+    # We use regexp_extract_all to find all matches, then len() to count them,
+    # then sum() to get total
+    # Note: We need to handle the case where text is NULL (though it shouldn't
+    # be after COALESCE)
+    # Also, we need to be careful with regex syntax in DuckDB.
+    # Python's regex might differ slightly from RE2 (DuckDB's regex engine).
+    # The patterns used here seem standard.
+
+    # Escape single quotes for SQL string interpolation
+    pattern_sql = pattern.replace("'", "''")
+
+    result = (
+        data.messages.filter("is_reaction IS NULL")
+        .aggregate(f"sum(len(regexp_extract_all(text, '{pattern_sql}')))")
+        .fetchone()
+    )
+
+    return result[0] if result and result[0] is not None else 0
 
 
 def main() -> None:
@@ -18,7 +33,7 @@ def main() -> None:
     shared, YouTube videos, Apple Music, etc.
     """
     cli_args = ica.get_cli_parser().parse_args(namespace=ica.TypedCLIArguments())
-    dfs = ica.get_dataframes(
+    data = ica.get_conversation_data(
         contact_name=cli_args.contact_name,
         timezone=cli_args.timezone,
         from_date=cli_args.from_date,
@@ -26,29 +41,60 @@ def main() -> None:
         from_person=cli_args.from_person,
     )
 
-    is_reaction = dfs.messages["is_reaction"]
+    # Attachments counts
+    # We can use SQL on the attachments relation
+    res = (
+        data.attachments.filter("mime_type = 'image/gif'")
+        .aggregate("count(*)")
+        .fetchone()
+    )
+    gifs = res[0] if res else 0
+
+    res = (
+        data.attachments.filter("filename LIKE '%.caf'")
+        .aggregate("count(*)")
+        .fetchone()
+    )
+    audio_messages = res[0] if res else 0
+
+    res = (
+        data.attachments.filter("filename LIKE '%.m4a'")
+        .aggregate("count(*)")
+        .fetchone()
+    )
+    audio_files = res[0] if res else 0
+
+    res = (
+        data.attachments.filter("mime_type = 'video/quicktime'")
+        .aggregate("count(*)")
+        .fetchone()
+    )
+    recorded_videos = res[0] if res else 0
+
     totals_map = {
-        "gifs": dfs.attachments["mime_type"].eq("image/gif").sum(),
+        "gifs": gifs,
         "youtube_videos": count_occurrences(
-            dfs.messages[is_reaction.eq(False)]["text"],
+            data,
             r"(https?://(?:www\.)(?:youtube\.com|youtu\.be)/(?:.*?)(?:\s|$))",
         ),
         "apple_music": count_occurrences(
-            dfs.messages[is_reaction.eq(False)]["text"],
+            data,
             r"(https?://(?:music\.apple\.com)/(?:.*?)(?:\s|$))",
         ),
         "spotify": count_occurrences(
-            dfs.messages[is_reaction.eq(False)]["text"],
+            data,
             r"(https?://(?:open\.spotify\.com)/(?:.*?)(?:\s|$))",
         ),
-        "audio_messages": (dfs.attachments["filename"].str.endswith(".caf").sum()),
-        "audio_files": (dfs.attachments["filename"].str.endswith(".m4a").sum()),
-        "recorded_videos": (dfs.attachments["mime_type"].eq("video/quicktime").sum()),
+        "audio_messages": audio_messages,
+        "audio_files": audio_files,
+        "recorded_videos": recorded_videos,
     }
+
+    # Sort by total descending
+    sorted_totals = sorted(totals_map.items(), key=lambda x: x[1], reverse=True)
+
     ica.output_results(
-        pd.DataFrame({"type": totals_map.keys(), "total": totals_map.values()})
-        .set_index("type")
-        .sort_values(by="total", ascending=False),
+        [{"type": k, "total": v} for k, v in sorted_totals],
         format=cli_args.format,
         output=cli_args.output,
     )

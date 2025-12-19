@@ -1,8 +1,7 @@
 SELECT
     "ROWID",
-    "text",
-    "attributedBody",
-    datetime("message"."date" / 1000000000 + strftime("%s", "2001-01-01") ,"unixepoch") as "datetime",
+    COALESCE(CAST("text" AS VARCHAR), decode_body(CAST("attributedBody" AS BLOB))) AS "text",
+    "date",
     "is_from_me"
 FROM "message"
 WHERE "message"."ROWID" IN (
@@ -13,16 +12,7 @@ WHERE "message"."ROWID" IN (
         -- Get all chats with the specified phone number
         SELECT "chat"."ROWID"
         FROM "chat"
-        WHERE :chat_identifiers LIKE (
-            '%'
-            ||
-            :chat_identifier_delimiter
-            ||
-            "chat_identifier"
-            ||
-            :chat_identifier_delimiter
-            ||
-            '%'
-        )
+        WHERE CAST(chat_identifier AS VARCHAR) IN (SELECT unnest(string_split(?, '|')))
     )
-) ORDER BY "datetime"
+)
+ORDER BY "date" ASC

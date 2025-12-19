@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any, Generator
 from unittest.mock import MagicMock, Mock, patch
 
+import duckdb
 import pytest
 
 import ica.analyzers.from_prompt.__main__ as from_prompt
@@ -12,6 +13,7 @@ from ica.analyzers.from_prompt.exceptions import (
     EmptyResponseError,
     ResponseMissingSQLError,
 )
+from ica.core import ConversationData
 from tests.utils import temp_ica_dir
 
 API_KEY = "abc"
@@ -47,11 +49,35 @@ def mock_dependencies() -> Generator[dict[str, Any], None, None]:
         patch("ica.output_results") as mock_output_results,
         patch("ica.execute_sql_query") as mock_execute_sql_query,
         patch("ica.get_sql_connection") as mock_get_sql_connection,
-        patch("ica.get_dataframes") as mock_get_dataframes,
+        patch("ica.get_conversation_data") as mock_get_conversation_data,
     ):
-        # Setup context manager for get_sql_connection
+        # Setup mock connection
         mock_db_con = MagicMock()
-        mock_get_sql_connection.return_value.__enter__.return_value = mock_db_con
+        mock_get_sql_connection.return_value = mock_db_con
+
+        # Setup conversation data
+        con = duckdb.connect(":memory:")
+        con.execute(
+            """
+            CREATE TABLE messages_table (
+                ROWID INTEGER,
+                text VARCHAR,
+                is_from_me BOOLEAN
+            )
+            """
+        )
+        con.execute(
+            "INSERT INTO messages_table VALUES (1, 'Hello', true), (2, 'World', false)"
+        )
+        con.execute("CREATE TABLE attachments_table (ROWID INTEGER, filename VARCHAR)")
+        con.execute("INSERT INTO attachments_table VALUES (1, 'image.png')")
+
+        mock_conversation_data = ConversationData(
+            con=con,
+            messages=con.table("messages_table"),
+            attachments=con.table("attachments_table"),
+        )
+        mock_get_conversation_data.return_value = mock_conversation_data
 
         # Setup output_results to print the expected table
         def side_effect(*args: Any, **kwargs: Any) -> None:
@@ -66,7 +92,7 @@ def mock_dependencies() -> Generator[dict[str, Any], None, None]:
             "output_results": mock_output_results,
             "execute_sql_query": mock_execute_sql_query,
             "get_sql_connection": mock_get_sql_connection,
-            "get_dataframes": mock_get_dataframes,
+            "get_conversation_data": mock_get_conversation_data,
             "db_con": mock_db_con,
         }
 

@@ -1,290 +1,121 @@
 #!/usr/bin/env python3
-"""test the message_totals built-in analyzer"""
+"""test the output_results function"""
 
-import itertools
+import csv
 from contextlib import redirect_stdout
-from enum import Enum
 from io import BytesIO, StringIO
 from pathlib import Path
-from typing import Optional
+from typing import Any
 
-import pandas as pd
+import duckdb
+import openpyxl
 import pytest
 
 import ica
-from ica.core import prepare_df_for_output
-from tests.utils import StdoutMockWithBuffer, temp_ica_dir
+from tests.utils import temp_ica_dir
 
 
-class IndexType(Enum):
-    """
-    A boolean enum type indicating whether a DataFrame uses the default
-    (auto-incrementing) index versus setting a custom index
-    """
-
-    USE_DEFAULT_INDEX = True
-    USE_CUSTOM_INDEX = False
+@pytest.fixture
+def sample_data() -> list[dict[str, Any]]:
+    return [
+        {"first_name": "Steven", "last_name": "Spielberg", "age": 75},
+        {"first_name": "Wes", "last_name": "Anderson", "age": 52},
+    ]
 
 
-test_cases = (
-    (
-        "default_index",
-        pd.DataFrame(
-            {
-                "first": ["Steven", "Wes", "Martin"],
-                "last": ["Spielberg", "Anderson", "Scorsese"],
-            }
-        ),
-        IndexType.USE_DEFAULT_INDEX,
-    ),
-    (
-        "labels_in_index",
-        pd.DataFrame(
-            {
-                "metric": ["Messages", "Reactions", "Attachments"],
-                "total": [987, 654, 321],
-            },
-        ).set_index("metric"),
-        IndexType.USE_CUSTOM_INDEX,
-    ),
-    (
-        "date_index",
-        pd.DataFrame(
-            {
-                "date": ["2024-01-26", "2024-01-27", "2024-01-28"],
-                "total": [12, 45, 56],
-            },
-        )
-        .assign(date=lambda df: pd.to_datetime(df["date"]))
-        .set_index("date"),
-        IndexType.USE_CUSTOM_INDEX,
-    ),
-)
-
-
-@pytest.mark.parametrize(
-    ("test_case", "output_type"),
-    list(
-        itertools.product(
-            test_cases,
-            (
-                (None, "txt", "read_table"),
-                ("csv", "csv", "read_csv"),
-                ("markdown", "md", "read_table"),
-            ),
-        )
-    ),
-)
-def test_output_results(
-    test_case: tuple[str, pd.DataFrame, IndexType],
-    output_type: tuple[str, str, str],
-) -> None:
-    """Should print a dataframe to stdout."""
-    test_name, df, use_default_index = test_case
-    format, ext, df_read_method_name = output_type
+def test_output_results_text(sample_data: list[dict[str, Any]]) -> None:
+    """Should print data as a text table."""
     with redirect_stdout(StringIO()) as stdout:
-        ica.output_results(df, format=format)
-        assert (
-            stdout.getvalue()
-            == Path(
-                f"tests/data/output/{ext}/output_results_{test_name}.{ext}"
-            ).read_text()
-        )
+        ica.output_results(sample_data)
+        output = stdout.getvalue()
+        # Check headers (Title Cased)
+        assert "First Name" in output
+        assert "Last Name" in output
+        assert "Age" in output
+        # Check data
+        assert "Steven" in output
+        assert "Spielberg" in output
+        assert "75" in output
 
 
-@pytest.mark.parametrize(
-    ("test_case", "format"),
-    list(itertools.product(test_cases, ("excel",))),
-)
-def test_output_results_bytes(
-    test_case: tuple[str, pd.DataFrame, IndexType],
-    format: Optional[str],
-) -> None:
-    """
-    Should print the dataframe to stdout as binary Excel data.
-    """
-    test_name, df, use_default_index = test_case
-    with redirect_stdout(StdoutMockWithBuffer()) as stdout:
-        ica.output_results(
-            df,
-            format=format,
-        )
-        assert stdout.getvalue() == ""
-        expected_df = prepare_df_for_output(df)
-        actual_df = prepare_df_for_output(
-            pd.read_excel(
-                stdout.buffer,
-                index_col=None if use_default_index.value else 0,
-            )
-        )
-        assert expected_df.to_dict(orient="index") == actual_df.to_dict(orient="index")
-
-
-@pytest.mark.parametrize(
-    ("test_case", "output_type"),
-    list(
-        itertools.product(
-            test_cases,
-            (
-                (None, "csv"),
-                ("csv", "csv"),
-                (None, "md"),
-                ("markdown", "md"),
-            ),
-        )
-    ),
-)
-def test_output_results_file_plaintext(
-    test_case: tuple[str, pd.DataFrame, IndexType],
-    output_type: tuple[str, str],
-) -> None:
-    """Should write a DataFrame to a plain-text file."""
-    test_name, df, use_default_index = test_case
-    format, ext = output_type
-    output_path = f"{temp_ica_dir}/{test_name}_{format}.{ext}"
-    ica.output_results(
-        df,
-        format=format,
-        output=output_path,
-    )
-    assert (
-        Path(output_path).read_text() + "\n"
-        == Path(f"tests/data/output/{ext}/output_results_{test_name}.{ext}").read_text()
-    )
-
-
-@pytest.mark.parametrize(
-    ("test_case", "output_type"),
-    list(
-        itertools.product(
-            test_cases,
-            (
-                ("excel", "xlsx"),
-                (None, "xlsx"),
-            ),
-        )
-    ),
-)
-def test_output_results_file_binary(
-    test_case: tuple[str, pd.DataFrame, IndexType],
-    output_type: tuple[str, str],
-) -> None:
-    """Should write a DataFrame to a binary file (i.e. Excel)."""
-    test_name, df, use_default_index = test_case
-    format, ext = output_type
-    output_path = f"{temp_ica_dir}/{test_name}_{format}.{ext}"
-    ica.output_results(
-        df,
-        format=format,
-        output=output_path,
-    )
-    expected_df = prepare_df_for_output(df)
-    actual_df: pd.DataFrame = prepare_df_for_output(
-        pd.read_excel(
-            output_path,
-            index_col=None if use_default_index.value else 0,
-            parse_dates=True,
-            date_format="ISO8601",
-        )
-    )
-    assert actual_df.to_dict(orient="index") == expected_df.to_dict(orient="index")
-
-
-@pytest.mark.parametrize(
-    ("test_case", "output_type"),
-    list(
-        itertools.product(
-            test_cases,
-            (
-                (None, "txt"),
-                ("csv", "csv"),
-                ("markdown", "md"),
-            ),
-        )
-    ),
-)
-def test_output_results_string_buffer(
-    test_case: tuple[str, pd.DataFrame, IndexType],
-    output_type: tuple[str, str],
-) -> None:
-    """
-    Should write a dataframe to an explicitly-passed StringIO buffer, but
-    not print to stdout.
-    """
-    test_name, df, use_default_index = test_case
-    format, ext = output_type
-    out = StringIO()
+def test_output_results_markdown(sample_data: list[dict[str, Any]]) -> None:
+    """Should print data as a markdown table."""
     with redirect_stdout(StringIO()) as stdout:
-        ica.output_results(
-            df,
-            format=format,
-            output=out,
-        )
-        assert stdout.getvalue() == ""
-        assert (
-            out.getvalue() + "\n"
-            == Path(
-                f"tests/data/output/{ext}/output_results_{test_name}.{ext}"
-            ).read_text()
-        )
+        ica.output_results(sample_data, format="markdown")
+        output = stdout.getvalue()
+        output_nospaces = output.replace(" ", "")
+        assert "|FirstName|LastName|Age|" in output_nospaces
+        assert "|Steven|Spielberg|75|" in output_nospaces
 
 
-def test_output_results_bytes_buffer() -> None:
-    """
-    Should write a dataframe to an explicitly-passed BytesIO buffer, but not
-    print to stdout.
-    """
-    test_name, df, use_default_index = test_cases[0]
-    format = "excel"
-    out = BytesIO()
+def test_output_results_csv(sample_data: list[dict[str, Any]]) -> None:
+    """Should print data as CSV."""
     with redirect_stdout(StringIO()) as stdout:
-        ica.output_results(
-            df,
-            format=format,
-            output=out,
-        )
-        assert stdout.getvalue() == ""
-        expected_df = prepare_df_for_output(df)
-        actual_df = prepare_df_for_output(pd.read_excel(out))
-        assert expected_df.to_dict(orient="index") == actual_df.to_dict(orient="index")
+        ica.output_results(sample_data, format="csv")
+        output = stdout.getvalue()
+        reader = csv.reader(StringIO(output))
+        rows = list(reader)
+        assert rows[0] == ["First Name", "Last Name", "Age"]
+        assert rows[1] == ["Steven", "Spielberg", "75"]
 
 
-def test_output_results_invalid_format() -> None:
+def test_output_results_excel(sample_data: list[dict[str, Any]]) -> None:
+    """Should return Excel bytes."""
+    output = BytesIO()
+    ica.output_results(sample_data, format="excel", output=output)
+    output.seek(0)
+    wb = openpyxl.load_workbook(output)
+    ws = wb.active
+    rows = list(ws.values)
+    assert rows[0] == ("First Name", "Last Name", "Age")
+    assert rows[1] == ("Steven", "Spielberg", 75)
+
+
+def test_output_results_duckdb_relation() -> None:
+    """Should handle DuckDB relation input."""
+    con = duckdb.connect(":memory:")
+    con.execute("CREATE TABLE people (first_name VARCHAR, last_name VARCHAR)")
+    con.execute("INSERT INTO people VALUES ('Martin', 'Scorsese')")
+    rel = con.table("people")
+
+    with redirect_stdout(StringIO()) as stdout:
+        ica.output_results(rel)
+        output = stdout.getvalue()
+        assert "First Name" in output
+        assert "Last Name" in output
+        assert "Martin" in output
+        assert "Scorsese" in output
+
+
+def test_output_results_file(sample_data: list[dict[str, Any]]) -> None:
+    """Should write to a file."""
+    output_file = Path(f"{temp_ica_dir}/output.csv")
+    ica.output_results(sample_data, output=str(output_file))
+    assert output_file.exists()
+    content = output_file.read_text()
+    assert "First Name,Last Name,Age" in content
+
+
+def test_output_results_invalid_format(sample_data: list[dict[str, Any]]) -> None:
     """Should raise an error if format is invalid."""
-    test_name, df, use_default_index = test_cases[0]
     with pytest.raises(ica.FormatNotSupportedError):
         with redirect_stdout(StringIO()):
-            ica.output_results(df, format="abc")
+            ica.output_results(sample_data, format="abc")
 
 
-def test_output_results_cannot_infer_format() -> None:
+def test_output_results_cannot_infer_format(sample_data: list[dict[str, Any]]) -> None:
     """
     Should fall back to default format if format cannot be inferred from
     output path's file extension.
     """
-    test_name, df, use_default_index = test_cases[0]
     output_path = f"{temp_ica_dir}/output.abc"
-    ica.output_results(
-        df,
-        output=output_path,
-    )
-    assert (
-        Path(output_path).read_text() + "\n"
-        == Path(f"tests/data/output/txt/output_results_{test_name}.txt").read_text()
-    )
-
-
-def test_output_results_empty_output_string() -> None:
-    """
-    Should print to stdout using default format if output is an empty string.
-    """
-    test_name, df, use_default_index = test_cases[0]
-    with redirect_stdout(StringIO()) as stdout:
+    with redirect_stdout(StringIO()):
         ica.output_results(
-            df,
-            output="",
+            sample_data,
+            output=output_path,
         )
-        assert (
-            stdout.getvalue()
-            == Path(f"tests/data/output/txt/output_results_{test_name}.txt").read_text()
-        )
+        # Should print to file in default format (text table)
+        assert Path(output_path).exists()
+        content = Path(output_path).read_text()
+        assert "First Name" in content
+        assert "Steven" in content

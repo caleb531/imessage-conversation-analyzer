@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
+from collections import Counter
 from typing import TypedDict
 
 import emoji
-import pandas as pd
 
 import ica
 
@@ -26,12 +26,15 @@ class EmojiMatch(TypedDict):
     match_end: int
 
 
-def get_concatenated_messages(messages: pd.DataFrame) -> str:
+def get_concatenated_messages(data: ica.ConversationData) -> str:
     """
     Retrieve and concatenate all non-reaction message texts into a single string.
     """
-    text = messages[messages["is_reaction"].eq(False)].get("text")
-    return text.str.cat(sep=" ")
+    # Filter reactions
+    rows = data.messages.filter("is_reaction IS NULL").project("text").fetchall()
+    # rows is list of tuples [(text,), (text,), ...]
+    # Filter out None values just in case
+    return " ".join(row[0] for row in rows if row[0])
 
 
 def filter_skin_tones(found_emojis: list[EmojiMatch]) -> list[str]:
@@ -61,7 +64,7 @@ def main() -> None:
         help="the number of emoji results to rank",
     )
     cli_args = cli_parser.parse_args(namespace=MostFrequentEmojisCLIArguments())
-    dfs = ica.get_dataframes(
+    data = ica.get_conversation_data(
         contact_name=cli_args.contact_name,
         timezone=cli_args.timezone,
         from_date=cli_args.from_date,
@@ -69,17 +72,18 @@ def main() -> None:
         from_person=cli_args.from_person,
     )
 
-    full_text = get_concatenated_messages(dfs.messages)
+    full_text = get_concatenated_messages(data)
     found_emojis = emoji.emoji_list(full_text)
     cleaned_emojis = filter_skin_tones(found_emojis)
 
+    # Count emojis
+    counts = Counter(cleaned_emojis)
+
+    # Get top N
+    top_emojis = counts.most_common(cli_args.result_count)
+
     ica.output_results(
-        (
-            pd.DataFrame({"emoji": pd.Series(cleaned_emojis).value_counts()})
-            .rename({"emoji": "count"}, axis="columns")
-            .rename_axis("emoji", axis="index")
-            .head(cli_args.result_count)
-        ),
+        [{"emoji": e, "count": c} for e, c in top_emojis],
         format=cli_args.format,
         output=cli_args.output,
     )

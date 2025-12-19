@@ -90,7 +90,7 @@ ICA includes several built-in analyzers out of the box:
    counts, and the `-r` / `--use-regex` option to enable regular expression mode
    for all phrases you specify
 7. `from_sql`: execute an arbitrary SQL query against the conversation data
-   (messages and attachments), using an in-memory SQLite database
+   (messages and attachments), using an in-memory DuckDB database
 8. `from_prompt`: generates a custom analyzer based on a natural language prompt
    using AI; requires an OpenAI API key via the `--api-key` / `-k` option; you
    can also write the generated SQL query to disk by supplying the `--write` /
@@ -148,8 +148,6 @@ iMessage conversation with one other person.
 ```python
 # get_my_transcript.py
 
-import pandas as pd
-
 import ica
 
 
@@ -162,9 +160,9 @@ def main() -> None:
     cli_args = ica.get_cli_parser().parse_args(
         namespace=ica.TypedCLIArguments()
     )
-    # Retrieve the dataframes corresponding to the processed contents of the
-    # database; dataframes include `messages` and `attachments`
-    dfs = ica.get_dataframes(
+    # Retrieve the relations corresponding to the processed contents of the
+    # database; relations include `messages` and `attachments`
+    data = ica.get_conversation_data(
         contact_name=cli_args.contact_name,
         timezone=cli_args.timezone,
         from_date=cli_args.from_date,
@@ -173,20 +171,17 @@ def main() -> None:
     )
     # Send the results to stdout (or to file) in the given format
     ica.output_results(
-        pd.DataFrame(
-            {
-                "timestamp": dfs.messages["datetime"],
-                "is_from_me": dfs.messages["is_from_me"],
-                "is_reaction": dfs.messages["is_reaction"],
-                # U+FFFC is the object replacement character, which appears as
-                # the textual message for every attachment
-                "message": dfs.messages["text"].replace(
-                    r"\ufffc", "(attachment)", regex=True
-                ),
-            }
+        data.messages.project(
+            """
+            datetime AS timestamp,
+            is_from_me,
+            is_reaction,
+            -- U+FFFC is the object replacement character, which appears as
+            -- the textual message for every attachment
+            regexp_replace(text, '\ufffc', '(attachment)', 'g') AS message
+            """
         ),
-        # The default format (None) corresponds to the pandas default dataframe
-        # table format
+        # The default format (None) corresponds to the default table format
         format=cli_args.format,
         # When output is None (the default), ICA will print to stdout
         output=cli_args.output,
@@ -213,7 +208,7 @@ python -m get_my_transcript -c 'Thomas Riverstone'
 ```
 
 You're not limited to writing a command line program, though! The
-`ica.get_dataframes()` function is the only function you will need in any
+`ica.get_conversation_data()` function is the only function you will need in any
 analyzer program. But beyond that, feel free to import other modules, send your
 results to other processes, or whatever you need to do!
 
@@ -244,17 +239,17 @@ ica totals_by_day -c 'Daniel Brightingale' -t America/New_York
 [iana]: https://data.iana.org/time-zones/tzdb-2021a/zone1970.tab
 
 The equivalent option for the Python API is the `timezone` parameter to
-`ica.get_dataframes`:
+`ica.get_conversation_data`:
 
 ```python
-dfs = ica.get_dataframes(contact_name=my_contact_name, timezone='UTC')
+data = ica.get_conversation_data(contact_name=my_contact_name, timezone='UTC')
 ```
 
 ### Data Schema
 
 All analyzers (including the built-in `from_sql` analyzer and any custom
-analyzers you write) have access to the following dataframes/tables. An object
-with these dataframes are returned by the `ica.get_dataframes()` function in the
+analyzers you write) have access to the following relations/tables. An object
+with these relations are returned by the `ica.get_conversation_data()` function in the
 Python API.
 
 #### `messages`
@@ -263,7 +258,7 @@ Python API.
 | :--- | :--- | :--- |
 | `ROWID` | Integer | The unique identifier of the message |
 | `text` | String | The content of the message |
-| `datetime` | Datetime | The timestamp of the message whose timezone is based on the `timezone` parameter you pass to `get_dataframes()` (defaults to the system's local timezone) |
+| `datetime` | Datetime | The timestamp of the message whose timezone is based on the `timezone` parameter you pass to `get_conversation_data()` (defaults to the system's local timezone) |
 | `is_from_me` | Boolean | Whether the message was sent by you (`True`) or the other person (`False`) |
 | `is_reaction` | Boolean | Whether the message is a reaction (e.g. "Loved ...") |
 

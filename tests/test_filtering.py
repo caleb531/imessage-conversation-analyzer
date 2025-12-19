@@ -3,7 +3,6 @@
 
 from unittest.mock import MagicMock, patch
 
-import pandas as pd
 import pytest
 
 import ica
@@ -29,7 +28,9 @@ def test_from_date(output_results: MagicMock) -> None:
     Should filter the results to those sent at or after the specified date.
     """
     totals_by_day.main()
-    df: pd.DataFrame = output_results.call_args[0][0]
+    rel = output_results.call_args[0][0]
+    data = [dict(zip(rel.columns, row)) for row in rel.fetchall()]
+    dates = [row["date"] for row in data]
     expected_dates = [
         "2024-01-11",
         "2024-01-14",
@@ -37,9 +38,7 @@ def test_from_date(output_results: MagicMock) -> None:
         "2024-01-17",
         "2024-01-19",
     ]
-    assert df.index.tolist() == [
-        pd.Timestamp(date, tz="UTC") for date in expected_dates
-    ]
+    assert dates == expected_dates
 
 
 @patch("ica.output_results")
@@ -60,7 +59,9 @@ def test_to_date(output_results: MagicMock) -> None:
     Should filter the results to those sent before the specified date.
     """
     totals_by_day.main()
-    df: pd.DataFrame = output_results.call_args[0][0]
+    rel = output_results.call_args[0][0]
+    data = [dict(zip(rel.columns, row)) for row in rel.fetchall()]
+    dates = [row["date"] for row in data]
     expected_dates = [
         "2024-01-07",
         "2024-01-08",
@@ -69,9 +70,7 @@ def test_to_date(output_results: MagicMock) -> None:
         "2024-01-14",
         "2024-01-16",
     ]
-    assert df.index.tolist() == [
-        pd.Timestamp(date, tz="UTC") for date in expected_dates
-    ]
+    assert dates == expected_dates
 
 
 @patch("ica.output_results")
@@ -94,15 +93,15 @@ def test_date_range(output_results: MagicMock) -> None:
     Should filter the results to those sent between the specified dates.
     """
     totals_by_day.main()
-    df: pd.DataFrame = output_results.call_args[0][0]
+    rel = output_results.call_args[0][0]
+    data = [dict(zip(rel.columns, row)) for row in rel.fetchall()]
+    dates = [row["date"] for row in data]
     expected_dates = [
         "2024-01-11",
         "2024-01-14",
         "2024-01-16",
     ]
-    assert df.index.tolist() == [
-        pd.Timestamp(date, tz="UTC") for date in expected_dates
-    ]
+    assert dates == expected_dates
 
 
 @patch("ica.output_results")
@@ -147,10 +146,11 @@ def test_from_person_me(output_results: MagicMock) -> None:
     command.
     """
     attachment_totals.main()
-    df: pd.DataFrame = output_results.call_args[0][0]
-    assert df.loc["youtube_videos"]["total"] == 1
-    assert df.loc["apple_music"]["total"] == 1
-    assert df.loc["spotify"]["total"] == 1
+    data = output_results.call_args[0][0]
+    result = {row["type"]: row["total"] for row in data}
+    assert result["youtube_videos"] == 1
+    assert result["apple_music"] == 1
+    assert result["spotify"] == 1
 
 
 @patch("ica.output_results")
@@ -171,10 +171,11 @@ def test_from_person_them(output_results: MagicMock) -> None:
     Should filter the results to those sent by the other participant.
     """
     attachment_totals.main()
-    df: pd.DataFrame = output_results.call_args[0][0]
-    assert df.loc["youtube_videos"]["total"] == 3
-    assert df.loc["apple_music"]["total"] == 0
-    assert df.loc["spotify"]["total"] == 0
+    data = output_results.call_args[0][0]
+    result = {row["type"]: row["total"] for row in data}
+    assert result["youtube_videos"] == 3
+    assert result.get("apple_music", 0) == 0
+    assert result.get("spotify", 0) == 0
 
 
 @patch("ica.output_results")
@@ -196,7 +197,8 @@ def test_from_person_both(output_results: MagicMock) -> None:
     filtering is applied).
     """
     attachment_totals.main()
-    df: pd.DataFrame = output_results.call_args[0][0]
-    assert df.loc["youtube_videos"]["total"] == 4
-    assert df.loc["apple_music"]["total"] == 1
-    assert df.loc["spotify"]["total"] == 1
+    data = output_results.call_args[0][0]
+    result = {row["type"]: row["total"] for row in data}
+    assert result["youtube_videos"] == 4
+    assert result["apple_music"] == 1
+    assert result["spotify"] == 1

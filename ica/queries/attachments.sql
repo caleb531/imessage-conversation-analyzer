@@ -3,7 +3,7 @@ SELECT
     "mime_type",
     "filename",
     "message_id",
-    datetime("message"."date" / 1000000000 + strftime("%s", "2001-01-01") ,"unixepoch") as "datetime",
+    "date",
     "is_from_me"
 FROM "attachment"
 INNER JOIN "message_attachment_join"
@@ -19,16 +19,7 @@ WHERE
             -- Get all chats with the specified phone number
             SELECT "chat"."ROWID"
             FROM "chat"
-            WHERE :chat_identifiers LIKE (
-                '%'
-                ||
-                :chat_identifier_delimiter
-                ||
-                "chat_identifier"
-                ||
-                :chat_identifier_delimiter
-                ||
-                '%'
-            )
+            WHERE CAST(chat_identifier AS VARCHAR) IN (SELECT unnest(string_split(?, '|')))
         )
     )
+ORDER BY "date" ASC

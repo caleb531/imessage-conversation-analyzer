@@ -49,6 +49,18 @@ def get_mock_data_for_db(
         )
 
 
+def infer_sqlite_type(key: str, value: Any) -> str:
+    if key == "attributedBody":
+        return "BLOB"
+    if isinstance(value, int):
+        return "INTEGER"
+    if isinstance(value, float):
+        return "REAL"
+    if isinstance(value, bytes):
+        return "BLOB"
+    return "TEXT"
+
+
 def create_mock_db(db_name: MockDatabaseName, db_path: Path) -> None:
     """Create and populate a mock database with the given name and path"""
     with sqlite3.connect(db_path) as con:
@@ -56,7 +68,11 @@ def create_mock_db(db_name: MockDatabaseName, db_path: Path) -> None:
             if not len(records):
                 continue
             cur = con.cursor()
-            cur.execute(f"CREATE TABLE {table_name}({', '.join(records[0].keys())})")
+            columns = [
+                f"{key} {infer_sqlite_type(key, value)}"
+                for key, value in records[0].items()
+            ]
+            cur.execute(f"CREATE TABLE {table_name}({', '.join(columns)})")
             key_placeholders = ", ".join(f":{key}" for key in records[0].keys())
             cur.executemany(
                 f"INSERT INTO {table_name} VALUES({key_placeholders})", records

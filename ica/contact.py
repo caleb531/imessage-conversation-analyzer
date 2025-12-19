@@ -7,7 +7,6 @@ import sqlite3
 from pathlib import Path
 from typing import Optional
 
-import pandas as pd
 import phonenumbers
 
 from ica.exceptions import ContactNotFoundError
@@ -62,28 +61,22 @@ def get_chat_identifiers(contact_name: str) -> list[str]:
     # databases and combine the separate results into a single result set
     for db_path in glob.iglob(str(DB_GLOB)):
         with sqlite3.connect(f"file:{db_path}?mode=ro", uri=True) as con:
-            rows = pd.read_sql_query(
-                sql=importlib.resources.files("ica")
+            con.row_factory = sqlite3.Row
+            cur = con.cursor()
+            query = (
+                importlib.resources.files("ica")
                 .joinpath(os.path.join("queries", "contact.sql"))
-                .read_text(),
-                con=con,
-                params={"contact_name": contact_name},
+                .read_text()
             )
+            cur.execute(query, {"contact_name": contact_name})
+            rows = cur.fetchall()
+
             # Combine the results
-            chat_identifiers.update(
-                rows["ZFULLNUMBER"]
-                .apply(normalize_phone_number)
-                # The normalization function will convert empty strings to None
-                # so that we can filter them out with dropna()
-                .dropna()
-            )
-            chat_identifiers.update(
-                rows["ZADDRESS"]
-                .apply(normalize_email_address)
-                # The normalization function will convert empty strings to None
-                # so that we can filter them out with dropna()
-                .dropna()
-            )
+            for row in rows:
+                if phone := normalize_phone_number(row["ZFULLNUMBER"]):
+                    chat_identifiers.add(phone)
+                if email := normalize_email_address(row["ZADDRESS"]):
+                    chat_identifiers.add(email)
 
     # Quit if the contact with the specified name could not be found
     if not len(chat_identifiers):

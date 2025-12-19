@@ -5,8 +5,6 @@ import json
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-import pandas as pd
-
 import ica.analyzers.most_frequent_emojis as most_frequent_emojis
 
 
@@ -16,8 +14,9 @@ def test_most_frequent_emojis(output_results: MagicMock) -> None:
     """Should compute the most frequently-used emojis."""
     most_frequent_emojis.__package__ = "ica"
     most_frequent_emojis.main()
-    df: pd.DataFrame = output_results.call_args[0][0]
-    assert df.to_dict("index") == json.loads(
+    data = output_results.call_args[0][0]
+    result = {item["emoji"]: {"count": item["count"]} for item in data}
+    assert result == json.loads(
         Path("tests/data/most_frequent_emojis.json").read_text()
     )
 
@@ -34,8 +33,9 @@ def test_most_frequent_emojis_result_count(output_results: MagicMock) -> None:
     """
     most_frequent_emojis.__package__ = "ica"
     most_frequent_emojis.main()
-    df: pd.DataFrame = output_results.call_args[0][0]
-    assert df.to_dict("index") == {
+    data = output_results.call_args[0][0]
+    result = {item["emoji"]: {"count": item["count"]} for item in data}
+    assert result == {
         k: v
         for k, v in json.loads(
             Path("tests/data/most_frequent_emojis.json").read_text()
@@ -50,5 +50,6 @@ def test_skin_tones(output_results: MagicMock) -> None:
     """Should disregard skin tones when counting emojis."""
     most_frequent_emojis.__package__ = "ica"
     most_frequent_emojis.main()
-    df: pd.DataFrame = output_results.call_args[0][0]
-    assert df.loc["👍"]["count"] == 6
+    data = output_results.call_args[0][0]
+    count = next((item["count"] for item in data if item["emoji"] == "👍"), 0)
+    assert count == 6

@@ -13,6 +13,7 @@ from pathlib import Path
 from tempfile import gettempdir
 from unittest.mock import patch
 
+import duckdb
 import pytest
 
 from tests.mock_db_utils import create_mock_db
@@ -22,6 +23,28 @@ temp_ica_dir = Path(gettempdir()) / "ica"
 mock_contacts_db_glob = temp_ica_dir / "*.abcddb"
 mock_contacts_db_path = mock_contacts_db_glob.with_name("addressbook.abcddb")
 mock_chats_db_path = temp_ica_dir / "chat.db"
+
+
+@pytest.fixture(autouse=True)
+def keep_duckdb_connections_alive() -> Generator[None, None, None]:
+    """
+    Keep DuckDB connections alive during tests to prevent them from being
+    garbage collected and closed before the test can inspect the results.
+    """
+    connections = []
+    original_connect = duckdb.connect
+
+    def mock_connect(*args, **kwargs):
+        con = original_connect(*args, **kwargs)
+        connections.append(con)
+        return con
+
+    with patch("duckdb.connect", side_effect=mock_connect):
+        yield
+
+    for con in connections:
+        with contextlib.suppress(Exception):
+            con.close()
 
 
 @pytest.fixture(autouse=True)

@@ -112,7 +112,7 @@ def main() -> None:
 
     print("Running query...")
 
-    dfs = ica.get_dataframes(
+    data = ica.get_conversation_data(
         contact_name=cli_args.contact_name,
         timezone=cli_args.timezone,
         from_date=cli_args.from_date,
@@ -121,16 +121,21 @@ def main() -> None:
     )
 
     # Execute the query and print the resulting dataframe to stdout
-    with ica.get_sql_connection(dfs) as con:
-        try:
-            result_df = ica.execute_sql_query(query, con=con)
-            ica.output_results(
-                result_df,
-                format=cli_args.format,
-                output=cli_args.output,
-            )
-        except Exception as error:
-            print(f"Error executing query: {error}", file=sys.stderr)
+    con = ica.get_sql_connection(data)
+
+    # Register views for messages and attachments so user can query them
+    data.messages.create_view("messages", replace=True)
+    data.attachments.create_view("attachments", replace=True)
+
+    try:
+        result_rel = ica.execute_sql_query(query, con=con)
+        ica.output_results(
+            result_rel,
+            format=cli_args.format,
+            output=cli_args.output,
+        )
+    except Exception as error:
+        print(f"Error executing query: {error}", file=sys.stderr)
 
 
 if __name__ == "__main__":

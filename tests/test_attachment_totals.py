@@ -3,9 +3,14 @@
 
 from unittest.mock import MagicMock, patch
 
-import pandas as pd
-
 import ica.analyzers.attachment_totals as attachment_totals
+
+
+def get_total(data: list[dict], type_name: str) -> int:
+    for item in data:
+        if item["type"] == type_name:
+            return item["total"]
+    return -1
 
 
 @patch("ica.output_results")
@@ -13,8 +18,8 @@ import ica.analyzers.attachment_totals as attachment_totals
 def test_gif_count(output_results: MagicMock) -> None:
     """Should count the number of GIFs for a conversation."""
     attachment_totals.main()
-    df: pd.DataFrame = output_results.call_args[0][0]
-    assert df.loc["gifs"]["total"] == 1
+    data = output_results.call_args[0][0]
+    assert get_total(data, "gifs") == 1
 
 
 @patch("ica.output_results")
@@ -22,8 +27,8 @@ def test_gif_count(output_results: MagicMock) -> None:
 def test_youtube_video_count(output_results: MagicMock) -> None:
     """Should count the number of YouTube videos for a conversation."""
     attachment_totals.main()
-    df: pd.DataFrame = output_results.call_args[0][0]
-    assert df.loc["youtube_videos"]["total"] == 4
+    data = output_results.call_args[0][0]
+    assert get_total(data, "youtube_videos") == 4
 
 
 @patch("ica.output_results")
@@ -31,8 +36,8 @@ def test_youtube_video_count(output_results: MagicMock) -> None:
 def test_apple_music_count(output_results: MagicMock) -> None:
     """Should count the number of Apple Music links for a conversation."""
     attachment_totals.main()
-    df: pd.DataFrame = output_results.call_args[0][0]
-    assert df.loc["apple_music"]["total"] == 1
+    data = output_results.call_args[0][0]
+    assert get_total(data, "apple_music") == 1
 
 
 @patch("ica.output_results")
@@ -40,5 +45,5 @@ def test_apple_music_count(output_results: MagicMock) -> None:
 def test_spotify_count(output_results: MagicMock) -> None:
     """Should count the number of Spotify links for a conversation."""
     attachment_totals.main()
-    df: pd.DataFrame = output_results.call_args[0][0]
-    assert df.loc["spotify"]["total"] == 1
+    data = output_results.call_args[0][0]
+    assert get_total(data, "spotify") == 1

@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """test the transcript built-in analyzer"""
 
+import json
+from pathlib import Path
 from typing import Any
 from unittest.mock import patch
 
-import pandas as pd
 import pytest
 
 import ica.analyzers.transcript as transcript
@@ -21,7 +22,17 @@ def test_transcripts(transcript_num: Any, contact_name: str) -> None:
         patch("sys.argv", [transcript.__file__, "-c", contact_name, "-t", "UTC"]),
     ):
         transcript.main()
-        df: pd.DataFrame = output_results.call_args[0][0]
-        assert df.to_dict(orient="records") == pd.read_json(
-            f"tests/data/transcript-{transcript_num}.json"
-        ).to_dict(orient="records")
+        rel = output_results.call_args[0][0]
+        data = [dict(zip(rel.columns, row)) for row in rel.fetchall()]
+
+        expected = json.loads(
+            Path(f"tests/data/transcript-{transcript_num}.json").read_text()
+        )
+
+        # Normalize timestamps
+        for item in data:
+            ts = item["timestamp"]
+            # Match the JSON format: 2024-01-07T16:49:39.000Z
+            item["timestamp"] = ts.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+
+        assert data == expected

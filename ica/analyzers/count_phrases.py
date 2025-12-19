@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 
 import re
-import typing
-
-import pandas as pd
 
 import ica
 
@@ -16,25 +13,62 @@ class CountPhrasesArgumentParser(ica.TypedCLIArguments):
     case_sensitive: bool
 
 
-# class CountPhrasesArgumentParser(ica.ICAArgumentParser):
-#     pass
-
-
 def get_phrase_counts(
-    messages_df: pd.DataFrame,
+    data: ica.ConversationData,
     phrases: list[str],
     use_regex: bool = False,
     case_sensitive: bool = False,
-) -> typing.Generator[int, None, None]:
-    return (
-        messages_df["text"]
-        .str.count(
-            re.escape(phrase) if use_regex else phrase,
-            flags=re.IGNORECASE if not case_sensitive else 0,
+) -> list[dict]:
+    results = []
+
+    messages_filtered = data.messages.filter("is_reaction IS NULL")
+
+    for phrase in phrases:
+        pattern = phrase
+        if not use_regex:
+            pattern = re.escape(pattern)
+
+        if not case_sensitive:
+            pattern = f"(?i){pattern}"
+
+        # DuckDB query
+        # We need to sum the count of matches per row
+        # sum(len(regexp_extract_all(text, ?)))
+
+        pattern_sql = pattern.replace("'", "''")
+
+        # Total
+        res = messages_filtered.aggregate(
+            f"sum(len(regexp_extract_all(text, '{pattern_sql}')))"
+        ).fetchone()
+        total = (res[0] if res else 0) or 0
+
+        # From me
+        res = (
+            messages_filtered.filter("is_from_me = true")
+            .aggregate(f"sum(len(regexp_extract_all(text, '{pattern_sql}')))")
+            .fetchone()
         )
-        .sum()
-        for phrase in phrases
-    )
+        from_me = (res[0] if res else 0) or 0
+
+        # From them
+        res = (
+            messages_filtered.filter("is_from_me = false")
+            .aggregate(f"sum(len(regexp_extract_all(text, '{pattern_sql}')))")
+            .fetchone()
+        )
+        from_them = (res[0] if res else 0) or 0
+
+        results.append(
+            {
+                "phrase": phrase,
+                "count": total,
+                "count_from_me": from_me,
+                "count_from_them": from_them,
+            }
+        )
+
+    return results
 
 
 def main() -> None:
@@ -53,36 +87,23 @@ def main() -> None:
         help="if specified, treats phrases as case-sensitive",
     )
     cli_args = cli_parser.parse_args(namespace=CountPhrasesArgumentParser())
-    dfs = ica.get_dataframes(
+    data = ica.get_conversation_data(
         contact_name=cli_args.contact_name,
         timezone=cli_args.timezone,
         from_date=cli_args.from_date,
         to_date=cli_args.to_date,
         from_person=cli_args.from_person,
     )
-    filtered_messages = dfs.messages[~dfs.messages["is_reaction"]]
+
+    results = get_phrase_counts(
+        data,
+        cli_args.phrases,
+        use_regex=cli_args.use_regex,
+        case_sensitive=cli_args.case_sensitive,
+    )
 
     ica.output_results(
-        (
-            pd.DataFrame(
-                {
-                    "phrase": cli_args.phrases,
-                    "count": get_phrase_counts(
-                        filtered_messages,
-                        cli_args.phrases,
-                        case_sensitive=cli_args.case_sensitive,
-                    ),
-                    "count_from_me": get_phrase_counts(
-                        filtered_messages[filtered_messages["is_from_me"].eq(True)],
-                        cli_args.phrases,
-                    ),
-                    "count_from_them": get_phrase_counts(
-                        filtered_messages[filtered_messages["is_from_me"].eq(False)],
-                        cli_args.phrases,
-                    ),
-                }
-            ).set_index("phrase")
-        ),
+        results,
         format=cli_args.format,
         output=cli_args.output,
         prettify_index=False,
