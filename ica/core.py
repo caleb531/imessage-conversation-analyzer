@@ -13,6 +13,7 @@ from io import BytesIO, StringIO
 from pathlib import Path
 from typing import Hashable, Optional, Union
 
+import duckdb
 import pandas as pd
 import tzlocal
 from typedstream.stream import TypedStreamReader
@@ -363,25 +364,23 @@ def output_results(
 @contextmanager
 def get_sql_connection(
     dfs: DataFrameNamespace,
-) -> Generator[sqlite3.Connection, None, None]:
+) -> Generator[duckdb.DuckDBPyConnection, None, None]:
     """
-    Create an in-memory SQLite database containing all ICA dataframes, and yield
-    a connection to that database
+    Create an in-memory DuckDB database containing all ICA dataframes, and yield
+    a connection to that database; using DuckDB over sqlite3 ensures that the
+    data is exposed virtually rather than copied, improving performance for
+    large conversations
     """
-    with sqlite3.connect(":memory:") as con:
-        dfs.messages.to_sql("messages", con, index=False)
-        dfs.attachments.to_sql("attachments", con, index=False)
+    with duckdb.connect(":memory:") as con:
+        con.register("messages", dfs.messages)
+        con.register("attachments", dfs.attachments)
         yield con
 
 
 # Execute an arbitrary SQL query against the database of all ICA dataframes
-def execute_sql_query(query: str, con: sqlite3.Connection) -> pd.DataFrame:
+def execute_sql_query(query: str, con: duckdb.DuckDBPyConnection) -> pd.DataFrame:
     """
     Execute the given arbitrary SQL query, provided a connection to the
-    in-memory SQLite database created by ica.get_sql_connection()
+    in-memory DuckDB database created by ica.get_sql_connection()
     """
-    return pd.read_sql_query(
-        sql=query,
-        con=con,
-        parse_dates={"datetime": "ISO8601"},
-    )
+    return con.execute(query).df()

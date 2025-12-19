@@ -81,7 +81,7 @@ def test_from_sql_error(
         from_sql.main()
 
     assert "Error executing query" in err.getvalue()
-    assert "no such table: non_existent_table" in err.getvalue()
+    assert "Table with name non_existent_table does not exist" in err.getvalue()
 
 
 @patch("ica.get_dataframes")
