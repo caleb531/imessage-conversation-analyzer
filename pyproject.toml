@@ -22,6 +22,7 @@ dependencies = [
     "openai>=1.102.0",
     "emoji>=2.15.0",
     "duckdb>=1.4.3",
+    "numpy>=2.0.2",
 ]
 
 [project.urls]
