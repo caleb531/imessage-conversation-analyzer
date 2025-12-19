@@ -224,6 +224,14 @@ def get_conversation_data(
     messages = get_messages_relation(con, chat_identifiers, timezone)
     attachments = get_attachments_relation(con, chat_identifiers, timezone)
 
+    # Materialize the relations into in-memory DuckDB tables to avoid re-running
+    # the expensive Python UDF and Regex for every subsequent query
+    con.sql("CREATE TEMPORARY TABLE messages_base AS SELECT * FROM messages")
+    messages = con.table("messages_base")
+
+    con.sql("CREATE TEMPORARY TABLE attachments_base AS SELECT * FROM attachments")
+    attachments = con.table("attachments_base")
+
     # Check if conversation exists (efficiently)
     res = messages.count("ROWID").fetchone()
     count = res[0] if res else 0
