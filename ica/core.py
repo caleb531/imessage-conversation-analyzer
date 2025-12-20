@@ -9,13 +9,15 @@ import sys
 from collections.abc import Generator
 from contextlib import contextmanager
 from dataclasses import dataclass
+from datetime import datetime
 from io import BytesIO, StringIO
 from pathlib import Path
 from typing import Hashable, Optional, Union
 
 import duckdb
-import pandas as pd
+import polars as pl
 import tzlocal
+from tabulate import tabulate
 from typedstream.stream import TypedStreamReader
 
 import ica.contact as contact
@@ -50,8 +52,8 @@ class DataFrameNamespace:
     the chat database
     """
 
-    messages: pd.DataFrame
-    attachments: pd.DataFrame
+    messages: pl.DataFrame
+    attachments: pl.DataFrame
 
 
 def get_chat_identifier_str(chat_identifiers: list[str]) -> str:
@@ -87,110 +89,130 @@ def get_messages_dataframe(
     con: sqlite3.Connection,
     chat_identifiers: list[str],
     timezone: Optional[str] = None,
-) -> pd.DataFrame:
+) -> pl.DataFrame:
     """
-    Return a pandas dataframe representing all messages in a particular
+    Return a polars dataframe representing all messages in a particular
     conversation (identified by the given phone number or email address)
     """
     # If no IANA timezone name is specified, default to the name of the system's
     # local timezone
     if not timezone:
         timezone = tzlocal.get_localzone().key
-    return (
-        pd.read_sql_query(
-            sql=importlib.resources.files("ica")
-            .joinpath(os.path.join("queries", "messages.sql"))
-            .read_text(),
-            con=con,
-            params={
-                "chat_identifiers": get_chat_identifier_str(chat_identifiers),
-                "chat_identifier_delimiter": CHAT_IDENTIFIER_DELIMITER,
-            },
-            parse_dates={"datetime": "ISO8601"},
-        )
+
+    query_template = (
+        importlib.resources.files("ica")
+        .joinpath(os.path.join("queries", "messages.sql"))
+        .read_text()
+    )
+    # Manually interpolate parameters since pl.read_database doesn't support
+    # parameterized queries for sqlite3 connections
+    query = query_template.replace(
+        ":chat_identifiers", f"'{get_chat_identifier_str(chat_identifiers)}'"
+    ).replace(":chat_identifier_delimiter", f"'{CHAT_IDENTIFIER_DELIMITER}'")
+
+    df = (
+        pl.read_database(query=query, connection=con)
         # SQL provides each date/time as a Unix timestamp (which is implicitly
-        # UTC), but the timestamp is timezone-naive when parsed by pandas; so
-        # first, we must add the missing timezone information, then we must
-        # convert the datetime to the specified timezone
-        .assign(
-            datetime=lambda df: df["datetime"]
-            .dt.tz_localize("UTC")
-            .dt.tz_convert(timezone)
+        # UTC), but the timestamp is timezone-naive when parsed; so first, we
+        # must add the missing timezone information, then we must convert the
+        # datetime to the specified timezone
+        .with_columns(
+            pl.col("datetime")
+            .str.to_datetime()
+            .dt.replace_time_zone("UTC")
+            .dt.convert_time_zone(timezone)
         )
-        # Decode any 'attributedBody' values and merge them into the 'text'
-        # column
-        .assign(
-            text=lambda df: df["text"].fillna(
-                df["attributedBody"].apply(decode_message_attributedbody)
-            )
+    )
+
+    # Decode any 'attributedBody' values and merge them into the 'text' column
+    # Optimization: Only run the expensive decoding on rows where 'text' is null
+    # and 'attributedBody' is present
+    df_text_ok = df.filter(pl.col("text").is_not_null())
+    df_text_null = df.filter(pl.col("text").is_null())
+
+    if not df_text_null.is_empty():
+        df_text_null = df_text_null.with_columns(
+            pl.col("attributedBody")
+            .map_elements(decode_message_attributedbody, return_dtype=pl.Utf8)
+            .alias("text")
         )
+
+    return (
+        pl.concat([df_text_ok, df_text_null])
         # Remove 'attributedBody' column now that it has been merged into the
         # 'text' column
-        .drop("attributedBody", axis="columns")
+        .drop("attributedBody")
         # Use a regex-based heuristic to determine which messages are reactions
-        .assign(
-            is_reaction=lambda df: df["text"].str.match(
+        .with_columns(
+            is_reaction=pl.col("text").str.contains(
                 r"^(Loved|Liked|Disliked|Laughed at|Emphasized|Questioned|Reacted)"
                 r" (“(.*?)”|an \w+|(.*?) to “(.*?)”)$"
             )
         )
         # Convert 'is_from_me' values from integers to proper booleans
-        .assign(is_from_me=lambda df: df["is_from_me"].astype(bool))
+        .with_columns(is_from_me=pl.col("is_from_me").cast(pl.Boolean))
     )
 
 
 def filter_dataframe(
-    df: pd.DataFrame,
+    df: pl.DataFrame,
     from_date: Optional[str] = None,
     to_date: Optional[str] = None,
     from_person: Optional[str] = None,
-) -> pd.DataFrame:
+) -> pl.DataFrame:
     """
     Return a copy of the messages dataframe that has been filtered by the
     user-supplied filters
     """
 
     # Raise an exception if the 'from' date is after the 'to' date
-    if from_date and to_date and pd.Timestamp(from_date) > pd.Timestamp(to_date):
+    if (
+        from_date
+        and to_date
+        and datetime.fromisoformat(from_date) > datetime.fromisoformat(to_date)
+    ):
         raise DateRangeInvalidError("Date range is backwards")
 
-    return (
-        df.pipe(lambda df: df[df["is_from_me"].eq(True)] if from_person == "me" else df)
-        .pipe(
-            lambda df: (df[df["is_from_me"].eq(False)] if from_person == "them" else df)
-        )
-        .pipe(lambda df: df[df["datetime"] >= from_date] if from_date else df)
-        .pipe(lambda df: df[df["datetime"] <= to_date] if to_date else df)
-    )
+    if from_person == "me":
+        df = df.filter(pl.col("is_from_me"))
+    elif from_person == "them":
+        df = df.filter(~pl.col("is_from_me"))
+
+    if from_date:
+        df = df.filter(pl.col("datetime") >= pl.lit(from_date).str.to_datetime())
+    if to_date:
+        df = df.filter(pl.col("datetime") <= pl.lit(to_date).str.to_datetime())
+
+    return df
 
 
 def get_attachments_dataframe(
     con: sqlite3.Connection,
     chat_identifiers: list[str],
     timezone: Optional[str] = None,
-) -> pd.DataFrame:
+) -> pl.DataFrame:
     """
-    Return a pandas dataframe representing all attachments in a particular
+    Return a polars dataframe representing all attachments in a particular
     conversation (identified by the given phone number)
     """
+    query_template = (
+        importlib.resources.files("ica")
+        .joinpath(os.path.join("queries", "attachments.sql"))
+        .read_text()
+    )
+    query = query_template.replace(
+        ":chat_identifiers", f"'{get_chat_identifier_str(chat_identifiers)}'"
+    ).replace(":chat_identifier_delimiter", f"'{CHAT_IDENTIFIER_DELIMITER}'")
+
     return (
-        pd.read_sql_query(
-            sql=importlib.resources.files("ica")
-            .joinpath(os.path.join("queries", "attachments.sql"))
-            .read_text(),
-            con=con,
-            params={
-                "chat_identifiers": get_chat_identifier_str(chat_identifiers),
-                "chat_identifier_delimiter": CHAT_IDENTIFIER_DELIMITER,
-            },
-            parse_dates={"datetime": "ISO8601"},
-        )
+        pl.read_database(query=query, connection=con)
         # Expose the date/time of the message alongside each attachment record,
         # for convenience
-        .assign(
-            datetime=lambda df: df["datetime"]
-            .dt.tz_localize("UTC")
-            .dt.tz_convert(timezone)
+        .with_columns(
+            pl.col("datetime")
+            .str.to_datetime()
+            .dt.replace_time_zone("UTC")
+            .dt.convert_time_zone(timezone)
         )
     )
 
@@ -211,7 +233,7 @@ def get_dataframes(
             messages=get_messages_dataframe(con, chat_identifiers, timezone),
             attachments=get_attachments_dataframe(con, chat_identifiers, timezone),
         )
-        if dfs.messages.empty:
+        if dfs.messages.is_empty():
             raise ConversationNotFoundError(
                 f'No conversation found for the contact "{contact_name}"'
             )
@@ -254,28 +276,21 @@ def infer_format_from_output_file_path(output: Optional[str]) -> Optional[str]:
     return ext
 
 
-def make_dataframe_tz_naive(df: pd.DataFrame) -> pd.DataFrame:
+def make_dataframe_tz_naive(df: pl.DataFrame) -> pl.DataFrame:
     """
     Convert all of the datetime timstamps in the given dataframe to be
-    timezone-naive, including all columns and the index
+    timezone-naive, including all columns
     """
-    return df.pipe(
-        lambda df: (
-            df.set_index(df.index.tz_localize(None))
-            if isinstance(df.index, pd.DatetimeIndex)
-            else df
-        )
-    ).assign(
-        **{
-            col: df[col].dt.tz_localize(None)
-            for col in df.select_dtypes(include=["datetime64[ns, UTC]"])
-        }
+    return df.with_columns(
+        pl.col(col).dt.replace_time_zone(None)
+        for col, dtype in zip(df.columns, df.dtypes)
+        if isinstance(dtype, pl.Datetime) and dtype.time_zone is not None
     )
 
 
 def prepare_df_for_output(
-    df: pd.DataFrame, prettify_index: bool = True
-) -> pd.DataFrame:
+    df: pl.DataFrame, prettify_index: bool = True
+) -> pl.DataFrame:
     """
     Prepare the given dataframe for output by prettifying column names,
     stripping timezone details incompatible with Excel, and other normalization
@@ -283,24 +298,17 @@ def prepare_df_for_output(
     """
     return (
         df.rename(
-            # Prettify header column (i.e. textual values in first column)
-            index=prettify_header_name if prettify_index else None,
             # Prettify header row (i.e. column names)
-            columns=prettify_header_name,
+            {col: prettify_header_name(col) for col in df.columns}
         )
-        # Prettify index column name
-        .rename_axis(prettify_header_name(df.index.name), axis="index")
-        # Make all indices start from 1 instead of 0, but only if the index is
-        # the default (rather than a custom column)
-        .pipe(lambda df: df.set_index(df.index + 1 if not df.index.name else df.index))
         # Make dataframe timestamps timezone-naive (which is required for
         # exporting to Excel)
-        .pipe(lambda df: make_dataframe_tz_naive(df))
+        .pipe(make_dataframe_tz_naive)
     )
 
 
 def output_results(
-    analyzer_df: pd.DataFrame,
+    analyzer_df: pl.DataFrame,
     format: Optional[str] = None,
     output: Union[str, StringIO, BytesIO, None] = None,
     prettify_index: bool = True,
@@ -308,7 +316,6 @@ def output_results(
     """
     Print the dataframe provided by an analyzer module
     """
-    is_default_index = not analyzer_df.index.name
     output_df = prepare_df_for_output(analyzer_df, prettify_index=prettify_index)
 
     if format and format not in {
@@ -330,29 +337,29 @@ def output_results(
         output_not_specified = True
         output = StringIO()
 
-    # Keyword arguments passed to any of the to_* output methods
-    output_args: dict = {"index": not is_default_index}
-
     # Output executed DataFrame to correct format
     if format in ("xlsx", "excel"):
-        output_df.to_excel(output, **output_args)
+        output_df.write_excel(output)
     elif format == "csv":
-        output_df.to_csv(output, **output_args)
+        output_df.write_csv(output)
     elif format in ("md", "markdown"):
-        output_df.to_markdown(output, **output_args)
+        # Polars doesn't have to_markdown, so we use tabulate
+        if isinstance(output, (StringIO, BytesIO)):
+            output.write(
+                tabulate(output_df.to_dicts(), headers="keys", tablefmt="github")
+            )
+        else:
+            with open(output, "w") as f:
+                f.write(
+                    tabulate(output_df.to_dicts(), headers="keys", tablefmt="github")
+                )
     else:
-        (
-            output_df
-            # When we output the dataframe with to_string(), if the index has a
-            # name, it will be displayed on a separate line underneath the line
-            # with the column names; this is because space needs to be reserved
-            # for the columns axis name; to solve this, we can make the name of
-            # the index the name of the columns axis, then remove the name from
-            # the index (source: <https://stackoverflow.com/a/43635736/560642>)
-            .rename_axis(output_df.index.name, axis="columns")
-            .rename_axis(None, axis="index")
-            .to_string(output, index=True, line_width=100000)
-        )
+        # Default output
+        if isinstance(output, (StringIO, BytesIO)):
+            output.write(str(output_df))
+        else:
+            with open(output, "w") as f:
+                f.write(str(output_df))
 
     # Print output if no output file path was supplied
     if output_not_specified and type(output) is BytesIO:
@@ -378,9 +385,9 @@ def get_sql_connection(
 
 
 # Execute an arbitrary SQL query against the database of all ICA dataframes
-def execute_sql_query(query: str, con: duckdb.DuckDBPyConnection) -> pd.DataFrame:
+def execute_sql_query(query: str, con: duckdb.DuckDBPyConnection) -> pl.DataFrame:
     """
     Execute the given arbitrary SQL query, provided a connection to the
     in-memory DuckDB database created by ica.get_sql_connection()
     """
-    return con.execute(query).df()
+    return con.execute(query).pl()
