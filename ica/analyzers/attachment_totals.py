@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 
 
-import pandas as pd
+import polars as pl
 
 import ica
 
 
 # Count the number of occurrences of the given regular expression pattern within
 # the provided Series
-def count_occurrences(series: pd.Series, pattern: str) -> int:
-    return series.str.count(pattern).sum()
+def count_occurrences(series: pl.Series, pattern: str) -> int:
+    # Use str.count_matches for regex counting in Polars
+    return series.str.count_matches(pattern).sum()
 
 
 def main() -> None:
@@ -26,29 +27,37 @@ def main() -> None:
         from_person=cli_args.from_person,
     )
 
-    is_reaction = dfs.messages["is_reaction"]
+    # Filter out reactions
+    messages_no_reactions = dfs.messages.filter(~pl.col("is_reaction"))
+
     totals_map = {
-        "gifs": dfs.attachments["mime_type"].eq("image/gif").sum(),
+        "gifs": dfs.attachments.filter(pl.col("mime_type") == "image/gif").height,
         "youtube_videos": count_occurrences(
-            dfs.messages[is_reaction.eq(False)]["text"],
+            messages_no_reactions["text"],
             r"(https?://(?:www\.)(?:youtube\.com|youtu\.be)/(?:.*?)(?:\s|$))",
         ),
         "apple_music": count_occurrences(
-            dfs.messages[is_reaction.eq(False)]["text"],
+            messages_no_reactions["text"],
             r"(https?://(?:music\.apple\.com)/(?:.*?)(?:\s|$))",
         ),
         "spotify": count_occurrences(
-            dfs.messages[is_reaction.eq(False)]["text"],
+            messages_no_reactions["text"],
             r"(https?://(?:open\.spotify\.com)/(?:.*?)(?:\s|$))",
         ),
-        "audio_messages": (dfs.attachments["filename"].str.endswith(".caf").sum()),
-        "audio_files": (dfs.attachments["filename"].str.endswith(".m4a").sum()),
-        "recorded_videos": (dfs.attachments["mime_type"].eq("video/quicktime").sum()),
+        "audio_messages": (
+            dfs.attachments.filter(pl.col("filename").str.ends_with(".caf")).height
+        ),
+        "audio_files": (
+            dfs.attachments.filter(pl.col("filename").str.ends_with(".m4a")).height
+        ),
+        "recorded_videos": (
+            dfs.attachments.filter(pl.col("mime_type") == "video/quicktime").height
+        ),
     }
     ica.output_results(
-        pd.DataFrame({"type": totals_map.keys(), "total": totals_map.values()})
-        .set_index("type")
-        .sort_values(by="total", ascending=False),
+        pl.DataFrame(
+            {"type": list(totals_map.keys()), "total": list(totals_map.values())}
+        ).sort("total", descending=True),
         format=cli_args.format,
         output=cli_args.output,
     )

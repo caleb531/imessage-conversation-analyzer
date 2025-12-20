@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import pandas as pd
+import polars as pl
 
 import ica
 
@@ -9,7 +9,7 @@ def convert_bool_to_yesno(value: bool) -> str:
     """
     Convert a boolean value to "Yes"/"No"
     """
-    return str(value).replace("True", "Yes").replace("False", "No")
+    return "Yes" if value else "No"
 
 
 def main() -> None:
@@ -26,16 +26,20 @@ def main() -> None:
         from_person=cli_args.from_person,
     )
     ica.output_results(
-        pd.DataFrame(
+        pl.DataFrame(
             {
                 "timestamp": dfs.messages["datetime"],
                 # Convert 1/0 to Yes/No
-                "is_from_me": dfs.messages["is_from_me"].apply(convert_bool_to_yesno),
-                "is_reaction": dfs.messages["is_reaction"].apply(convert_bool_to_yesno),
+                "is_from_me": dfs.messages["is_from_me"].map_elements(
+                    convert_bool_to_yesno, return_dtype=pl.Utf8
+                ),
+                "is_reaction": dfs.messages["is_reaction"].map_elements(
+                    convert_bool_to_yesno, return_dtype=pl.Utf8
+                ),
                 # U+FFFC is the object replacement character, which appears as the
                 # textual message for every attachment
-                "message": dfs.messages["text"].replace(
-                    r"\ufffc", "(attachment)", regex=True
+                "message": dfs.messages["text"].str.replace_all(
+                    r"\ufffc", "(attachment)"
                 ),
             }
         ),

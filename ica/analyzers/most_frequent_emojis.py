@@ -3,7 +3,7 @@
 from typing import TypedDict
 
 import emoji
-import pandas as pd
+import polars as pl
 
 import ica
 
@@ -26,12 +26,14 @@ class EmojiMatch(TypedDict):
     match_end: int
 
 
-def get_concatenated_messages(messages: pd.DataFrame) -> str:
+def get_concatenated_messages(messages: pl.DataFrame) -> str:
     """
     Retrieve and concatenate all non-reaction message texts into a single string.
     """
-    text = messages[messages["is_reaction"].eq(False)].get("text")
-    return text.str.cat(sep=" ")
+    text = messages.filter(~pl.col("is_reaction"))["text"]
+    # Polars doesn't have a direct str.cat equivalent for the whole series in the
+    # same way but we can convert to list and join
+    return " ".join(text.to_list())
 
 
 def filter_skin_tones(found_emojis: list[EmojiMatch]) -> list[str]:
@@ -73,13 +75,17 @@ def main() -> None:
     found_emojis = emoji.emoji_list(full_text)
     cleaned_emojis = filter_skin_tones(found_emojis)
 
+    # Create a DataFrame from the list of emojis and count them
+    emoji_counts = (
+        pl.DataFrame({"emoji": cleaned_emojis})
+        .group_by("emoji")
+        .agg(pl.len().alias("count"))
+        .sort("count", descending=True)
+        .head(cli_args.result_count)
+    )
+
     ica.output_results(
-        (
-            pd.DataFrame({"emoji": pd.Series(cleaned_emojis).value_counts()})
-            .rename({"emoji": "count"}, axis="columns")
-            .rename_axis("emoji", axis="index")
-            .head(cli_args.result_count)
-        ),
+        emoji_counts,
         format=cli_args.format,
         output=cli_args.output,
     )
