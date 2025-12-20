@@ -1,18 +1,11 @@
 SELECT
-    "ROWID",
-    COALESCE(CAST("text" AS VARCHAR), decode_body(CAST("attributedBody" AS BLOB))) AS "text",
-    "date",
-    "is_from_me"
-FROM "message"
-WHERE "message"."ROWID" IN (
-    -- Get all messages tied to chat
-    SELECT "message_id"
-    FROM "chat_message_join"
-    WHERE "chat_id" IN (
-        -- Get all chats with the specified phone number
-        SELECT "chat"."ROWID"
-        FROM "chat"
-        WHERE CAST(chat_identifier AS VARCHAR) IN (SELECT unnest(string_split(?, '|')))
-    )
-)
-ORDER BY "date" ASC
+    m."ROWID",
+    CAST(m."text" AS VARCHAR) AS "text",
+    CAST(m."attributedBody" AS BLOB) AS "attributedBody",
+    m."date",
+    m."is_from_me"
+FROM "chat" c
+JOIN "chat_message_join" cmj ON c."ROWID" = cmj."chat_id"
+JOIN "message" m ON cmj."message_id" = m."ROWID"
+WHERE CAST(c.chat_identifier AS VARCHAR) IN (SELECT unnest(string_split(?, '|')))
+ORDER BY m."date" ASC, m."ROWID" ASC

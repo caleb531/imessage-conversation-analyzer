@@ -1,25 +1,14 @@
 SELECT
-    "attachment"."ROWID",
-    "mime_type",
-    "filename",
-    "message_id",
-    "date",
-    "is_from_me"
-FROM "attachment"
-INNER JOIN "message_attachment_join"
-    ON "attachment"."ROWID" = "attachment_id"
-INNER JOIN "message"
-    ON "message"."ROWID" = "message_id"
-WHERE
-    "message_id" IN (
-        -- Get all messages tied to chat
-        SELECT "message_id"
-        FROM "chat_message_join"
-        WHERE "chat_id" IN (
-            -- Get all chats with the specified phone number
-            SELECT "chat"."ROWID"
-            FROM "chat"
-            WHERE CAST(chat_identifier AS VARCHAR) IN (SELECT unnest(string_split(?, '|')))
-        )
-    )
-ORDER BY "date" ASC
+    a."ROWID",
+    a."mime_type",
+    a."filename",
+    maj."message_id",
+    m."date",
+    m."is_from_me"
+FROM "chat" c
+JOIN "chat_message_join" cmj ON c."ROWID" = cmj."chat_id"
+JOIN "message" m ON cmj."message_id" = m."ROWID"
+JOIN "message_attachment_join" maj ON m."ROWID" = maj."message_id"
+JOIN "attachment" a ON maj."attachment_id" = a."ROWID"
+WHERE CAST(c.chat_identifier AS VARCHAR) IN (SELECT unnest(string_split(?, '|')))
+ORDER BY m."date" ASC

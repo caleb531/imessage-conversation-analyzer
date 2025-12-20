@@ -4,6 +4,7 @@ import csv
 import importlib.resources
 import os
 import sys
+import uuid
 from dataclasses import dataclass
 from io import BytesIO, StringIO
 from pathlib import Path
@@ -12,6 +13,7 @@ from typing import Any, Hashable, Optional, Union
 import duckdb
 import duckdb.sqltypes
 import openpyxl
+import pyarrow as pa
 import tabulate
 import tzlocal
 from typedstream.stream import TypedStreamReader
@@ -105,27 +107,113 @@ def get_messages_relation(
     # We need to pass the chat identifiers string to the query
     chat_identifiers_str = get_chat_identifier_str(chat_identifiers)
 
-    rel = con.sql(query, params=[chat_identifiers_str])
-
-    # Apply transformations that were previously done in Pandas
-    # 1. Timezone conversion
-    # 2. Reaction detection
-    # 3. Boolean conversion for is_from_me
-
-    # Note: The SQL query already handles COALESCE(text, decode_body(attributedBody))
-
-    return rel.project(
+    # Create a temporary table to store the IDs to enable efficient pagination
+    # We wrap the original query to select only ROWID and date for sorting
+    ids_table_name = f"message_ids_{uuid.uuid4().hex}"
+    con.execute(
         f"""
+        CREATE TEMPORARY TABLE {ids_table_name} AS
+        SELECT ROWID FROM ({query})
+        ORDER BY date ASC, ROWID ASC
+    """,
+        parameters=[chat_identifiers_str],
+    )
+
+    res = con.table(ids_table_name).count("ROWID").fetchone()
+    total_count = res[0] if res else 0
+
+    # Create a temporary table to store the processed messages
+    # We use a random suffix to avoid collisions
+    temp_table_name = f"messages_processed_{uuid.uuid4().hex}"
+    con.execute(f"""
+        CREATE TEMPORARY TABLE {temp_table_name} (
+            ROWID VARCHAR,
+            text VARCHAR,
+            datetime TIMESTAMP,
+            is_from_me BOOLEAN
+        )
+    """)
+
+    chunk_size = 2048
+    for offset in range(0, total_count, chunk_size):
+        # Fetch chunk details by joining with the IDs table
+        # We use LIMIT/OFFSET on the IDs table which is fast
+        chunk_query = f"""
+            SELECT
+                m.ROWID,
+                CAST(m.text AS VARCHAR) AS text,
+                CAST(m.attributedBody AS BLOB) AS attributedBody,
+                m.date,
+                CAST(m.is_from_me AS BOOLEAN) as is_from_me
+            FROM message m
+            JOIN (
+                SELECT ROWID FROM {ids_table_name} LIMIT {chunk_size} OFFSET {offset}
+            ) ids
+            ON m.ROWID = ids.ROWID
+        """
+
+        # Fetch as Arrow Table (it's small, limited by chunk_size)
+        batch_table = con.sql(chunk_query).fetch_arrow_table()
+
+        # Process the batch
+        text_col = batch_table["text"]
+        body_col = batch_table["attributedBody"]
+        new_text = []
+
+        # Convert to Python lists for iteration
+        text_list = text_col.to_pylist()
+        body_list = body_col.to_pylist()
+
+        for t, b in zip(text_list, body_list):
+            if t is not None:
+                new_text.append(t)
+            elif b is not None:
+                new_text.append(decode_message_attributedbody(b))
+            else:
+                new_text.append(None)
+
+        # Create a small Arrow table for this batch
+        arrays = [
+            batch_table["ROWID"],
+            pa.array(new_text, type=pa.string()),
+            batch_table["date"],
+            batch_table["is_from_me"],
+        ]
+        names = ["ROWID", "text", "date", "is_from_me"]
+
+        new_batch_table = pa.Table.from_arrays(arrays, names=names)
+
+        # Insert into DuckDB
+        batch_view_name = f"batch_view_{uuid.uuid4().hex}"
+        con.register(batch_view_name, new_batch_table)
+        con.execute(f"""
+            INSERT INTO {temp_table_name}
+            SELECT
+                ROWID,
+                text,
+                timezone(
+                    '{timezone}',
+                    to_timestamp(CAST(date AS BIGINT) / 1000000000 + 978307200)
+                ),
+                is_from_me
+            FROM {batch_view_name}
+        """)
+        con.unregister(batch_view_name)
+
+    # Return a relation to this new table, adding the reaction logic
+    # Note: We must handle the case where the table is empty (no messages found)
+    # If the table is empty, DuckDB might infer types as NULL if we don't cast,
+    # but since we created the table with explicit types, it should be fine.
+    return con.table(temp_table_name).project(
+        """
         ROWID,
         text,
-            timezone('{timezone}',
-                to_timestamp(CAST(date AS BIGINT) / 1000000000 + 978307200)
-            ) as datetime,
+        datetime,
         CASE WHEN regexp_matches(text,
             '^(Loved|Liked|Disliked|Laughed at|Emphasized|Questioned|Reacted) ' ||
             '(“(.*?)”|an \\w+|(.*?) to “(.*?)”)$'
         ) THEN true ELSE NULL END as is_reaction,
-        CAST(is_from_me AS BOOLEAN) as is_from_me
+        is_from_me
         """
     )
 
@@ -226,8 +314,7 @@ def get_conversation_data(
 
     # Materialize the relations into in-memory DuckDB tables to avoid re-running
     # the expensive Python UDF and Regex for every subsequent query
-    con.sql("CREATE TEMPORARY TABLE messages_base AS SELECT * FROM messages")
-    messages = con.table("messages_base")
+    # Note: messages is already materialized via Arrow in get_messages_relation
 
     con.sql("CREATE TEMPORARY TABLE attachments_base AS SELECT * FROM attachments")
     attachments = con.table("attachments_base")
