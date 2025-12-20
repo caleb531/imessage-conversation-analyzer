@@ -121,7 +121,9 @@ def get_messages_dataframe(
         # column
         .assign(
             text=lambda df: df["text"].fillna(
-                df["attributedBody"].apply(decode_message_attributedbody)
+                df.loc[df["text"].isna(), "attributedBody"].apply(
+                    decode_message_attributedbody
+                )
             )
         )
         # Remove 'attributedBody' column now that it has been merged into the
