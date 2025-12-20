@@ -7,8 +7,8 @@ import sqlite3
 from pathlib import Path
 from typing import Optional
 
-import pandas as pd
 import phonenumbers
+import polars as pl
 
 from ica.exceptions import ContactNotFoundError
 
@@ -62,27 +62,31 @@ def get_chat_identifiers(contact_name: str) -> list[str]:
     # databases and combine the separate results into a single result set
     for db_path in glob.iglob(str(DB_GLOB)):
         with sqlite3.connect(f"file:{db_path}?mode=ro", uri=True) as con:
-            rows = pd.read_sql_query(
-                sql=importlib.resources.files("ica")
+            cursor = con.cursor()
+            query = (
+                importlib.resources.files("ica")
                 .joinpath(os.path.join("queries", "contact.sql"))
-                .read_text(),
-                con=con,
-                params={"contact_name": contact_name},
+                .read_text()
             )
+            cursor.execute(query, {"contact_name": contact_name})
+            rows = pl.DataFrame(
+                cursor.fetchall(), schema=["ZFULLNUMBER", "ZADDRESS"], orient="row"
+            )
+
             # Combine the results
             chat_identifiers.update(
                 rows["ZFULLNUMBER"]
-                .apply(normalize_phone_number)
+                .map_elements(normalize_phone_number, return_dtype=pl.Utf8)
                 # The normalization function will convert empty strings to None
-                # so that we can filter them out with dropna()
-                .dropna()
+                # so that we can filter them out with drop_nulls()
+                .drop_nulls()
             )
             chat_identifiers.update(
                 rows["ZADDRESS"]
-                .apply(normalize_email_address)
+                .map_elements(normalize_email_address, return_dtype=pl.Utf8)
                 # The normalization function will convert empty strings to None
-                # so that we can filter them out with dropna()
-                .dropna()
+                # so that we can filter them out with drop_nulls()
+                .drop_nulls()
             )
 
     # Quit if the contact with the specified name could not be found

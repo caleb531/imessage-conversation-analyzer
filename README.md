@@ -148,7 +148,7 @@ iMessage conversation with one other person.
 ```python
 # get_my_transcript.py
 
-import pandas as pd
+import polars as pl
 
 import ica
 
@@ -173,19 +173,19 @@ def main() -> None:
     )
     # Send the results to stdout (or to file) in the given format
     ica.output_results(
-        pd.DataFrame(
+        pl.DataFrame(
             {
                 "timestamp": dfs.messages["datetime"],
                 "is_from_me": dfs.messages["is_from_me"],
                 "is_reaction": dfs.messages["is_reaction"],
                 # U+FFFC is the object replacement character, which appears as
                 # the textual message for every attachment
-                "message": dfs.messages["text"].replace(
-                    r"\ufffc", "(attachment)", regex=True
+                "message": dfs.messages["text"].str.replace(
+                    r"\ufffc", "(attachment)"
                 ),
             }
         ),
-        # The default format (None) corresponds to the pandas default dataframe
+        # The default format (None) corresponds to the polars default dataframe
         # table format
         format=cli_args.format,
         # When output is None (the default), ICA will print to stdout

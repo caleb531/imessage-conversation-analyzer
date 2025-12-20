@@ -80,7 +80,7 @@ def main() -> None:
         pl.DataFrame({"emoji": cleaned_emojis})
         .group_by("emoji")
         .agg(pl.len().alias("count"))
-        .sort("count", descending=True)
+        .sort(["count", "emoji"], descending=[True, False])
         .head(cli_args.result_count)
     )
 

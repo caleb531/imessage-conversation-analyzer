@@ -3,7 +3,7 @@
 
 from unittest.mock import MagicMock, patch
 
-import pandas as pd
+import polars as pl
 from freezegun import freeze_time
 
 import ica.analyzers.message_totals as message_totals
@@ -14,10 +14,10 @@ import ica.analyzers.message_totals as message_totals
 def test_message_counts(output_results: MagicMock) -> None:
     """Should count the number of messages according to various criteria."""
     message_totals.main()
-    df: pd.DataFrame = output_results.call_args[0][0]
-    assert df.loc["messages"]["total"] == 9
-    assert df.loc["messages_from_me"]["total"] == 5
-    assert df.loc["messages_from_them"]["total"] == 4
+    df: pl.DataFrame = output_results.call_args[0][0]
+    assert df.filter(pl.col("metric") == "messages")["total"].item() == 9
+    assert df.filter(pl.col("metric") == "messages_from_me")["total"].item() == 5
+    assert df.filter(pl.col("metric") == "messages_from_them")["total"].item() == 4
 
 
 @patch("ica.output_results")
@@ -26,10 +26,10 @@ def test_reaction_counts(output_results: MagicMock) -> None:
     """Should count the number of reactions according to various
     criteria."""
     message_totals.main()
-    df: pd.DataFrame = output_results.call_args[0][0]
-    assert df.loc["reactions"]["total"] == 2
-    assert df.loc["reactions_from_me"]["total"] == 0
-    assert df.loc["reactions_from_them"]["total"] == 2
+    df: pl.DataFrame = output_results.call_args[0][0]
+    assert df.filter(pl.col("metric") == "reactions")["total"].item() == 2
+    assert df.filter(pl.col("metric") == "reactions_from_me")["total"].item() == 0
+    assert df.filter(pl.col("metric") == "reactions_from_them")["total"].item() == 2
 
 
 @patch("ica.output_results")
@@ -38,7 +38,7 @@ def test_reaction_counts(output_results: MagicMock) -> None:
 def test_day_counts(output_results: MagicMock) -> None:
     """Should count the number of days according to various criteria."""
     message_totals.main()
-    df: pd.DataFrame = output_results.call_args[0][0]
-    assert df.loc["days_messaged"]["total"] == 8
-    assert df.loc["days_missed"]["total"] == 12
-    assert df.loc["days_with_no_reply"]["total"] == 6
+    df: pl.DataFrame = output_results.call_args[0][0]
+    assert df.filter(pl.col("metric") == "days_messaged")["total"].item() == 8
+    assert df.filter(pl.col("metric") == "days_missed")["total"].item() == 12
+    assert df.filter(pl.col("metric") == "days_with_no_reply")["total"].item() == 6

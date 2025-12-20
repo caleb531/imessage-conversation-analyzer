@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-import pandas as pd
+import polars as pl
 
 import ica.analyzers.most_frequent_emojis as most_frequent_emojis
 
@@ -16,8 +16,12 @@ def test_most_frequent_emojis(output_results: MagicMock) -> None:
     """Should compute the most frequently-used emojis."""
     most_frequent_emojis.__package__ = "ica"
     most_frequent_emojis.main()
-    df: pd.DataFrame = output_results.call_args[0][0]
-    assert df.to_dict("index") == json.loads(
+    df: pl.DataFrame = output_results.call_args[0][0]
+    # Convert to dict keyed by emoji to match JSON structure
+    result_dict = {
+        row["emoji"]: {"count": row["count"]} for row in df.to_dicts()
+    }
+    assert result_dict == json.loads(
         Path("tests/data/most_frequent_emojis.json").read_text()
     )
 
@@ -34,13 +38,16 @@ def test_most_frequent_emojis_result_count(output_results: MagicMock) -> None:
     """
     most_frequent_emojis.__package__ = "ica"
     most_frequent_emojis.main()
-    df: pd.DataFrame = output_results.call_args[0][0]
-    assert df.to_dict("index") == {
+    df: pl.DataFrame = output_results.call_args[0][0]
+    result_dict = {
+        row["emoji"]: {"count": row["count"]} for row in df.to_dicts()
+    }
+    assert result_dict == {
         k: v
         for k, v in json.loads(
             Path("tests/data/most_frequent_emojis.json").read_text()
         ).items()
-        if k in ["😀", "😊", "👨‍💻"]
+        if k in ["😀", "😊", "☺️"]
     }
 
 
@@ -50,5 +57,5 @@ def test_skin_tones(output_results: MagicMock) -> None:
     """Should disregard skin tones when counting emojis."""
     most_frequent_emojis.__package__ = "ica"
     most_frequent_emojis.main()
-    df: pd.DataFrame = output_results.call_args[0][0]
-    assert df.loc["👍"]["count"] == 6
+    df: pl.DataFrame = output_results.call_args[0][0]
+    assert df.filter(pl.col("emoji") == "👍")["count"].item() == 6

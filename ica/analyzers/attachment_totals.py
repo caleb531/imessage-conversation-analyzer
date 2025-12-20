@@ -56,7 +56,7 @@ def main() -> None:
     }
     ica.output_results(
         pl.DataFrame(
-            {"type": list(totals_map.keys()), "total": list(totals_map.values())}
+            {"metric": list(totals_map.keys()), "total": list(totals_map.values())}
         ).sort("total", descending=True),
         format=cli_args.format,
         output=cli_args.output,

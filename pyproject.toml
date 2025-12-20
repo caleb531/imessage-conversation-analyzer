@@ -11,12 +11,9 @@ maintainers = [
     {name = 'Caleb Evans', email = 'caleb@calebevans.me'}
 ]
 license = "MIT"
-keywords = ["apple", "imessage", "macos", "conversation", "chat", "analysis", "pandas"]
+keywords = ["apple", "imessage", "macos", "conversation", "chat", "analysis", "polars"]
 dependencies = [
-    "pandas",
-    "pyarrow",
     "tabulate",
-    "openpyxl",
     "pytypedstream",
     "phonenumbers",
     "tzlocal",
@@ -25,6 +22,7 @@ dependencies = [
     "duckdb>=1.4.3",
     "polars>=1.36.1",
     "xlsxwriter>=3.2.9",
+    "fastexcel>=0.16.0",
 ]
 
 [project.urls]

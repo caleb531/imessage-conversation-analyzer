@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """test the ability to filter analyzer results by date and person"""
 
+from datetime import datetime
 from unittest.mock import MagicMock, patch
+from zoneinfo import ZoneInfo
 
-import pandas as pd
+import polars as pl
 import pytest
 
 import ica
@@ -29,7 +31,7 @@ def test_from_date(output_results: MagicMock) -> None:
     Should filter the results to those sent at or after the specified date.
     """
     totals_by_day.main()
-    df: pd.DataFrame = output_results.call_args[0][0]
+    df: pl.DataFrame = output_results.call_args[0][0]
     expected_dates = [
         "2024-01-11",
         "2024-01-14",
@@ -37,8 +39,10 @@ def test_from_date(output_results: MagicMock) -> None:
         "2024-01-17",
         "2024-01-19",
     ]
-    assert df.index.tolist() == [
-        pd.Timestamp(date, tz="UTC") for date in expected_dates
+    # Polars datetimes are python datetime objects when converted to list
+    assert df["date"].to_list() == [
+        datetime.strptime(date, "%Y-%m-%d").replace(tzinfo=ZoneInfo("UTC"))
+        for date in expected_dates
     ]
 
 
@@ -60,7 +64,7 @@ def test_to_date(output_results: MagicMock) -> None:
     Should filter the results to those sent before the specified date.
     """
     totals_by_day.main()
-    df: pd.DataFrame = output_results.call_args[0][0]
+    df: pl.DataFrame = output_results.call_args[0][0]
     expected_dates = [
         "2024-01-07",
         "2024-01-08",
@@ -69,8 +73,9 @@ def test_to_date(output_results: MagicMock) -> None:
         "2024-01-14",
         "2024-01-16",
     ]
-    assert df.index.tolist() == [
-        pd.Timestamp(date, tz="UTC") for date in expected_dates
+    assert df["date"].to_list() == [
+        datetime.strptime(date, "%Y-%m-%d").replace(tzinfo=ZoneInfo("UTC"))
+        for date in expected_dates
     ]
 
 
@@ -94,14 +99,15 @@ def test_date_range(output_results: MagicMock) -> None:
     Should filter the results to those sent between the specified dates.
     """
     totals_by_day.main()
-    df: pd.DataFrame = output_results.call_args[0][0]
+    df: pl.DataFrame = output_results.call_args[0][0]
     expected_dates = [
         "2024-01-11",
         "2024-01-14",
         "2024-01-16",
     ]
-    assert df.index.tolist() == [
-        pd.Timestamp(date, tz="UTC") for date in expected_dates
+    assert df["date"].to_list() == [
+        datetime.strptime(date, "%Y-%m-%d").replace(tzinfo=ZoneInfo("UTC"))
+        for date in expected_dates
     ]
 
 
@@ -147,10 +153,10 @@ def test_from_person_me(output_results: MagicMock) -> None:
     command.
     """
     attachment_totals.main()
-    df: pd.DataFrame = output_results.call_args[0][0]
-    assert df.loc["youtube_videos"]["total"] == 1
-    assert df.loc["apple_music"]["total"] == 1
-    assert df.loc["spotify"]["total"] == 1
+    df: pl.DataFrame = output_results.call_args[0][0]
+    assert df.filter(pl.col("metric") == "youtube_videos")["total"].item() == 1
+    assert df.filter(pl.col("metric") == "apple_music")["total"].item() == 1
+    assert df.filter(pl.col("metric") == "spotify")["total"].item() == 1
 
 
 @patch("ica.output_results")
@@ -171,10 +177,10 @@ def test_from_person_them(output_results: MagicMock) -> None:
     Should filter the results to those sent by the other participant.
     """
     attachment_totals.main()
-    df: pd.DataFrame = output_results.call_args[0][0]
-    assert df.loc["youtube_videos"]["total"] == 3
-    assert df.loc["apple_music"]["total"] == 0
-    assert df.loc["spotify"]["total"] == 0
+    df: pl.DataFrame = output_results.call_args[0][0]
+    assert df.filter(pl.col("metric") == "youtube_videos")["total"].item() == 3
+    assert df.filter(pl.col("metric") == "apple_music")["total"].item() == 0
+    assert df.filter(pl.col("metric") == "spotify")["total"].item() == 0
 
 
 @patch("ica.output_results")
@@ -196,7 +202,7 @@ def test_from_person_both(output_results: MagicMock) -> None:
     filtering is applied).
     """
     attachment_totals.main()
-    df: pd.DataFrame = output_results.call_args[0][0]
-    assert df.loc["youtube_videos"]["total"] == 4
-    assert df.loc["apple_music"]["total"] == 1
-    assert df.loc["spotify"]["total"] == 1
+    df: pl.DataFrame = output_results.call_args[0][0]
+    assert df.filter(pl.col("metric") == "youtube_videos")["total"].item() == 4
+    assert df.filter(pl.col("metric") == "apple_music")["total"].item() == 1
+    assert df.filter(pl.col("metric") == "spotify")["total"].item() == 1

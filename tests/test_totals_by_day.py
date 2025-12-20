@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """test the totals_by_day built-in analyzer"""
 
+import json
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-import pandas as pd
+import polars as pl
 
 import ica.analyzers.totals_by_day as totals_by_day
 
@@ -13,14 +15,16 @@ import ica.analyzers.totals_by_day as totals_by_day
 def test_totals_by_day(output_results: MagicMock) -> None:
     """Should count the total number of days."""
     totals_by_day.main()
-    df: pd.DataFrame = output_results.call_args[0][0]
-    assert df.to_dict(orient="index") == (
-        pd.read_json("tests/data/totals_by_day.json", orient="index")
-        # ICA provides timezone-aware date/times, however the date/time
-        # objects parsed from the JSON are missing timezone information
-        # (i.e. they are timezone-naive); therefore, we must add the missing
-        # timezone information (note that this does not perform any
-        # conversions)
-        .pipe(lambda df: df.set_index(df.index.tz_localize("UTC")))
-        .to_dict(orient="index")
-    )
+    df: pl.DataFrame = output_results.call_args[0][0]
+    
+    # Convert dataframe to dict keyed by date string to match JSON
+    # The JSON keys are like "2024-01-07T00:00:00.000"
+    result_dict = {
+        row["date"].strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]: {
+            k: v for k, v in row.items() if k != "date"
+        }
+        for row in df.to_dicts()
+    }
+    
+    expected_dict = json.loads(Path("tests/data/totals_by_day.json").read_text())
+    assert result_dict == expected_dict

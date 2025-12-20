@@ -110,18 +110,32 @@ def get_messages_dataframe(
         ":chat_identifiers", f"'{get_chat_identifier_str(chat_identifiers)}'"
     ).replace(":chat_identifier_delimiter", f"'{CHAT_IDENTIFIER_DELIMITER}'")
 
-    df = (
-        pl.read_database(query=query, connection=con)
-        # SQL provides each date/time as a Unix timestamp (which is implicitly
-        # UTC), but the timestamp is timezone-naive when parsed; so first, we
-        # must add the missing timezone information, then we must convert the
-        # datetime to the specified timezone
-        .with_columns(
-            pl.col("datetime")
-            .str.to_datetime()
-            .dt.replace_time_zone("UTC")
-            .dt.convert_time_zone(timezone)
+    df = pl.read_database(
+        query=query,
+        connection=con,
+        schema_overrides={
+            "text": pl.Utf8,
+            "attributedBody": pl.Binary,
+            "datetime": pl.Int64,
+        },
+    )
+
+    if df.is_empty():
+        return pl.DataFrame(
+            schema={
+                "ROWID": pl.Int64,
+                "text": pl.Utf8,
+                "is_from_me": pl.Boolean,
+                "datetime": pl.Datetime(time_zone=timezone),
+                "is_reaction": pl.Boolean,
+            }
         )
+
+    df = df.with_columns(
+        pl.col("datetime")
+        .cast(pl.Datetime(time_unit="ns"))
+        .dt.replace_time_zone("UTC")
+        .dt.convert_time_zone(timezone)
     )
 
     # Decode any 'attributedBody' values and merge them into the 'text' column
@@ -151,6 +165,8 @@ def get_messages_dataframe(
         )
         # Convert 'is_from_me' values from integers to proper booleans
         .with_columns(is_from_me=pl.col("is_from_me").cast(pl.Boolean))
+        # Restore chronological order, which was lost during the concat() above
+        .sort("datetime")
     )
 
 
@@ -179,9 +195,9 @@ def filter_dataframe(
         df = df.filter(~pl.col("is_from_me"))
 
     if from_date:
-        df = df.filter(pl.col("datetime") >= pl.lit(from_date).str.to_datetime())
+        df = df.filter(pl.col("datetime").dt.date() >= pl.lit(from_date).str.to_date())
     if to_date:
-        df = df.filter(pl.col("datetime") <= pl.lit(to_date).str.to_datetime())
+        df = df.filter(pl.col("datetime").dt.date() < pl.lit(to_date).str.to_date())
 
     return df
 
@@ -195,6 +211,11 @@ def get_attachments_dataframe(
     Return a polars dataframe representing all attachments in a particular
     conversation (identified by the given phone number)
     """
+    # If no IANA timezone name is specified, default to the name of the system's
+    # local timezone
+    if not timezone:
+        timezone = tzlocal.get_localzone().key
+
     query_template = (
         importlib.resources.files("ica")
         .joinpath(os.path.join("queries", "attachments.sql"))
@@ -204,15 +225,40 @@ def get_attachments_dataframe(
         ":chat_identifiers", f"'{get_chat_identifier_str(chat_identifiers)}'"
     ).replace(":chat_identifier_delimiter", f"'{CHAT_IDENTIFIER_DELIMITER}'")
 
+    df = pl.read_database(
+        query=query,
+        connection=con,
+        schema_overrides={
+            "mime_type": pl.Utf8,
+            "filename": pl.Utf8,
+            "datetime": pl.Int64,
+        },
+    )
+
+    if df.is_empty():
+        return pl.DataFrame(
+            schema={
+                "ROWID": pl.Int64,
+                "mime_type": pl.Utf8,
+                "filename": pl.Utf8,
+                "message_id": pl.Int64,
+                "datetime": pl.Datetime(time_zone=timezone),
+                "is_from_me": pl.Boolean,
+            }
+        )
+
     return (
-        pl.read_database(query=query, connection=con)
+        df
         # Expose the date/time of the message alongside each attachment record,
         # for convenience
         .with_columns(
             pl.col("datetime")
-            .str.to_datetime()
+            .cast(pl.Datetime(time_unit="ns"))
             .dt.replace_time_zone("UTC")
-            .dt.convert_time_zone(timezone)
+            .dt.convert_time_zone(timezone),
+            pl.col("filename").cast(pl.Utf8),
+            pl.col("mime_type").cast(pl.Utf8),
+            pl.col("is_from_me").cast(pl.Boolean),
         )
     )
 
@@ -379,8 +425,29 @@ def get_sql_connection(
     large conversations
     """
     with duckdb.connect(":memory:") as con:
-        con.register("messages", dfs.messages)
-        con.register("attachments", dfs.attachments)
+        for name, df in [("messages", dfs.messages), ("attachments", dfs.attachments)]:
+            try:
+                con.register(name, df)
+                # Verify that the registration actually works (e.g. that pyarrow
+                # is available and working)
+                con.execute(f"SELECT count(*) FROM {name}")
+            except (AttributeError, ImportError, Exception):
+                # Fallback for when pyarrow is missing or broken
+                import tempfile
+
+                with tempfile.NamedTemporaryFile(
+                    mode="w", suffix=".csv", delete=False
+                ) as tmp:
+                    df.write_csv(tmp.name)
+                    tmp_path = tmp.name
+
+                try:
+                    con.execute(
+                        f"CREATE TABLE {name} AS SELECT * FROM read_csv_auto('{tmp_path}')"
+                    )
+                finally:
+                    if os.path.exists(tmp_path):
+                        os.unlink(tmp_path)
         yield con
 
 
@@ -390,4 +457,12 @@ def execute_sql_query(query: str, con: duckdb.DuckDBPyConnection) -> pl.DataFram
     Execute the given arbitrary SQL query, provided a connection to the
     in-memory DuckDB database created by ica.get_sql_connection()
     """
-    return con.execute(query).pl()
+    try:
+        return con.execute(query).pl()
+    except (AttributeError, ImportError, Exception):
+        # Fallback if pyarrow is missing/broken
+        # Use fetchall() and create DataFrame manually
+        result = con.execute(query)
+        columns = [desc[0] for desc in result.description]
+        data = result.fetchall()
+        return pl.DataFrame(data, schema=columns, orient="row")

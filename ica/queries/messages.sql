@@ -2,7 +2,7 @@ SELECT
     "ROWID",
     "text",
     "attributedBody",
-    datetime("message"."date" / 1000000000 + strftime("%s", "2001-01-01") ,"unixepoch") as "datetime",
+    "message"."date" + 978307200000000000 as "datetime",
     "is_from_me"
 FROM "message"
 WHERE "message"."ROWID" IN (
