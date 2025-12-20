@@ -1,32 +1,17 @@
 #!/usr/bin/env python3
 
 import datetime
-from typing import Union
 
 import pandas as pd
 
 import ica
 
-# The format to use for all date strings
-DATE_FORMAT = "%Y-%m-%d"
 
-
-def get_first_message_date(dfs: ica.DataFrameNamespace) -> datetime.datetime:
+def get_first_message_date(dfs: ica.DataFrameNamespace) -> pd.Timestamp:
     """
     Retrieve the date of the very first message sent in the conversation
     """
-    datestr = str(dfs.messages["datetime"].min().strftime(DATE_FORMAT))
-    return datetime.datetime.strptime(datestr, DATE_FORMAT)
-
-
-def get_dates_between(
-    start_date: Union[str, datetime.datetime], end_date: Union[str, datetime.datetime]
-) -> list[datetime.datetime]:
-    """
-    Get all dates between (and including) the given two dates; each date can be
-    either of type str or datetime
-    """
-    return list(pd.date_range(start_date, end_date).strftime(DATE_FORMAT))
+    return pd.Timestamp(dfs.messages["datetime"].min().date())
 
 
 def get_sums_by_day(dfs: ica.DataFrameNamespace) -> pd.DataFrame:
@@ -34,32 +19,26 @@ def get_sums_by_day(dfs: ica.DataFrameNamespace) -> pd.DataFrame:
     Calculate the text message sums, grouped by date
     """
     return (
-        dfs.messages
-        # Count all "text" column values by converting them to integers (always
-        # 1), because resampling the DataFrame will remove all non-numeric
-        # columns
-        .assign(text=lambda df: df["text"].apply(pd.to_numeric, errors="coerce").isna())
+        dfs.messages.assign(message_count=1)
         .resample("D", on="datetime")
-        .sum()
+        .sum(numeric_only=True)
         .rename_axis("date", axis="index")
-        .assign(is_from_them=lambda df: df["text"] - df["is_from_me"])
+        .assign(is_from_them=lambda df: df["message_count"] - df["is_from_me"])
     )
 
 
-def get_all_message_datestrs(dfs: ica.DataFrameNamespace) -> list[str]:
+def get_days_messaged_count(sums_by_day: pd.DataFrame) -> int:
     """
-    Retrieve a list of every date for which at least one message was sent
+    Retrieve the number of days for which at least one message was sent
     """
-    sums_by_day = get_sums_by_day(dfs)
-    return list(sums_by_day[sums_by_day["text"] > 0].index)
+    return (sums_by_day["message_count"] > 0).sum()
 
 
-def get_noreply_count(dfs: ica.DataFrameNamespace) -> int:
+def get_noreply_count(sums_by_day: pd.DataFrame) -> int:
     """
     Generate a day-by-day breakdown of the number of messages sent where only
     one person sent messages for that day
     """
-    sums_by_day = get_sums_by_day(dfs)
     is_from_me = sums_by_day["is_from_me"]
     is_from_them = sums_by_day["is_from_them"]
     return len(
@@ -84,31 +63,26 @@ def main() -> None:
         from_person=cli_args.from_person,
     )
 
-    all_datestrs = get_dates_between(
-        get_first_message_date(dfs), str(datetime.date.today())
-    )
-    message_datestrs = get_all_message_datestrs(dfs)
+    first_message_date = get_first_message_date(dfs)
+    today = pd.Timestamp(datetime.date.today())
+    total_days = (today - first_message_date).days + 1
 
-    is_reaction = dfs.messages["is_reaction"]
+    sums_by_day = get_sums_by_day(dfs)
+    days_messaged_count = get_days_messaged_count(sums_by_day)
+
+    messages_only = dfs.messages[~dfs.messages["is_reaction"]]
+    reactions_only = dfs.messages[dfs.messages["is_reaction"]]
 
     totals_map = {
-        "messages": len(dfs.messages[is_reaction.eq(False)]),
-        "messages_from_me": (
-            dfs.messages[is_reaction.eq(False)]["is_from_me"].eq(True).sum()
-        ),
-        "messages_from_them": (
-            dfs.messages[is_reaction.eq(False)]["is_from_me"].eq(False).sum()
-        ),
-        "reactions": len(dfs.messages[is_reaction.eq(True)]),
-        "reactions_from_me": (
-            dfs.messages[is_reaction.eq(True)]["is_from_me"].eq(True).sum()
-        ),
-        "reactions_from_them": (
-            dfs.messages[is_reaction.eq(True)]["is_from_me"].eq(False).sum()
-        ),
-        "days_messaged": len(message_datestrs),
-        "days_missed": len(all_datestrs) - len(message_datestrs),
-        "days_with_no_reply": get_noreply_count(dfs),
+        "messages": len(messages_only),
+        "messages_from_me": messages_only["is_from_me"].sum(),
+        "messages_from_them": (~messages_only["is_from_me"]).sum(),
+        "reactions": len(reactions_only),
+        "reactions_from_me": reactions_only["is_from_me"].sum(),
+        "reactions_from_them": (~reactions_only["is_from_me"]).sum(),
+        "days_messaged": days_messaged_count,
+        "days_missed": total_days - days_messaged_count,
+        "days_with_no_reply": get_noreply_count(sums_by_day),
     }
     ica.output_results(
         pd.DataFrame(
