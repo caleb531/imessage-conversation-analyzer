@@ -20,9 +20,9 @@ dependencies = [
     "pytypedstream",
     "phonenumbers",
     "tzlocal",
-    "openai>=1.102.0",
-    "emoji>=2.15.0",
-    "duckdb>=1.4.3",
+    "openai",
+    "emoji",
+    "duckdb",
 ]
 
 [project.urls]
