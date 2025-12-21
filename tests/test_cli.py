@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """test the cli built-in analyzer"""
 
+import importlib.metadata
 import sys
 from contextlib import redirect_stderr, redirect_stdout
 from io import StringIO
@@ -119,3 +120,24 @@ def test_cli_get_cli_args() -> None:
     cli_args = cli.get_cli_args()
     assert cli_args.contact_name == sys.argv[2]
     assert cli_args.analyzer == sys.argv[3]
+
+
+@patch("importlib.metadata.version", return_value="1.2.3")
+@patch("sys.argv", [cli.__file__, "--version"])
+def test_cli_version(mock_version: MagicMock) -> None:
+    """Should print the version number."""
+    with redirect_stdout(StringIO()) as stdout, pytest.raises(SystemExit):
+        cli.main()
+    assert "1.2.3" in stdout.getvalue()
+
+
+@patch(
+    "importlib.metadata.version",
+    side_effect=importlib.metadata.PackageNotFoundError,
+)
+@patch("sys.argv", [cli.__file__, "--version"])
+def test_cli_version_fallback(mock_version: MagicMock) -> None:
+    """Should print 0.0.0 if package version cannot be obtained."""
+    with redirect_stdout(StringIO()) as stdout, pytest.raises(SystemExit):
+        cli.main()
+    assert "0.0.0" in stdout.getvalue()

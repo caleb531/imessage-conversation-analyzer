@@ -3,6 +3,7 @@
 import argparse
 import contextlib
 import importlib.machinery
+import importlib.metadata
 import importlib.util
 import sys
 from pathlib import Path
@@ -33,6 +34,16 @@ class TypedCLIArguments(object):
     from_person: Union[str, None]
     format: Union[str, None]
     output: Union[str, None]
+
+
+def get_package_version() -> str:
+    """
+    Retrieve the current ICA version from the project metadata
+    """
+    try:
+        return importlib.metadata.version("imessage-conversation-analyzer")
+    except importlib.metadata.PackageNotFoundError:
+        return "0.0.0"
 
 
 def get_cli_parser() -> argparse.ArgumentParser:
@@ -95,6 +106,11 @@ def get_cli_parser() -> argparse.ArgumentParser:
         "-o",
         help="the path of the file to export analyzer results to; required when"
         " exporting Excel (xlsx) files",
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"%(prog)s {get_package_version()}",
     )
 
     return parser
