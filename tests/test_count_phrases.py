@@ -72,16 +72,16 @@ def test_whitespace(output_results: MagicMock) -> None:
 @patch("ica.output_results")
 @patch(
     "sys.argv",
-    [count_phrases.__file__, "-c", "Thomas Riverstone", "!"],
+    [count_phrases.__file__, "-c", "Thomas Riverstone", "?"],
 )
 def test_special_characters(output_results: MagicMock) -> None:
     """Should count the number of occurrences of a special character."""
     count_phrases.main()
     df: pd.DataFrame = output_results.call_args[0][0]
     phrase = sys.argv[-1]
-    assert df.loc[phrase]["count"] == 10
-    assert df.loc[phrase]["count_from_me"] == 5
-    assert df.loc[phrase]["count_from_them"] == 5
+    assert df.loc[phrase]["count"] == 9
+    assert df.loc[phrase]["count_from_me"] == 2
+    assert df.loc[phrase]["count_from_them"] == 7
 
 
 @patch("ica.output_results")

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import re
-import typing
 
 import pandas as pd
 
@@ -25,16 +24,31 @@ def get_phrase_counts(
     phrases: list[str],
     use_regex: bool = False,
     case_sensitive: bool = False,
-) -> typing.Generator[int, None, None]:
-    return (
-        messages_df["text"]
-        .str.count(
-            re.escape(phrase) if use_regex else phrase,
-            flags=re.IGNORECASE if not case_sensitive else 0,
-        )
-        .sum()
-        for phrase in phrases
-    )
+) -> pd.DataFrame:
+    patterns = [phrase if use_regex else re.escape(phrase) for phrase in phrases]
+    flags = 0 if case_sensitive else re.IGNORECASE
+
+    # Filter dataframes once to avoid repeated filtering in the loop
+    messages_from_me = messages_df[messages_df["is_from_me"]]
+    messages_from_them = messages_df[~messages_df["is_from_me"]]
+
+    return pd.DataFrame(
+        {
+            "phrase": phrases,
+            "count": (
+                messages_df["text"].str.count(pattern, flags=flags).sum()
+                for pattern in patterns
+            ),
+            "count_from_me": (
+                messages_from_me["text"].str.count(pattern, flags=flags).sum()
+                for pattern in patterns
+            ),
+            "count_from_them": (
+                messages_from_them["text"].str.count(pattern, flags=flags).sum()
+                for pattern in patterns
+            ),
+        }
+    ).set_index("phrase")
 
 
 def main() -> None:
@@ -60,28 +74,13 @@ def main() -> None:
         to_date=cli_args.to_date,
         from_person=cli_args.from_person,
     )
-    filtered_messages = dfs.messages[~dfs.messages["is_reaction"]]
 
     ica.output_results(
-        (
-            pd.DataFrame(
-                {
-                    "phrase": cli_args.phrases,
-                    "count": get_phrase_counts(
-                        filtered_messages,
-                        cli_args.phrases,
-                        case_sensitive=cli_args.case_sensitive,
-                    ),
-                    "count_from_me": get_phrase_counts(
-                        filtered_messages[filtered_messages["is_from_me"].eq(True)],
-                        cli_args.phrases,
-                    ),
-                    "count_from_them": get_phrase_counts(
-                        filtered_messages[filtered_messages["is_from_me"].eq(False)],
-                        cli_args.phrases,
-                    ),
-                }
-            ).set_index("phrase")
+        get_phrase_counts(
+            dfs.messages[~dfs.messages["is_reaction"]],
+            phrases=cli_args.phrases,
+            use_regex=cli_args.use_regex,
+            case_sensitive=cli_args.case_sensitive,
         ),
         format=cli_args.format,
         output=cli_args.output,
