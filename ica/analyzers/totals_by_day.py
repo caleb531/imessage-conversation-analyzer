@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-import pandas as pd
-
 import ica
 
 # The format to use for all date strings
@@ -22,32 +20,18 @@ def main() -> None:
     )
     ica.output_results(
         (
-            dfs.messages[["text", "is_from_me", "datetime", "is_reaction"]]
-            # Count all "text" column values by converting them to integers
-            # (always 1), because resampling the DataFrame will remove all
-            # non-numeric columns
-            .assign(
-                text=lambda df: df["text"].apply(pd.to_numeric, errors="coerce").isna()
-            )
-            .resample("D", on="datetime")
-            .sum()
-            .rename_axis("date", axis="index")
-            # Filter out any rows for dates where neither person sent a message
-            .pipe(lambda df: df[df["text"] != 0])
-            # Add a column for the by-day number of messages from the other
-            # person, for convenience (even though it can technically be derived
-            # from the existing columns)
-            .assign(is_from_them=lambda df: df["text"] - df["is_from_me"])
-            # Do not include reaction data for brevity
-            .drop(columns=["is_reaction"])
-            # Rename columns to be more intuitive
+            dfs.messages.resample("D", on="datetime")["is_from_me"]
+            .agg(["count", "sum"])
+            .assign(sent_by_them=lambda df: df["count"] - df["sum"])
+            .loc[lambda df: df["count"] > 0]
             .rename(
                 columns={
-                    "text": "#_sent",
-                    "is_from_me": "#_sent_by_me",
-                    "is_from_them": "#_sent_by_them",
+                    "count": "#_sent",
+                    "sum": "#_sent_by_me",
+                    "sent_by_them": "#_sent_by_them",
                 }
             )
+            .rename_axis("date")
         ),
         format=cli_args.format,
         output=cli_args.output,
