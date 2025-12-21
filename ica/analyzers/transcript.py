@@ -1,15 +1,6 @@
 #!/usr/bin/env python3
 
-import pandas as pd
-
 import ica
-
-
-def convert_bool_to_yesno(value: bool) -> str:
-    """
-    Convert a boolean value to "Yes"/"No"
-    """
-    return str(value).replace("True", "Yes").replace("False", "No")
 
 
 def main() -> None:
@@ -26,19 +17,18 @@ def main() -> None:
         from_person=cli_args.from_person,
     )
     ica.output_results(
-        pd.DataFrame(
-            {
-                "timestamp": dfs.messages["datetime"],
-                # Convert 1/0 to Yes/No
-                "is_from_me": dfs.messages["is_from_me"].apply(convert_bool_to_yesno),
-                "is_reaction": dfs.messages["is_reaction"].apply(convert_bool_to_yesno),
-                # U+FFFC is the object replacement character, which appears as the
-                # textual message for every attachment
-                "message": dfs.messages["text"].replace(
-                    r"\ufffc", "(attachment)", regex=True
-                ),
-            }
-        ),
+        dfs.messages.assign(
+            timestamp=lambda df: df["datetime"],
+            is_from_me=lambda df: df["is_from_me"].map({True: "Yes", False: "No"}),
+            is_reaction=lambda df: df["is_reaction"].map({True: "Yes", False: "No"}),
+            # U+FFFC is the object replacement character, which appears as the
+            # textual message for every attachment
+            message=lambda df: df["text"].replace(
+                r"\ufffc", "(attachment)", regex=True
+            ),
+        )
+        # Output only the following columns and in this particular order
+        .loc[:, ["timestamp", "is_from_me", "is_reaction", "message"]],
         format=cli_args.format,
         output=cli_args.output,
     )
