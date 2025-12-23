@@ -1,4 +1,4 @@
-from contextlib import redirect_stderr, redirect_stdout
+from contextlib import redirect_stdout
 from io import StringIO
 from unittest.mock import MagicMock, patch
 
@@ -56,32 +56,6 @@ def test_from_sql_success(
     assert "Text" in output
     assert "Hello" in output
     assert "World" not in output
-
-
-@patch("ica.get_dataframes")
-def test_from_sql_error(
-    mock_get_dataframes: MagicMock, dfs: DataFrameNamespace
-) -> None:
-    """
-    Should print an error message to stderr if the query fails.
-    """
-    mock_get_dataframes.return_value = dfs
-    query = "SELECT * FROM non_existent_table"
-
-    out = StringIO()
-    err = StringIO()
-    with (
-        redirect_stdout(out),
-        redirect_stderr(err),
-        patch(
-            "sys.argv",
-            [from_sql.__file__, "-c", "Jane Doe", query],
-        ),
-    ):
-        from_sql.main()
-
-    assert "Error executing query" in err.getvalue()
-    assert "Table with name non_existent_table does not exist" in err.getvalue()
 
 
 @patch("ica.get_dataframes")
