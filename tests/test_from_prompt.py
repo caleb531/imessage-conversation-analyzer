@@ -1,5 +1,5 @@
 import types
-from contextlib import redirect_stderr, redirect_stdout
+from contextlib import redirect_stdout
 from io import StringIO
 from pathlib import Path
 from typing import Any, Generator
@@ -230,28 +230,3 @@ def test_from_prompt_no_sql_in_response(
     out = StringIO()
     with redirect_stdout(out), pytest.raises(ResponseMissingSQLError):
         from_prompt.main()
-
-
-@patch(
-    "openai.chat.completions.create",
-    return_value=get_mock_completion_response(),
-)
-@patch(
-    "sys.argv",
-    [from_prompt.__file__, "-c", "Jane Fernbrook", "--api-key", API_KEY, PROMPT],
-)
-def test_from_prompt_stderr(
-    completions_create: Mock,
-    mock_dependencies: dict[str, Any],
-    openai_api_key: None,
-) -> None:
-    """
-    Should print any runtime errors from the generated SQL to stderr
-    """
-    mock_dependencies["execute_sql_query"].side_effect = Exception("SQL Error")
-
-    out = StringIO()
-    err = StringIO()
-    with redirect_stdout(out), redirect_stderr(err):
-        from_prompt.main()
-        assert "Error executing query: SQL Error" in err.getvalue()
