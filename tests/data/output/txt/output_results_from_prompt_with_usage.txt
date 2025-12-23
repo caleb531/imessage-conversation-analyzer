@@ -2,7 +2,5 @@ Generating SQL with AI ({MODEL})...
 Input Tokens: 10
 Output Tokens: 2
 Running query...
-Metric              Total
-Messages             1200
-Messages From Me      700
-Messages From Them    500
+   Total Messages
+1              11

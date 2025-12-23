@@ -2,8 +2,7 @@ import types
 from contextlib import redirect_stdout
 from io import StringIO
 from pathlib import Path
-from typing import Any, Generator
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import Mock, patch
 
 import pytest
 
@@ -41,37 +40,6 @@ def get_mock_completion_response(
 
 
 @pytest.fixture
-def mock_dependencies() -> Generator[dict[str, Any], None, None]:
-    """Setup mock dependencies for from_prompt tests."""
-    with (
-        patch("ica.output_results") as mock_output_results,
-        patch("ica.execute_sql_query") as mock_execute_sql_query,
-        patch("ica.get_sql_connection") as mock_get_sql_connection,
-        patch("ica.get_dataframes") as mock_get_dataframes,
-    ):
-        # Setup context manager for get_sql_connection
-        mock_db_con = MagicMock()
-        mock_get_sql_connection.return_value.__enter__.return_value = mock_db_con
-
-        # Setup output_results to print the expected table
-        def side_effect(*args: Any, **kwargs: Any) -> None:
-            print("Metric              Total")
-            print("Messages             1200")
-            print("Messages From Me      700")
-            print("Messages From Them    500")
-
-        mock_output_results.side_effect = side_effect
-
-        yield {
-            "output_results": mock_output_results,
-            "execute_sql_query": mock_execute_sql_query,
-            "get_sql_connection": mock_get_sql_connection,
-            "get_dataframes": mock_get_dataframes,
-            "db_con": mock_db_con,
-        }
-
-
-@pytest.fixture
 def openai_api_key(monkeypatch: pytest.MonkeyPatch) -> None:
     """Set the OPENAI_API_KEY environment variable."""
     monkeypatch.setenv("OPENAI_API_KEY", API_KEY)
@@ -87,7 +55,6 @@ def openai_api_key(monkeypatch: pytest.MonkeyPatch) -> None:
 )
 def test_from_prompt_with_usage(
     completions_create: Mock,
-    mock_dependencies: dict[str, Any],
     openai_api_key: None,
 ) -> None:
     """
@@ -102,12 +69,6 @@ def test_from_prompt_with_usage(
         assert kwargs["max_tokens"] == 4096
         assert kwargs["messages"][0]["role"] == "system"
         assert kwargs["messages"][1]["role"] == "user"
-
-        # Verify SQL execution
-        mock_dependencies["execute_sql_query"].assert_called_once_with(
-            MOCK_SQL_QUERY, con=mock_dependencies["db_con"]
-        )
-        mock_dependencies["output_results"].assert_called_once()
 
         assert out.getvalue() == (
             Path("tests/data/output/txt/output_results_from_prompt_with_usage.txt")
@@ -126,7 +87,6 @@ def test_from_prompt_with_usage(
 )
 def test_from_prompt_no_usage(
     completions_create: Mock,
-    mock_dependencies: dict[str, Any],
     openai_api_key: None,
 ) -> None:
     """
@@ -142,11 +102,6 @@ def test_from_prompt_no_usage(
         assert kwargs["messages"][0]["role"] == "system"
         assert kwargs["messages"][1]["role"] == "user"
 
-        # Verify SQL execution
-        mock_dependencies["execute_sql_query"].assert_called_once_with(
-            MOCK_SQL_QUERY, con=mock_dependencies["db_con"]
-        )
-
         assert out.getvalue() == (
             Path("tests/data/output/txt/output_results_from_prompt_no_usage.txt")
             .read_text()
@@ -160,7 +115,6 @@ def test_from_prompt_no_usage(
 )
 def test_from_prompt_keep_sql(
     completions_create: Mock,
-    mock_dependencies: dict[str, Any],
     openai_api_key: None,
 ) -> None:
     """
@@ -199,7 +153,6 @@ def test_from_prompt_keep_sql(
 )
 def test_from_prompt_empty_response(
     completions_create: Mock,
-    mock_dependencies: dict[str, Any],
     openai_api_key: None,
 ) -> None:
     """
@@ -220,7 +173,6 @@ def test_from_prompt_empty_response(
 )
 def test_from_prompt_no_sql_in_response(
     completions_create: Mock,
-    mock_dependencies: dict[str, Any],
     openai_api_key: None,
 ) -> None:
     """
