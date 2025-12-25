@@ -7,8 +7,8 @@ import sqlite3
 from collections.abc import Generator
 from typing import Any, Sequence, Union
 
-import ica.contact as contact
-import ica.core as core
+import ica.contact
+import ica.core
 from tests.utils import (
     mock_chats_db_path,
     mock_contacts_db_glob,
@@ -23,8 +23,8 @@ def get_duplicates(items: Union[Sequence[Any], Generator[Any, Any, Any]]) -> lis
 
 def test_db_paths() -> None:
     """Should mock paths to databases."""
-    assert core.DB_PATH == mock_chats_db_path
-    assert contact.DB_GLOB == mock_contacts_db_glob
+    assert ica.core.DB_PATH == mock_chats_db_path
+    assert ica.contact.DB_GLOB == mock_contacts_db_glob
     assert str(mock_contacts_db_path) in glob.glob(str(mock_contacts_db_glob)), (
         "glob for mock contact database does not correctly resolve to database path"
     )

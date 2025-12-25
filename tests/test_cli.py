@@ -118,7 +118,7 @@ def test_cli_get_cli_args() -> None:
     with redirect_stdout(StringIO()):
         cli.main()
     cli_args = cli.get_cli_args()
-    assert cli_args.contact_name == sys.argv[2]
+    assert cli_args.contact == sys.argv[2]
     assert cli_args.analyzer == sys.argv[3]
 
 

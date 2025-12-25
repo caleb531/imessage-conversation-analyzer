@@ -48,6 +48,9 @@ minimum required arguments are:
 2. The first and last name of the contact, via the `-c`/`--contact` flag
    1. If the contact has no last name on record, you can just pass the first
       name
+   2. You can also pass any phone number or email address associated with the
+      contact; keep in mind that analysis will still run on all phone numbers /
+      email addresses associated with the contact, not just the one you specify
 
 #### Example
 
@@ -165,7 +168,7 @@ def main() -> None:
     # Retrieve the dataframes corresponding to the processed contents of the
     # database; dataframes include `messages` and `attachments`
     dfs = ica.get_dataframes(
-        contact_name=cli_args.contact_name,
+        contact=cli_args.contact,
         timezone=cli_args.timezone,
         from_date=cli_args.from_date,
         to_date=cli_args.to_date,
@@ -247,7 +250,7 @@ The equivalent option for the Python API is the `timezone` parameter to
 `ica.get_dataframes`:
 
 ```python
-dfs = ica.get_dataframes(contact_name=my_contact_name, timezone='UTC')
+dfs = ica.get_dataframes(contact=my_contact, timezone='UTC')
 ```
 
 ### Data Schema

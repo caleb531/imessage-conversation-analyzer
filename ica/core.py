@@ -18,7 +18,7 @@ import pandas as pd
 import tzlocal
 from typedstream.stream import TypedStreamReader
 
-import ica.contact as contact
+from ica.contact import get_chat_identifiers
 from ica.exceptions import (
     ConversationNotFoundError,
     DateRangeInvalidError,
@@ -198,7 +198,7 @@ def get_attachments_dataframe(
 
 
 def get_dataframes(
-    contact_name: str,
+    contact: str,
     timezone: Optional[str] = None,
     from_date: Optional[str] = None,
     to_date: Optional[str] = None,
@@ -207,7 +207,7 @@ def get_dataframes(
     """
     Return all dataframes for a specific macOS Messages conversation
     """
-    chat_identifiers = contact.get_chat_identifiers(contact_name)
+    chat_identifiers = get_chat_identifiers(contact)
     with sqlite3.connect(f"file:{DB_PATH}?mode=ro", uri=True) as con:
         dfs = DataFrameNamespace(
             messages=get_messages_dataframe(con, chat_identifiers, timezone),
@@ -215,7 +215,7 @@ def get_dataframes(
         )
         if dfs.messages.empty:
             raise ConversationNotFoundError(
-                f'No conversation found for the contact "{contact_name}"'
+                f'No conversation found for the contact "{contact}"'
             )
         dfs.messages = filter_dataframe(
             dfs.messages,

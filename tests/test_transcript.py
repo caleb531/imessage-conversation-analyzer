@@ -11,14 +11,14 @@ import ica.analyzers.transcript as transcript
 
 
 @pytest.mark.parametrize(
-    ("transcript_num", "contact_name"),
+    ("transcript_num", "contact"),
     [(1, "Jane Fernbrook"), (2, "Thomas Riverstone")],
 )
-def test_transcripts(transcript_num: Any, contact_name: str) -> None:
+def test_transcripts(transcript_num: Any, contact: str) -> None:
     """Should generate transcripts of all mock conversations."""
     with (
         patch("ica.output_results") as output_results,
-        patch("sys.argv", [transcript.__file__, "-c", contact_name, "-t", "UTC"]),
+        patch("sys.argv", [transcript.__file__, "-c", contact, "-t", "UTC"]),
     ):
         transcript.main()
         df: pd.DataFrame = output_results.call_args[0][0]

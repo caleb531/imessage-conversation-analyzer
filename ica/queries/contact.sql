@@ -21,7 +21,55 @@ WITH "contact_search" AS (
                 ifnull("ZLASTNAME", '')
             )
         ) = lower(
-            trim(:contact_name)
+            trim(:contact_identifier)
+        )
+    )
+    UNION
+    SELECT
+        "ZOWNER"
+    FROM "ZABCDEMAILADDRESS"
+    WHERE lower(trim("ZADDRESS")) = lower(trim(:contact_identifier))
+    UNION
+    SELECT
+        "ZOWNER"
+    FROM "ZABCDPHONENUMBER"
+    WHERE (
+        -- The macOS contacts database stores the phone number as the user
+        -- entered it (without normalization), so we must normalize each phone
+        -- number ourselves during comparison by stripping out common formatting
+        -- characters
+        replace(
+            replace(
+                replace(
+                    replace(
+                        replace("ZFULLNUMBER", ' ', ''),
+                        '-',
+                        ''
+                    ),
+                    '(',
+                    ''
+                ),
+                ')',
+                ''
+            ),
+            '+',
+            ''
+        ) LIKE '%' || replace(
+            replace(
+                replace(
+                    replace(
+                        replace(:contact_identifier, ' ', ''),
+                        '-',
+                        ''
+                    ),
+                    '(',
+                    ''
+                ),
+                ')',
+                ''
+            ),
+            '+',
+            ''
         )
     )
 )

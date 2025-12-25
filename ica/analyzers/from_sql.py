@@ -12,7 +12,7 @@ def main() -> None:
     cli_args = parser.parse_args()
 
     dfs = ica.get_dataframes(
-        contact_name=cli_args.contact_name,
+        contact=cli_args.contact,
         timezone=cli_args.timezone,
         from_date=cli_args.from_date,
         to_date=cli_args.to_date,
