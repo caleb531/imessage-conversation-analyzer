@@ -71,6 +71,7 @@ test_cases = (
                 (None, "txt", "read_table"),
                 ("csv", "csv", "read_csv"),
                 ("markdown", "md", "read_table"),
+                ("json", "json", "read_json"),
             ),
         )
     ),
@@ -199,6 +200,7 @@ def test_output_results_file_binary(
                 (None, "txt"),
                 ("csv", "csv"),
                 ("markdown", "md"),
+                ("json", "json"),
             ),
         )
     ),

@@ -118,7 +118,7 @@ ica message_totals -c 'Jane Fernbrook' --from-date 2024-12-01 --to-date 2025-01-
 #### Other formats
 
 You can optionally pass the `-f`/`--format` flag to output to a specific format
-like CSV (supported formats include `csv`, `excel`/`xlsx`, and `markdown`/`md`).
+like CSV (supported formats include `csv`, `excel`/`xlsx`, `markdown`/`md`, and `json`).
 
 ```sh
 ica message_totals -c 'Jane Fernbrook' -f csv

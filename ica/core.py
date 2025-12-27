@@ -40,7 +40,12 @@ DB_PATH = Path.home() / "Library" / "Messages" / "chat.db"
 # The formats supported for file output, represented as a dictionary where each
 # key is the format name and the value is the file extension corresponding to
 # that format
-SUPPORTED_OUTPUT_FORMAT_MAP = {"csv": "csv", "excel": "xlsx", "markdown": "md"}
+SUPPORTED_OUTPUT_FORMAT_MAP = {
+    "csv": "csv",
+    "excel": "xlsx",
+    "markdown": "md",
+    "json": "json",
+}
 
 
 @dataclass
@@ -340,6 +345,12 @@ def output_results(
         output_df.to_excel(output, **output_args)
     elif format == "csv":
         output_df.to_csv(output, **output_args)
+    elif format == "json":
+        json_output_df = (
+            # Reset index if it's to be included in output
+            output_df.reset_index() if output_args.get("index") else output_df
+        )
+        json_output_df.to_json(output, orient="records", date_format="iso", indent=2)
     elif format in ("md", "markdown"):
         output_df.to_markdown(output, **output_args)
     else:
