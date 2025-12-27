@@ -1,14 +1,18 @@
 [
   {
-    "ROWID": "handle-id-1",
+    "ROWID": "user-daniel",
     "id": "+12123456789"
   },
   {
-    "ROWID": "handle-id-2",
+    "ROWID": "user-jane",
     "id": "+12234567890"
   },
   {
-    "ROWID": "handle-id-3",
+    "ROWID": "user-thomas",
     "id": "thomas.riverstone@example.com"
+  },
+  {
+    "ROWID": "user-john",
+    "id": "+15555555555"
   }
 ]

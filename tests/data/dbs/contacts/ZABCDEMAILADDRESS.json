@@ -1,18 +1,18 @@
 [
   {
-    "ZOWNER": "5573a2e8-bbf9-4a12-b8ad-5228898cef58",
+    "ZOWNER": "user-jane",
     "ZADDRESS": "jane.fernbrook@example.com"
   },
   {
-    "ZOWNER": "5573a2e8-bbf9-4a12-b8ad-5228898cef58",
+    "ZOWNER": "user-jane",
     "ZADDRESS": ""
   },
   {
-    "ZOWNER": "c98d7168-9ea7-43a5-806d-1d9e7897d5e6",
+    "ZOWNER": "user-thomas",
     "ZADDRESS": ""
   },
   {
-    "ZOWNER": "c98d7168-9ea7-43a5-806d-1d9e7897d5e6",
+    "ZOWNER": "user-thomas",
     "ZADDRESS": "thomas.riverstone@example.com"
   }
 ]

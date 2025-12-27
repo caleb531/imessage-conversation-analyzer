@@ -1,18 +1,18 @@
 [
   {
-    "ROWID": "9caf81e4-551a-412c-ad55-b09fa5f03819",
+    "ROWID": "chat-daniel-john",
     "chat_identifier": "+12123456789"
   },
   {
-    "ROWID": "290be1d9-62c0-44d7-a681-47a839fbf479",
+    "ROWID": "chat-jane-john",
     "chat_identifier": "+12234567890"
   },
   {
-    "ROWID": "af28944d-06e3-421c-9f7b-c429c04ac052",
+    "ROWID": "chat-thomas-john",
     "chat_identifier": "thomas.riverstone@example.com"
   },
   {
-    "ROWID": "group-chat-id-123",
+    "ROWID": "chat-daniel-jane-john",
     "chat_identifier": "chat123456789",
     "display_name": "Group Chat"
   }
