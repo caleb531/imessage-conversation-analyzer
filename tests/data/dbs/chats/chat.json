@@ -10,5 +10,10 @@
   {
     "ROWID": "af28944d-06e3-421c-9f7b-c429c04ac052",
     "chat_identifier": "thomas.riverstone@example.com"
+  },
+  {
+    "ROWID": "group-chat-id-123",
+    "chat_identifier": "chat123456789",
+    "display_name": "Group Chat"
   }
 ]

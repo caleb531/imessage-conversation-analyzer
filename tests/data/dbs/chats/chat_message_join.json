@@ -146,5 +146,9 @@
   {
     "message_id": "9368cfd3-ad0c-4110-8658-0b81b08e71eb",
     "chat_id": "af28944d-06e3-421c-9f7b-c429c04ac052"
+  },
+  {
+    "message_id": "group-message-1",
+    "chat_id": "group-chat-id-123"
   }
 ]

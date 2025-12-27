@@ -27,7 +27,7 @@ class TypedCLIArguments(object):
     """
 
     analyzer: str
-    contact: str
+    contacts: list[str]
     timezone: Union[str, None]
     from_date: Union[str, None]
     to_date: Union[str, None]
@@ -62,11 +62,12 @@ def get_cli_parser() -> argparse.ArgumentParser:
             help="the name of a built-in analyzer, or a path to an analyzer file",
         )
     parser.add_argument(
-        "--contact",
+        "--contacts",
         "-c",
         required=True,
-        help="the full name, phone number, or email address of a macOS contact "
-        "whose conversation you want to analyze",
+        nargs="+",
+        help="the full name(s), phone number(s), or email address(es) of the "
+        "macOS contact(s) whose conversation you want to analyze",
     )
     parser.add_argument(
         "--timezone",

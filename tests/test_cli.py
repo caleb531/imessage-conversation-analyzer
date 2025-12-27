@@ -88,7 +88,7 @@ def test_cli_conversation_not_found() -> None:
         cli.main()
     assert (
         out.getvalue().rstrip()
-        == 'No conversation found for the contact "Evelyn Oakhaven"'
+        == 'No conversation found for the contact(s) "Evelyn Oakhaven"'
     )
 
 
@@ -111,15 +111,15 @@ def test_keyboardinterrupt(spec_from_loader: MagicMock) -> None:
     assert stdout.getvalue() == "\n"
 
 
-@patch("sys.argv", [cli.__file__, "-c", "Jane Fernbrook", "message_totals"])
+@patch("sys.argv", [cli.__file__, "message_totals", "-c", "Jane Fernbrook"])
 def test_cli_get_cli_args() -> None:
     """Should call the deprecated get_cli_args() function."""
     # Ensure that CLI is run so did_user_invoke_cli_directly is set to True
     with redirect_stdout(StringIO()):
         cli.main()
     cli_args = cli.get_cli_args()
-    assert cli_args.contact == sys.argv[2]
-    assert cli_args.analyzer == sys.argv[3]
+    assert cli_args.contacts == [sys.argv[3]]
+    assert cli_args.analyzer == sys.argv[1]
 
 
 @patch("importlib.metadata.version", return_value="1.2.3")

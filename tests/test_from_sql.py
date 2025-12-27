@@ -13,9 +13,9 @@ import ica.analyzers.from_sql as from_sql
     "sys.argv",
     [
         from_sql.__file__,
+        "SELECT count(*) as total_messages FROM messages",
         "-c",
         "Jane Fernbrook",
-        "SELECT count(*) as total_messages FROM messages",
     ],
 )
 def test_from_sql_success() -> None:
@@ -38,9 +38,9 @@ def test_from_sql_success() -> None:
     "sys.argv",
     [
         from_sql.__file__,
+        "SELECT count(*) as FROM messages",
         "-c",
         "Jane Fernbrook",
-        "SELECT count(*) as FROM messages",
     ],
 )
 def test_from_sql_error() -> None:

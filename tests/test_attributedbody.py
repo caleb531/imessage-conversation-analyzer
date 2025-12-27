@@ -6,5 +6,5 @@ import ica
 
 def test_decode_attributedbody() -> None:
     """Should properly decode message contents encoded in attributedBody."""
-    dfs = ica.get_dataframes(contact="Thomas Riverstone")
+    dfs = ica.get_dataframes(contacts=["Thomas Riverstone"])
     assert dfs.messages.iloc[-1]["text"] == "Loved “Same here! 🤣 Catch you later!”"

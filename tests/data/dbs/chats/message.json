@@ -257,5 +257,12 @@
     "attributedBody": "base64:BAtzdHJlYW10eXBlZIHoA4QBQISEhBlOU011dGFibGVBdHRyaWJ1dGVkU3RyaW5nAISEEk5TQXR0cmlidXRlZFN0cmluZwCEhAhOU09iamVjdACFkoSEhA9OU011dGFibGVTdHJpbmcBhIQITlNTdHJpbmcBlYQBKyxMb3ZlZCDigJxTYW1lIGhlcmUhIPCfpKMgQ2F0Y2ggeW91IGxhdGVyIeKAnYaEAmlJASaShISEDE5TRGljdGlvbmFyeQCVhAFpAZKEmJgdX19rSU1NZXNzYWdlUGFydEF0dHJpYnV0ZU5hbWWGkoSEhAhOU051bWJlcgCEhAdOU1ZhbHVlAJWEASqEm5sAhoaG",
     "date": 726787260392262912,
     "is_from_me": false
+  },
+  {
+    "ROWID": "group-message-1",
+    "text": "Hello everyone!",
+    "attributedBody": "",
+    "date": 727379229507062145,
+    "is_from_me": true
   }
 ]

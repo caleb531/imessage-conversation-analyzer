@@ -17,7 +17,6 @@ Much of this program was inspired by and built using findings from [this blog po
 
 ### Caveats
 
-- Group chats (three or more people) are not supported at this time
 - This program only runs on macOS
 
 ## Installation
@@ -45,12 +44,13 @@ To use ICA from the command line, run the `ica` command from the Terminal. The
 minimum required arguments are:
 
 1. A path to an analyzer file to run, or the name of a built-in analyzer
-2. The first and last name of the contact, via the `-c`/`--contact` flag
+2. The first and last name of the contact(s), via the `-c`/`--contacts` flag
    1. If the contact has no last name on record, you can just pass the first
       name
    2. You can also pass any phone number or email address associated with the
       contact; keep in mind that analysis will still run on all phone numbers /
       email addresses associated with the contact, not just the one you specify
+   3. For group chats, simply pass multiple contacts (e.g. `-c 'Jane Fernbrook' 'John Doe'`)
 
 #### Example
 
@@ -168,7 +168,7 @@ def main() -> None:
     # Retrieve the dataframes corresponding to the processed contents of the
     # database; dataframes include `messages` and `attachments`
     dfs = ica.get_dataframes(
-        contact=cli_args.contact,
+        contacts=cli_args.contacts,
         timezone=cli_args.timezone,
         from_date=cli_args.from_date,
         to_date=cli_args.to_date,

@@ -88,9 +88,61 @@ def decode_message_attributedbody(data: bytes) -> str:
     return ""
 
 
+def get_chat_ids_for_contacts(
+    con: sqlite3.Connection, contacts: list[str]
+) -> list[str]:
+    """
+    Find the chat IDs for the chat(s) involving exactly the specified contacts.
+    """
+    contact_handles_sets = [set(get_chat_identifiers(c)) for c in contacts]
+
+    # If any contact has no handles, we can't find a chat
+    if any(not handles for handles in contact_handles_sets):
+        return []
+
+    try:
+        # Get all chats and their participants
+        query = """
+        SELECT chat_id, id
+        FROM chat_handle_join
+        JOIN handle ON chat_handle_join.handle_id = handle.ROWID
+        """
+        df = pd.read_sql_query(query, con)
+    except Exception:
+        # Fallback or handle error if tables don't exist
+        return []
+
+    valid_chat_ids = []
+    for chat_id, group in df.groupby("chat_id"):
+        participants = set(group["id"])
+
+        # Check if number of participants matches number of contacts
+        if len(participants) != len(contacts):
+            continue
+
+        # Check if each participant matches one of the contacts
+        matched_contacts = set()
+        all_participants_matched = True
+        for participant in participants:
+            found_contact = False
+            for i, handles in enumerate(contact_handles_sets):
+                if participant in handles:
+                    matched_contacts.add(i)
+                    found_contact = True
+                    break
+            if not found_contact:
+                all_participants_matched = False
+                break
+
+        if all_participants_matched and len(matched_contacts) == len(contacts):
+            valid_chat_ids.append(chat_id)
+
+    return valid_chat_ids
+
+
 def get_messages_dataframe(
     con: sqlite3.Connection,
-    chat_identifiers: list[str],
+    chat_ids: list[str],
     timezone: Optional[str] = None,
 ) -> pd.DataFrame:
     """
@@ -101,16 +153,16 @@ def get_messages_dataframe(
     # local timezone
     if not timezone:
         timezone = tzlocal.get_localzone().key
+
+    chat_ids_placeholder = ", ".join(f"'{cid}'" for cid in chat_ids)
+
     return (
         pd.read_sql_query(
             sql=importlib.resources.files("ica")
             .joinpath(os.path.join("queries", "messages.sql"))
-            .read_text(),
+            .read_text()
+            .format(chat_ids_placeholder=chat_ids_placeholder),
             con=con,
-            params={
-                "chat_identifiers": get_chat_identifier_str(chat_identifiers),
-                "chat_identifier_delimiter": CHAT_IDENTIFIER_DELIMITER,
-            },
             parse_dates={"datetime": "ISO8601"},
         )
         # SQL provides each date/time as a Unix timestamp (which is implicitly
@@ -173,23 +225,22 @@ def filter_dataframe(
 
 def get_attachments_dataframe(
     con: sqlite3.Connection,
-    chat_identifiers: list[str],
+    chat_ids: list[str],
     timezone: Optional[str] = None,
 ) -> pd.DataFrame:
     """
     Return a pandas dataframe representing all attachments in a particular
     conversation (identified by the given phone number)
     """
+    chat_ids_placeholder = ", ".join(f"'{cid}'" for cid in chat_ids)
+
     return (
         pd.read_sql_query(
             sql=importlib.resources.files("ica")
             .joinpath(os.path.join("queries", "attachments.sql"))
-            .read_text(),
+            .read_text()
+            .format(chat_ids_placeholder=chat_ids_placeholder),
             con=con,
-            params={
-                "chat_identifiers": get_chat_identifier_str(chat_identifiers),
-                "chat_identifier_delimiter": CHAT_IDENTIFIER_DELIMITER,
-            },
             parse_dates={"datetime": "ISO8601"},
         )
         # Expose the date/time of the message alongside each attachment record,
@@ -203,7 +254,7 @@ def get_attachments_dataframe(
 
 
 def get_dataframes(
-    contact: str,
+    contacts: list[str],
     timezone: Optional[str] = None,
     from_date: Optional[str] = None,
     to_date: Optional[str] = None,
@@ -212,15 +263,15 @@ def get_dataframes(
     """
     Return all dataframes for a specific macOS Messages conversation
     """
-    chat_identifiers = get_chat_identifiers(contact)
     with sqlite3.connect(f"file:{DB_PATH}?mode=ro", uri=True) as con:
+        chat_ids = get_chat_ids_for_contacts(con, contacts)
         dfs = DataFrameNamespace(
-            messages=get_messages_dataframe(con, chat_identifiers, timezone),
-            attachments=get_attachments_dataframe(con, chat_identifiers, timezone),
+            messages=get_messages_dataframe(con, chat_ids, timezone),
+            attachments=get_attachments_dataframe(con, chat_ids, timezone),
         )
         if dfs.messages.empty:
             raise ConversationNotFoundError(
-                f'No conversation found for the contact "{contact}"'
+                f'No conversation found for the contact(s) "{", ".join(contacts)}"'
             )
         dfs.messages = filter_dataframe(
             dfs.messages,
