@@ -1,17 +1,14 @@
 [
   {
     "ROWID": "handle-id-1",
-    "id": "+12123456789",
-    "service": "iMessage"
+    "id": "+12123456789"
   },
   {
     "ROWID": "handle-id-2",
-    "id": "+12234567890",
-    "service": "iMessage"
+    "id": "+12234567890"
   },
   {
     "ROWID": "handle-id-3",
-    "id": "thomas.riverstone@example.com",
-    "service": "iMessage"
+    "id": "thomas.riverstone@example.com"
   }
 ]
