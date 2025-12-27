@@ -59,19 +59,6 @@ class DataFrameNamespace:
     attachments: pd.DataFrame
 
 
-def get_chat_identifier_str(chat_identifiers: list[str]) -> str:
-    """
-    Join the list of chat identifiers into a delimited string; in order for the
-    SQL comparison to function properly, this string must also start and end
-    with the delimiter symbol
-    """
-    return "{start}{joined}{end}".format(
-        start=CHAT_IDENTIFIER_DELIMITER,
-        joined=CHAT_IDENTIFIER_DELIMITER.join(chat_identifiers),
-        end=CHAT_IDENTIFIER_DELIMITER,
-    )
-
-
 def decode_message_attributedbody(data: bytes) -> str:
     """
     The textual contents of some messages are encoded in a special
