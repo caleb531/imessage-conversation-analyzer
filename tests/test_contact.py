@@ -84,6 +84,6 @@ def test_find_group_conversation() -> None:
     """
     Should find conversation for a group chat.
     """
-    dfs = ica.get_dataframes(contacts=["Daniel Brightingale", "+15551234567"])
+    dfs = ica.get_dataframes(contacts=["Daniel Brightingale", "Jane Fernbrook"])
     assert len(dfs.messages) > 0
     assert "Hello everyone!" in dfs.messages["text"].values

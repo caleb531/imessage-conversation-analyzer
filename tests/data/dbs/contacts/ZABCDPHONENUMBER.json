@@ -14,9 +14,5 @@
   {
     "ZOWNER": "04db77a1-2a17-48fb-941f-f3121a193ab3",
     "ZFULLNUMBER": "345-678-9012"
-  },
-  {
-    "ZOWNER": "alice-owner-id",
-    "ZFULLNUMBER": "+15551234567"
   }
 ]

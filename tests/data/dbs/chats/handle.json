@@ -13,10 +13,5 @@
     "ROWID": "handle-id-3",
     "id": "thomas.riverstone@example.com",
     "service": "iMessage"
-  },
-  {
-    "ROWID": "handle-id-4",
-    "id": "+15551234567",
-    "service": "iMessage"
   }
 ]
