@@ -75,53 +75,62 @@ def decode_message_attributedbody(data: bytes) -> str:
     return ""
 
 
+def get_all_chats_participants(con: sqlite3.Connection) -> pd.DataFrame:
+    """
+    Retrieve a dataframe containing all chat IDs and their associated participant
+    handles.
+    """
+    query = """
+    SELECT chat_id, id
+    FROM chat_handle_join
+    JOIN handle ON chat_handle_join.handle_id = handle.ROWID
+    """
+    return pd.read_sql_query(query, con)
+
+
+def do_participants_match_contacts(
+    participants: set[str], contact_handles_sets: list[set[str]]
+) -> bool:
+    """
+    Determine if the given set of chat participants corresponds exactly to the
+    list of contacts (where each contact is represented by a set of handles).
+    """
+    if len(participants) != len(contact_handles_sets):
+        return False
+
+    matched_contacts_indices = set()
+
+    for participant in participants:
+        found_contact = False
+        for i, handles in enumerate(contact_handles_sets):
+            if participant in handles:
+                matched_contacts_indices.add(i)
+                found_contact = True
+                break
+        if not found_contact:
+            return False
+
+    return len(matched_contacts_indices) == len(contact_handles_sets)
+
+
 def get_chat_ids_for_contacts(
     con: sqlite3.Connection, contacts: list[str]
 ) -> list[str]:
     """
     Find the chat IDs for the chat(s) involving exactly the specified contacts.
     """
-    contact_handles_sets = [set(get_chat_identifiers(c)) for c in contacts]
+    contact_handles_sets = [set(get_chat_identifiers(contact)) for contact in contacts]
 
     # If any contact has no handles, we can't find a chat
     if any(not handles for handles in contact_handles_sets):
         return []
 
-    try:
-        # Get all chats and their participants
-        query = """
-        SELECT chat_id, id
-        FROM chat_handle_join
-        JOIN handle ON chat_handle_join.handle_id = handle.ROWID
-        """
-        df = pd.read_sql_query(query, con)
-    except Exception:
-        # Fallback or handle error if tables don't exist
-        return []
+    df = get_all_chats_participants(con)
 
     valid_chat_ids = []
     for chat_id, group in df.groupby("chat_id"):
         participants = set(group["id"])
-
-        # Check if number of participants matches number of contacts
-        if len(participants) != len(contacts):
-            continue
-
-        # Check if each participant matches one of the contacts
-        matched_contacts = set()
-        all_participants_matched = True
-        for participant in participants:
-            found_contact = False
-            for i, handles in enumerate(contact_handles_sets):
-                if participant in handles:
-                    matched_contacts.add(i)
-                    found_contact = True
-                    break
-            if not found_contact:
-                all_participants_matched = False
-                break
-
-        if all_participants_matched and len(matched_contacts) == len(contacts):
+        if do_participants_match_contacts(participants, contact_handles_sets):
             valid_chat_ids.append(chat_id)
 
     return valid_chat_ids
