@@ -3,7 +3,9 @@ import glob
 import importlib.resources
 import os
 import sqlite3
+from collections.abc import Sequence
 from contextlib import suppress
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
@@ -72,47 +74,82 @@ def normalize_contact_identifier(contact_identifier: str) -> str:
     return contact_identifier
 
 
-def get_chat_identifiers(contact_identifier: str) -> list[str]:
-    """
-    Fetch the sequence of chat identifiers for the contact with the given
-    contact identifier (i.e. full name, phone number, or email address)
-    """
+@dataclass
+class ContactRecord:
+    # The first and last name of the contact
+    first_name: str
+    last_name: str
+    # The phone numbers and email addresses associated with the contact
+    phone_numbers: list[str] = field(default_factory=list)
+    email_addresses: list[str] = field(default_factory=list)
 
+    def get_identifiers(self) -> list[str]:
+        """
+        Retrieve the identifiers for the contact that may be stored on the
+        messages database
+        """
+        return sorted(set(self.phone_numbers + self.email_addresses))
+
+
+def get_contact_record(
+    con: sqlite3.Connection, contact_identifier: str
+) -> ContactRecord:
     contact_identifier = normalize_contact_identifier(contact_identifier)
 
-    chat_identifiers: set[str] = set()
+    rows = pd.read_sql_query(
+        sql=importlib.resources.files("ica")
+        .joinpath(os.path.join("queries", "contact.sql"))
+        .read_text(),
+        con=con,
+        params={"contact_identifier": contact_identifier},
+    )
+
+    if rows.empty:
+        raise ContactNotFoundError(f"Contact '{contact_identifier}' not found")
+
+    first_name = (
+        rows["ZFIRSTNAME"].dropna().iloc[0]
+        if not rows["ZFIRSTNAME"].dropna().empty
+        else ""
+    )
+    last_name = (
+        rows["ZLASTNAME"].dropna().iloc[0]
+        if not rows["ZLASTNAME"].dropna().empty
+        else ""
+    )
+
+    phone_numbers = (
+        rows["ZFULLNUMBER"].apply(normalize_phone_number).dropna().unique().tolist()
+    )
+    email_addresses = (
+        rows["ZADDRESS"].apply(normalize_email_address).dropna().unique().tolist()
+    )
+
+    return ContactRecord(
+        first_name=first_name,
+        last_name=last_name,
+        phone_numbers=phone_numbers,
+        email_addresses=email_addresses,
+    )
+
+
+def get_contact_records(contact_identifiers: Sequence[str]) -> list[ContactRecord]:
+    """
+    Fetch the attributes for the given contact identifiers; each user-supplied
+    identifier could be a full name, phone number, or email address; all
+    identifiers may not represent the same contact
+    """
+    records: list[ContactRecord] = []
     # There is a separate AddressBook database file for each "source" of
     # contacts (e.g. On My Mac, iCloud, etc.); we must query each of these
     # databases and combine the separate results into a single result set
     for db_path in glob.iglob(str(DB_GLOB)):
         with sqlite3.connect(f"file:{db_path}?mode=ro", uri=True) as con:
-            rows = pd.read_sql_query(
-                sql=importlib.resources.files("ica")
-                .joinpath(os.path.join("queries", "contact.sql"))
-                .read_text(),
-                con=con,
-                params={"contact_identifier": contact_identifier},
-            )
-            # Combine the results
-            chat_identifiers.update(
-                rows["ZFULLNUMBER"]
-                .apply(normalize_phone_number)
-                # The normalization function will convert empty strings to None
-                # so that we can filter them out with dropna()
-                .dropna()
-            )
-            chat_identifiers.update(
-                rows["ZADDRESS"]
-                .apply(normalize_email_address)
-                # The normalization function will convert empty strings to None
-                # so that we can filter them out with dropna()
-                .dropna()
+            records.extend(
+                (
+                    get_contact_record(con, contact_identifier)
+                    for contact_identifier in contact_identifiers
+                )
             )
 
-    # Quit if the contact with the specified name could not be found
-    if not len(chat_identifiers):
-        raise ContactNotFoundError(
-            f'No contact found with the name "{contact_identifier}"'
-        )
-
-    return sorted(chat_identifiers)
+    return records

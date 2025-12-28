@@ -18,8 +18,9 @@ import pandas as pd
 import tzlocal
 from typedstream.stream import TypedStreamReader
 
-from ica.contact import get_chat_identifiers
+from ica.contact import get_contact_records
 from ica.exceptions import (
+    ContactNotFoundError,
     ConversationNotFoundError,
     DateRangeInvalidError,
     FormatNotSupportedError,
@@ -119,7 +120,15 @@ def get_chat_ids_for_contacts(
     """
     Find the chat IDs for the chat(s) involving exactly the specified contacts.
     """
-    contact_handles_sets = [set(get_chat_identifiers(contact)) for contact in contacts]
+    contact_handles_sets = []
+    for contact in contacts:
+        records = get_contact_records([contact])
+
+        identifiers = set().union(*(r.get_identifiers() for r in records))
+        if not identifiers:
+            raise ContactNotFoundError(f'No contact found with the name "{contact}"')
+
+        contact_handles_sets.append(identifiers)
 
     # If any contact has no handles, we can't find a chat
     if any(not handles for handles in contact_handles_sets):
