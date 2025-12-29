@@ -12,7 +12,7 @@ from typing import Optional
 import pandas as pd
 import phonenumbers
 
-from ica.exceptions import ContactNotFoundError
+from ica.exceptions import ContactWithSameNameError
 
 # The glob pattern matching all AddressBook SQL databases to read from
 DB_GLOB = (
@@ -93,7 +93,7 @@ class ContactRecord:
 
 def get_contact_record(
     con: sqlite3.Connection, contact_identifier: str
-) -> ContactRecord:
+) -> list[ContactRecord]:
     contact_identifier = normalize_contact_identifier(contact_identifier)
 
     rows = pd.read_sql_query(
@@ -104,52 +104,64 @@ def get_contact_record(
         params={"contact_identifier": contact_identifier},
     )
 
+    records = []
     if rows.empty:
-        raise ContactNotFoundError(f"Contact '{contact_identifier}' not found")
+        return records
 
-    first_name = (
-        rows["ZFIRSTNAME"].dropna().iloc[0]
-        if not rows["ZFIRSTNAME"].dropna().empty
-        else ""
-    )
-    last_name = (
-        rows["ZLASTNAME"].dropna().iloc[0]
-        if not rows["ZLASTNAME"].dropna().empty
-        else ""
-    )
+    for _, group in rows.groupby("contact_id"):
+        first_name = group["ZFIRSTNAME"].iloc[0] or ""
+        last_name = group["ZLASTNAME"].iloc[0] or ""
 
-    phone_numbers = (
-        rows["ZFULLNUMBER"].apply(normalize_phone_number).dropna().unique().tolist()
-    )
-    email_addresses = (
-        rows["ZADDRESS"].apply(normalize_email_address).dropna().unique().tolist()
-    )
+        phone_numbers = (
+            group["ZFULLNUMBER"]
+            .apply(normalize_phone_number)
+            .dropna()
+            .unique()
+            .tolist()
+        )
+        email_addresses = (
+            group["ZADDRESS"].apply(normalize_email_address).dropna().unique().tolist()
+        )
 
-    return ContactRecord(
-        first_name=first_name,
-        last_name=last_name,
-        phone_numbers=phone_numbers,
-        email_addresses=email_addresses,
-    )
+        records.append(
+            ContactRecord(
+                first_name=first_name,
+                last_name=last_name,
+                phone_numbers=phone_numbers,
+                email_addresses=email_addresses,
+            )
+        )
+
+    return records
 
 
-def get_contact_records(contact_identifiers: Sequence[str]) -> list[ContactRecord]:
+def get_contact_records(
+    contact_identifiers: Sequence[str],
+) -> dict[str, list[ContactRecord]]:
     """
     Fetch the attributes for the given contact identifiers; each user-supplied
     identifier could be a full name, phone number, or email address; all
     identifiers may not represent the same contact
     """
-    records: list[ContactRecord] = []
+    records: dict[str, list[ContactRecord]] = {
+        identifier: [] for identifier in contact_identifiers
+    }
     # There is a separate AddressBook database file for each "source" of
     # contacts (e.g. On My Mac, iCloud, etc.); we must query each of these
     # databases and combine the separate results into a single result set
     for db_path in glob.iglob(str(DB_GLOB)):
         with sqlite3.connect(f"file:{db_path}?mode=ro", uri=True) as con:
-            records.extend(
-                (
+            for contact_identifier in contact_identifiers:
+                records[contact_identifier].extend(
                     get_contact_record(con, contact_identifier)
-                    for contact_identifier in contact_identifiers
                 )
+
+    # Check for duplicate contacts with the same name
+    for identifier, contact_records in records.items():
+        if len(contact_records) > 1:
+            raise ContactWithSameNameError(
+                f'Multiple contacts found for "{identifier}". Please specify a '
+                "phone number or email address instead."
             )
 
     return records

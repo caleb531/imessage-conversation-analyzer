@@ -17,6 +17,14 @@ class ContactNotFoundError(BaseAnalyzerException):
     pass
 
 
+class ContactWithSameNameError(BaseAnalyzerException):
+    """
+    Raised when multiple contacts with the same name are found
+    """
+
+    pass
+
+
 class ConversationNotFoundError(BaseAnalyzerException):
     """
     Raised when no conversation was found for the specified contact

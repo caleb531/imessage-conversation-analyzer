@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 """test the message_totals built-in analyzer"""
 
+from pathlib import Path
+from tempfile import gettempdir
+
 import pytest
 
 import ica
+from tests.mock_db_utils import create_mock_db
 
 
 def test_find_conversation_via_phone_number_only() -> None:
@@ -87,3 +91,16 @@ def test_find_group_conversation() -> None:
     dfs = ica.get_dataframes(contacts=["Daniel Brightingale", "Jane Fernbrook"])
     assert len(dfs.messages) > 0
     assert "Hello everyone!" in dfs.messages["text"].values
+
+
+def test_duplicate_contact_name_error() -> None:
+    """
+    Should raise ContactWithSameNameError if multiple contacts share the same name.
+    """
+    # Create a duplicate contacts database to simulate multiple sources
+    # containing the same contact name
+    duplicate_db_path = Path(gettempdir()) / "ica" / "duplicate.abcddb"
+    create_mock_db("contacts", duplicate_db_path)
+
+    with pytest.raises(ica.ContactWithSameNameError):
+        ica.get_dataframes(contacts=["Daniel Brightingale"])

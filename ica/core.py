@@ -115,18 +115,21 @@ def do_participants_match_contacts(
 
 
 def get_chat_ids_for_contacts(
-    con: sqlite3.Connection, contacts: list[str]
+    con: sqlite3.Connection, contact_identifiers: list[str]
 ) -> list[str]:
     """
     Find the chat IDs for the chat(s) involving exactly the specified contacts.
     """
     contact_handles_sets = []
-    for contact in contacts:
-        records = get_contact_records([contact])
+    contact_records_map = get_contact_records(contact_identifiers)
 
+    for contact_identifier in contact_identifiers:
+        records = contact_records_map[contact_identifier]
         identifiers = set().union(*(r.get_identifiers() for r in records))
         if not identifiers:
-            raise ContactNotFoundError(f'No contact found with the name "{contact}"')
+            raise ContactNotFoundError(
+                f'No contact found with the name "{contact_identifier}"'
+            )
 
         contact_handles_sets.append(identifiers)
 

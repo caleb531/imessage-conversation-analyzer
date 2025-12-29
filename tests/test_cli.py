@@ -97,7 +97,9 @@ def test_cli_contact_not_found() -> None:
     """Should print an error message if contact was not found."""
     with redirect_stderr(StringIO()) as out, pytest.raises(SystemExit):
         cli.main()
-    assert out.getvalue().rstrip() == "Contact 'Imaginary Person' not found"
+    assert (
+        out.getvalue().rstrip() == 'No contact found with the name "Imaginary Person"'
+    )
 
 
 @patch("importlib.util.spec_from_loader", side_effect=KeyboardInterrupt())

@@ -12,6 +12,7 @@ from ica.core import (
 from ica.exceptions import (
     BaseAnalyzerException,
     ContactNotFoundError,
+    ContactWithSameNameError,
     ConversationNotFoundError,
     DateRangeInvalidError,
     FormatNotSupportedError,
