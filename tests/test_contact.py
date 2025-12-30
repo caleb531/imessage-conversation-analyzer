@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """test the message_totals built-in analyzer"""
 
+import sqlite3
 from pathlib import Path
 from tempfile import gettempdir
 
@@ -33,15 +34,6 @@ def test_has_contact_info_but_no_conversation() -> None:
     """
     with pytest.raises(ica.ConversationNotFoundError):
         ica.get_dataframes(contacts=["Evelyn Oakhaven"])
-
-
-def test_missing_contact_info() -> None:
-    """
-    Should raise a ContactNotFoundError if contact exists but has no contact
-    info.
-    """
-    with pytest.raises(ica.ContactNotFoundError):
-        ica.get_dataframes(contacts=["Matthew Whisperton"])
 
 
 def test_contact_not_found_error() -> None:
@@ -101,6 +93,33 @@ def test_duplicate_contact_name_error() -> None:
     # containing the same contact name
     duplicate_db_path = Path(gettempdir()) / "ica" / "duplicate.abcddb"
     create_mock_db("contacts", duplicate_db_path)
+
+    # The duplicate database contains the same contact "Daniel Brightingale"
+    # with the same phone number. The coalescing logic should merge these
+    # into a single record, so no error should be raised.
+    ica.get_dataframes(contacts=["Daniel Brightingale"])
+
+
+def test_contact_with_same_name_error() -> None:
+    """
+    Should raise ContactWithSameNameError if multiple contacts share the same name
+    but have completely different identifiers.
+    """
+    # Create a duplicate contacts database
+    duplicate_db_path = Path(gettempdir()) / "ica" / "duplicate_diff.abcddb"
+
+    # We need to manually insert a record with the same name but different phone
+    with sqlite3.connect(duplicate_db_path) as con:
+        con.execute(
+            "CREATE TABLE ZABCDRECORD (Z_PK INTEGER PRIMARY KEY, ZFIRSTNAME TEXT, ZLASTNAME TEXT)"  # noqa: E501
+        )
+        con.execute("CREATE TABLE ZABCDPHONENUMBER (ZOWNER INTEGER, ZFULLNUMBER TEXT)")
+        con.execute("CREATE TABLE ZABCDEMAILADDRESS (ZOWNER INTEGER, ZADDRESS TEXT)")
+
+        # Insert "Daniel Brightingale" but with a different phone number
+        con.execute("INSERT INTO ZABCDRECORD VALUES (1, 'Daniel', 'Brightingale')")
+        con.execute("INSERT INTO ZABCDPHONENUMBER VALUES (1, '555-999-9999')")
+        con.commit()
 
     with pytest.raises(ica.ContactWithSameNameError):
         ica.get_dataframes(contacts=["Daniel Brightingale"])

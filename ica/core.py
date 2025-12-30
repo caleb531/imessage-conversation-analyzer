@@ -20,7 +20,6 @@ from typedstream.stream import TypedStreamReader
 
 from ica.contact import get_contact_records
 from ica.exceptions import (
-    ContactNotFoundError,
     ConversationNotFoundError,
     DateRangeInvalidError,
     FormatNotSupportedError,
@@ -90,20 +89,20 @@ def get_all_chats_participants(con: sqlite3.Connection) -> pd.DataFrame:
 
 
 def do_participants_match_contacts(
-    participants: set[str], contact_handles_sets: list[set[str]]
+    participants: set[str], contact_identifier_sets: list[set[str]]
 ) -> bool:
     """
     Determine if the given set of chat participants corresponds exactly to the
     list of contacts (where each contact is represented by a set of handles).
     """
-    if len(participants) != len(contact_handles_sets):
+    if len(participants) != len(contact_identifier_sets):
         return False
 
     matched_contacts_indices = set()
 
     for participant in participants:
         found_contact = False
-        for i, handles in enumerate(contact_handles_sets):
+        for i, handles in enumerate(contact_identifier_sets):
             if participant in handles:
                 matched_contacts_indices.add(i)
                 found_contact = True
@@ -111,7 +110,7 @@ def do_participants_match_contacts(
         if not found_contact:
             return False
 
-    return len(matched_contacts_indices) == len(contact_handles_sets)
+    return len(matched_contacts_indices) == len(contact_identifier_sets)
 
 
 def get_chat_ids_for_contacts(
@@ -120,30 +119,29 @@ def get_chat_ids_for_contacts(
     """
     Find the chat IDs for the chat(s) involving exactly the specified contacts.
     """
-    contact_handles_sets = []
-    contact_records_map = get_contact_records(contact_identifiers)
+    contact_records = get_contact_records(contact_identifiers)
 
-    for contact_identifier in contact_identifiers:
-        records = contact_records_map[contact_identifier]
-        identifiers = set().union(*(r.get_identifiers() for r in records))
-        if not identifiers:
-            raise ContactNotFoundError(
-                f'No contact found with the name "{contact_identifier}"'
-            )
+    # Each contact is represented by a set of handles (phone numbers/emails)
+    contact_identifier_sets = [record.get_identifiers() for record in contact_records]
+    # Retrieve the mapping between each handle ID and the ID of the chat it
+    # belongs to
+    chats_handles_df = get_all_chats_participants(con)
 
-        contact_handles_sets.append(identifiers)
-
-    # If any contact has no handles, we can't find a chat
-    if any(not handles for handles in contact_handles_sets):
-        return []
-
-    df = get_all_chats_participants(con)
-
+    # Any matching chats will have the exact participants as the specified
+    # contacts, so we must check each chat's participants against the list of
+    # contact identifiers
     valid_chat_ids = []
-    for chat_id, group in df.groupby("chat_id"):
+    for chat_id, group in chats_handles_df.groupby("chat_id"):
         participants = set(group["id"])
-        if do_participants_match_contacts(participants, contact_handles_sets):
+        if do_participants_match_contacts(participants, contact_identifier_sets):
             valid_chat_ids.append(chat_id)
+
+    if not valid_chat_ids:
+        raise ConversationNotFoundError(
+            'No conversation found for the contact(s) "{}"'.format(
+                ", ".join(contact_identifiers)
+            )
+        )
 
     return valid_chat_ids
 

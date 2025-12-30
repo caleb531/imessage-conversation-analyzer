@@ -3,6 +3,7 @@ import glob
 import importlib.resources
 import os
 import sqlite3
+from collections import Counter
 from collections.abc import Sequence
 from contextlib import suppress
 from dataclasses import dataclass, field
@@ -12,7 +13,7 @@ from typing import Optional
 import pandas as pd
 import phonenumbers
 
-from ica.exceptions import ContactWithSameNameError
+from ica.exceptions import ContactNotFoundError, ContactWithSameNameError
 
 # The glob pattern matching all AddressBook SQL databases to read from
 DB_GLOB = (
@@ -83,12 +84,12 @@ class ContactRecord:
     phone_numbers: list[str] = field(default_factory=list)
     email_addresses: list[str] = field(default_factory=list)
 
-    def get_identifiers(self) -> list[str]:
+    def get_identifiers(self) -> set[str]:
         """
         Retrieve the identifiers for the contact that may be stored on the
         messages database
         """
-        return sorted(set(self.phone_numbers + self.email_addresses))
+        return set(self.phone_numbers + self.email_addresses)
 
 
 def get_contact_record(
@@ -135,33 +136,83 @@ def get_contact_record(
     return records
 
 
+def coalesce_contact_records(records: list[ContactRecord]) -> list[ContactRecord]:
+    """
+    Merge contact records that share at least one identifier (phone number or
+    email address)
+    """
+    # A list of merged contact records
+    unique_records: list[ContactRecord] = []
+    for record in records:
+        found = False
+        for unique_record in unique_records:
+            # If any identifier overlaps, merge
+            if record.get_identifiers() & unique_record.get_identifiers():
+                # Merge identifiers
+                unique_record.phone_numbers = sorted(
+                    set(unique_record.phone_numbers) | set(record.phone_numbers)
+                )
+                unique_record.email_addresses = sorted(
+                    set(unique_record.email_addresses) | set(record.email_addresses)
+                )
+                # Optionally, update names if needed (e.g., keep the longest, or
+                # prefer non-empty)
+                if not unique_record.first_name and record.first_name:
+                    unique_record.first_name = record.first_name
+                if not unique_record.last_name and record.last_name:
+                    unique_record.last_name = record.last_name
+                found = True
+                break
+        # If no overlapping record was found, add as new
+        if not found:
+            unique_records.append(record)
+    return unique_records
+
+
+def validate_contact_records(
+    contact_records: list[ContactRecord], contact_identifiers: Sequence[str]
+) -> None:
+    """
+    Validate that at least one contact record was found; if multiple records
+    have the same full name, raise an error.
+    """
+    if not contact_records:
+        raise ContactNotFoundError(
+            "No contact found for the given identifiers: {}".format(
+                ", ".join(contact_identifiers)
+            )
+        )
+
+    # Check for duplicate full names
+    # Check for duplicate contacts with the same name but different identifiers
+    name_counts = Counter(
+        (record.first_name, record.last_name) for record in contact_records
+    )
+    duplicates = [name for name, count in name_counts.items() if count > 1]
+    if duplicates:
+        # Only report the first duplicate found
+        name = duplicates[0]
+        raise ContactWithSameNameError(
+            f'Multiple contacts found for name "{name[0]} {name[1]}". Please specify a phone number or email address instead.'  # noqa: E501
+        )
+
+
 def get_contact_records(
     contact_identifiers: Sequence[str],
-) -> dict[str, list[ContactRecord]]:
+) -> list[ContactRecord]:
     """
     Fetch the attributes for the given contact identifiers; each user-supplied
     identifier could be a full name, phone number, or email address; all
-    identifiers may not represent the same contact
+    identifiers may not represent the same contact. Returns a flat list of
+    unique ContactRecord objects.
     """
-    records: dict[str, list[ContactRecord]] = {
-        identifier: [] for identifier in contact_identifiers
-    }
-    # There is a separate AddressBook database file for each "source" of
-    # contacts (e.g. On My Mac, iCloud, etc.); we must query each of these
-    # databases and combine the separate results into a single result set
+    all_records: list[ContactRecord] = []
     for db_path in glob.iglob(str(DB_GLOB)):
         with sqlite3.connect(f"file:{db_path}?mode=ro", uri=True) as con:
             for contact_identifier in contact_identifiers:
-                records[contact_identifier].extend(
-                    get_contact_record(con, contact_identifier)
-                )
+                all_records.extend(get_contact_record(con, contact_identifier))
 
-    # Check for duplicate contacts with the same name
-    for identifier, contact_records in records.items():
-        if len(contact_records) > 1:
-            raise ContactWithSameNameError(
-                f'Multiple contacts found for "{identifier}". Please specify a '
-                "phone number or email address instead."
-            )
-
-    return records
+    # Coalesce all records across all identifiers and sources
+    unique_records = coalesce_contact_records(all_records)
+    validate_contact_records(unique_records, contact_identifiers)
+    return unique_records

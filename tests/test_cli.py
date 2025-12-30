@@ -98,7 +98,8 @@ def test_cli_contact_not_found() -> None:
     with redirect_stderr(StringIO()) as out, pytest.raises(SystemExit):
         cli.main()
     assert (
-        out.getvalue().rstrip() == 'No contact found with the name "Imaginary Person"'
+        out.getvalue().rstrip()
+        == "No contact found for the given identifiers: Imaginary Person"
     )
 
 
