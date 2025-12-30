@@ -75,8 +75,8 @@ def get_cli_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--timezone",
         "-t",
-        help="the IANA time zone name to use for dates; "
-        "defaults to the system's local time zone",
+        help="the IANA time zone name to use for dates, "
+        "e.g. 'America/New_York'; defaults to the system's local time zone",
     )
     parser.add_argument(
         "--from-date",
