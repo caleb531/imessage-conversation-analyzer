@@ -178,9 +178,7 @@ def validate_contact_records(
     """
     if not contact_records:
         raise ContactNotFoundError(
-            "No contact found for the given identifiers: {}".format(
-                ", ".join(contact_identifiers)
-            )
+            "No contact found for {}".format(", ".join(contact_identifiers))
         )
 
     # Check for duplicate full names
