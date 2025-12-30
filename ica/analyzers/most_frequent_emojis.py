@@ -76,8 +76,8 @@ def main() -> None:
     ica.output_results(
         (
             pd.DataFrame({"emoji": pd.Series(cleaned_emojis).value_counts()})
-            .rename({"emoji": "count"}, axis="columns")
-            .rename_axis("emoji", axis="index")
+            .rename(columns={"emoji": "count"})
+            .rename_axis(index="emoji")
             .head(cli_args.result_count)
         ),
         format=cli_args.format,

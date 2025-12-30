@@ -191,7 +191,7 @@ def get_messages_dataframe(
         )
         # Remove 'attributedBody' column now that it has been merged into the
         # 'text' column
-        .drop("attributedBody", axis="columns")
+        .drop(columns="attributedBody")
         # Use a regex-based heuristic to determine which messages are reactions
         .assign(
             is_reaction=lambda df: df["text"].str.match(
@@ -353,7 +353,7 @@ def prepare_df_for_output(
             columns=prettify_header_name,
         )
         # Prettify index column name
-        .rename_axis(prettify_header_name(df.index.name), axis="index")
+        .rename_axis(index=prettify_header_name(df.index.name))
         # Make all indices start from 1 instead of 0, but only if the index is
         # the default (rather than a custom column)
         .pipe(lambda df: df.set_index(df.index + 1 if not df.index.name else df.index))
@@ -419,8 +419,8 @@ def output_results(
             # for the columns axis name; to solve this, we can make the name of
             # the index the name of the columns axis, then remove the name from
             # the index (source: <https://stackoverflow.com/a/43635736/560642>)
-            .rename_axis(output_df.index.name, axis="columns")
-            .rename_axis(None, axis="index")
+            .rename_axis(columns=output_df.index.name)
+            .rename_axis(index=None)
             .to_string(output, index=True, line_width=100000)
         )
 

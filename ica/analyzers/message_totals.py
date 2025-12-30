@@ -22,7 +22,7 @@ def get_sums_by_day(dfs: ica.DataFrameNamespace) -> pd.DataFrame:
         dfs.messages.assign(message_count=1)
         .resample("D", on="datetime")
         .sum(numeric_only=True)
-        .rename_axis("date", axis="index")
+        .rename_axis(index="date")
         .assign(is_from_them=lambda df: df["message_count"] - df["is_from_me"])
     )
 
