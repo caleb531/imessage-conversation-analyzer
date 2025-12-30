@@ -62,12 +62,15 @@ def get_cli_parser() -> argparse.ArgumentParser:
             help="the name of a built-in analyzer, or a path to an analyzer file",
         )
     parser.add_argument(
-        "--contacts",
+        "--contact",
         "-c",
+        dest="contacts",
         required=True,
-        nargs="+",
-        help="the full name(s), phone number(s), or email address(es) of the "
-        "macOS contact(s) whose conversation you want to analyze",
+        action="append",
+        help="the full name, phone number, or email address of each "
+        "macOS contact whose conversation you want to analyze; "
+        "you will need to specify --contact/-c for each contact in the "
+        "conversation (excluding yourself)",
     )
     parser.add_argument(
         "--timezone",
@@ -169,7 +172,7 @@ def main() -> None:
     # parse_known_args() is slightly different from parse_args() in that the
     # former returns a two-item tuple, where the first item is the Namespace of
     # known arguments, and the second item is a list of any unknown arguments
-    cli_args = get_cli_parser().parse_known_args(namespace=TypedCLIArguments)[0]
+    cli_args = get_cli_parser().parse_known_args(namespace=TypedCLIArguments())[0]
 
     try:
         run_analyzer(cli_args.analyzer)

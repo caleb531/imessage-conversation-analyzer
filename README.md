@@ -44,7 +44,7 @@ To use ICA from the command line, run the `ica` command from the Terminal. The
 minimum required arguments are:
 
 1. A path to an analyzer file to run, or the name of a built-in analyzer
-2. The first and last name of the contact(s), via the `-c`/`--contacts` flag
+2. The first and last name of the contact(s), via the `--contact` / `-c` flag
    1. If the contact has no last name on record, you can just pass the first
       name
    2. You can also pass any phone number or email address associated with the
