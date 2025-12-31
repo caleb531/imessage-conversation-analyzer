@@ -262,30 +262,28 @@ Python API.
 
 #### `messages`
 
-A list of all messages in the conversation, including text messages and
-reactions.
+A list of all messages in the conversation, including text messages and reactions.
 
 | Column | Type | Description |
 | :--- | :--- | :--- |
-| `ROWID` | Integer | The unique identifier of the message |
-| `text` | String | The content of the message |
-| `datetime` | Datetime | The timestamp of the message whose timezone is based on the `timezone` parameter you pass to `get_dataframes()` (defaults to the system's local timezone) |
-| `is_from_me` | Boolean | Whether the message was sent by you (`True`) or the other person (`False`) |
-| `is_reaction` | Boolean | Whether the message is a reaction (e.g. "Loved ...") |
+| `ROWID` | `int` | The unique identifier of the message |
+| `text` | `str` | The content of the message |
+| `datetime` | `datetime.datetime` | The timestamp of the message whose timezone is based on the `timezone` parameter you pass to `get_dataframes()` (defaults to the system's local timezone) |
+| `is_from_me` | `bool` | Whether the message was sent by you (`True`) or the other person (`False`) |
+| `is_reaction` | `bool` | Whether the message is a reaction (e.g. "Loved ...") |
 
 #### `attachments`
 
-A list of all attachments in the conversation, including images, videos, audio
-files, and other types of files. Please note that no content is included, only metadata.
+A list of all attachments in the conversation, including images, videos, audio, and any other types of files. Please note that no content is included, only metadata.
 
 | Column | Type | Description |
 | :--- | :--- | :--- |
-| `ROWID` | Integer | The unique identifier of the attachment |
-| `filename` | String | The filename of the attachment |
-| `mime_type` | String | The MIME type of the attachment (e.g. `image/jpeg`) |
-| `message_id` | Integer | The `ROWID` of the associated message |
-| `datetime` | Datetime | The localized timestamp of the message |
-| `is_from_me` | Boolean | Whether the attachment was sent by you (`True`) or the other person (`False`) |
+| `ROWID` | `int` | The unique identifier of the attachment |
+| `filename` | `str` | The filename of the attachment |
+| `mime_type` | `str` | The MIME type of the attachment (e.g. `image/jpeg`) |
+| `message_id` | `int` | The `ROWID` of the associated message |
+| `datetime` | `datetime.datetime` | The localized timestamp of the message |
+| `is_from_me` | `bool` | Whether the attachment was sent by you (`True`) or the other person (`False`) |
 
 #### `participants`
 
@@ -293,10 +291,10 @@ A list of all participants in the conversation other than you (the host user).
 
 | Column | Type | Description |
 | :--- | :--- | :--- |
-| `first_name` | String | The first name of the participant |
-| `last_name` | String | The last name of the participant |
-| `phone_numbers` | List\<String> | A list of phone numbers associated with the participant |
-| `email_addresses` | List\<String> | A list of email addresses associated with the participant |
+| `first_name` | `str` | The first name of the participant |
+| `last_name` | `str` | The last name of the participant |
+| `phone_numbers` | `list[str]` | A list of phone numbers associated with the participant |
+| `email_addresses` | `list[str]` | A list of email addresses associated with the participant |
 
 ## Developer Setup
 
