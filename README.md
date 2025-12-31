@@ -262,6 +262,9 @@ Python API.
 
 #### `messages`
 
+A list of all messages in the conversation, including text messages and
+reactions.
+
 | Column | Type | Description |
 | :--- | :--- | :--- |
 | `ROWID` | Integer | The unique identifier of the message |
@@ -271,6 +274,9 @@ Python API.
 | `is_reaction` | Boolean | Whether the message is a reaction (e.g. "Loved ...") |
 
 #### `attachments`
+
+A list of all attachments in the conversation, including images, videos, audio
+files, and other types of files. Please note that no content is included, only metadata.
 
 | Column | Type | Description |
 | :--- | :--- | :--- |
@@ -282,6 +288,8 @@ Python API.
 | `is_from_me` | Boolean | Whether the attachment was sent by you (`True`) or the other person (`False`) |
 
 #### `participants`
+
+A list of all participants in the conversation other than you (the host user).
 
 | Column | Type | Description |
 | :--- | :--- | :--- |
