@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+import functools
 import importlib.machinery
 import importlib.resources
 import importlib.util
@@ -294,11 +294,16 @@ def get_dataframes(
         return dfs
 
 
-def prettify_header_name(header_name: Hashable) -> Hashable:
+def prettify_header_name(
+    header_name: Hashable, prettified_label_overrides: Optional[dict[str, str]] = None
+) -> Hashable:
     """
     Format the given header name to be more human-readable (e.g. "foo_bar" =>
     "Foo Bar")
     """
+    if prettified_label_overrides and header_name in prettified_label_overrides:
+        return prettified_label_overrides[header_name]
+
     if header_name and type(header_name) is str:
         return header_name.replace("_", " ").title()
     else:
@@ -338,22 +343,31 @@ def make_dataframe_tz_naive(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def prepare_df_for_output(
-    df: pd.DataFrame, prettify_index: bool = True
+    df: pd.DataFrame, prettified_label_overrides: Optional[dict[str, str]] = None
 ) -> pd.DataFrame:
     """
     Prepare the given dataframe for output by prettifying column names,
     stripping timezone details incompatible with Excel, and other normalization
     operations; return the normalized dataframe
     """
+
     return (
         df.rename(
             # Prettify header column (i.e. textual values in first column)
-            index=prettify_header_name if prettify_index else None,
+            index=functools.partial(
+                prettify_header_name,
+                prettified_label_overrides=prettified_label_overrides,
+            ),
             # Prettify header row (i.e. column names)
-            columns=prettify_header_name,
+            columns=functools.partial(
+                prettify_header_name,
+                prettified_label_overrides=prettified_label_overrides,
+            ),
         )
         # Prettify index column name
-        .rename_axis(index=prettify_header_name(df.index.name))
+        .rename_axis(
+            index=prettify_header_name(df.index.name, prettified_label_overrides)
+        )
         # Make all indices start from 1 instead of 0, but only if the index is
         # the default (rather than a custom column)
         .pipe(lambda df: df.set_index(df.index + 1 if not df.index.name else df.index))
@@ -367,13 +381,15 @@ def output_results(
     analyzer_df: pd.DataFrame,
     format: Optional[str] = None,
     output: Union[str, StringIO, BytesIO, None] = None,
-    prettify_index: bool = True,
+    prettified_label_overrides: Optional[dict[str, str]] = None,
 ) -> None:
     """
     Print the dataframe provided by an analyzer module
     """
     is_default_index = not analyzer_df.index.name
-    output_df = prepare_df_for_output(analyzer_df, prettify_index=prettify_index)
+    output_df = prepare_df_for_output(
+        analyzer_df, prettified_label_overrides=prettified_label_overrides
+    )
 
     if format and format not in {
         *SUPPORTED_OUTPUT_FORMAT_MAP.keys(),

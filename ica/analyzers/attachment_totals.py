@@ -51,6 +51,10 @@ def main() -> None:
         .sort_values(by="total", ascending=False),
         format=cli_args.format,
         output=cli_args.output,
+        prettified_label_overrides={
+            "youtube_videos": "YouTube Videos",
+            "gifs": "GIFs",
+        },
     )
 
 

@@ -84,7 +84,7 @@ def main() -> None:
         ),
         format=cli_args.format,
         output=cli_args.output,
-        prettify_index=False,
+        prettified_label_overrides={phrase: phrase for phrase in cli_args.phrases},
     )
 
 
