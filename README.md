@@ -84,9 +84,9 @@ ICA includes several built-in analyzers out of the box:
 3. `most_frequent_emojis`: count data for the top 10 most frequently used emojis
    across the entire conversation
 4. `totals_by_day`: a comprehensive breakdown of message totals for every day
-   you and the other person have been messaging in the conversation
+   you and the other participants have been messaging in the conversation
 5. `transcript`: a full, unedited transcript of every message, including
-   reactions, between you and the other person (attachment files not included)
+   reactions, between you and the other participants (attachment files not included)
 6. `count_phrases`: count the number of case-insensitive occurrences of any
    arbitrary strings across all messages in a conversation (excluding
    reactions); use the `-s` / `--case-sensitive` option for case-sensitive
@@ -146,7 +146,7 @@ type of Python project that can run on macOS. All of the built-in analyzers
 (under the `ica/analyzers` directory) actually use this API.
 
 Here's a complete example that shows how to retrieve the transcript of an entire
-iMessage conversation with one other person.
+iMessage conversation with one or more other people.
 
 ```python
 # get_my_transcript.py
@@ -269,12 +269,12 @@ A list of all messages in the conversation, including text messages and reaction
 | `ROWID` | `int` | The unique identifier of the message |
 | `text` | `str` | The content of the message |
 | `datetime` | `datetime.datetime` | The timestamp of the message whose timezone is based on the `timezone` parameter you pass to `get_dataframes()` (defaults to the system's local timezone) |
-| `is_from_me` | `bool` | Whether the message was sent by you (`True`) or the other person (`False`) |
+| `is_from_me` | `bool` | Whether the message was sent by you (`True`) or another participant (`False`) |
 | `is_reaction` | `bool` | Whether the message is a reaction (e.g. "Loved ...") |
 
 #### `attachments`
 
-A list of all attachments in the conversation, including images, videos, audio, and any other types of files. Please note that no content is included, only metadata.
+A list of all attachments in the conversation, including images, videos, audio\, and any other types of files. Please note that no content is included, only metadata.
 
 | Column | Type | Description |
 | :--- | :--- | :--- |
@@ -283,7 +283,7 @@ A list of all attachments in the conversation, including images, videos, audio, 
 | `mime_type` | `str` | The MIME type of the attachment (e.g. `image/jpeg`) |
 | `message_id` | `int` | The `ROWID` of the associated message |
 | `datetime` | `datetime.datetime` | The localized timestamp of the message |
-| `is_from_me` | `bool` | Whether the attachment was sent by you (`True`) or the other person (`False`) |
+| `is_from_me` | `bool` | Whether the attachment was sent by you (`True`) or another participant (`False`) |
 
 #### `participants`
 

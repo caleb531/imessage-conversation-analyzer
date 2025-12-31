@@ -8,7 +8,7 @@ DATE_FORMAT = "%Y-%m-%d"
 def main() -> None:
     """
     Generates a comprehensive breakdown of message totals for every day you and
-    the other person have been messaging in the conversation
+    the other participants have been messaging in the conversation
     """
     cli_args = ica.get_cli_parser().parse_args(namespace=ica.TypedCLIArguments())
     dfs = ica.get_dataframes(
