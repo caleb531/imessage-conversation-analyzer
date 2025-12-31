@@ -31,7 +31,7 @@ def main() -> None:
                     "sent_by_them": "#_sent_by_them",
                 }
             )
-            .rename_axis("date")
+            .rename_axis(index="date")
         ),
         format=cli_args.format,
         output=cli_args.output,
