@@ -281,6 +281,15 @@ Python API.
 | `datetime` | Datetime | The localized timestamp of the message |
 | `is_from_me` | Boolean | Whether the attachment was sent by you (`True`) or the other person (`False`) |
 
+#### `participants`
+
+| Column | Type | Description |
+| :--- | :--- | :--- |
+| `first_name` | String | The first name of the participant |
+| `last_name` | String | The last name of the participant |
+| `phone_numbers` | List\<String> | A list of phone numbers associated with the participant |
+| `email_addresses` | List\<String> | A list of email addresses associated with the participant |
+
 ## Developer Setup
 
 The following instructions are written for developers who want to run the

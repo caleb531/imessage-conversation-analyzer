@@ -18,7 +18,7 @@ import pandas as pd
 import tzlocal
 from typedstream.stream import TypedStreamReader
 
-from ica.contact import get_contact_records
+from ica.contact import ContactRecord, get_contact_records
 from ica.exceptions import (
     ConversationNotFoundError,
     DateRangeInvalidError,
@@ -57,6 +57,7 @@ class DataFrameNamespace:
 
     messages: pd.DataFrame
     attachments: pd.DataFrame
+    participants: pd.DataFrame
 
 
 def decode_message_attributedbody(data: bytes) -> str:
@@ -114,13 +115,11 @@ def do_participants_match_contacts(
 
 
 def get_chat_ids_for_contacts(
-    con: sqlite3.Connection, contact_identifiers: list[str]
+    con: sqlite3.Connection, contact_records: list[ContactRecord]
 ) -> list[str]:
     """
     Find the chat IDs for the chat(s) involving exactly the specified contacts.
     """
-    contact_records = get_contact_records(contact_identifiers)
-
     # Each contact is represented by a set of handles (phone numbers/emails)
     contact_identifier_sets = [record.get_identifiers() for record in contact_records]
     # Retrieve the mapping between each handle ID and the ID of the chat it
@@ -135,13 +134,6 @@ def get_chat_ids_for_contacts(
         participants = set(group["id"])
         if do_participants_match_contacts(participants, contact_identifier_sets):
             valid_chat_ids.append(chat_id)
-
-    if not valid_chat_ids:
-        raise ConversationNotFoundError(
-            'No conversation found for the contact(s) "{}"'.format(
-                ", ".join(contact_identifiers)
-            )
-        )
 
     return valid_chat_ids
 
@@ -259,6 +251,17 @@ def get_attachments_dataframe(
     )
 
 
+def get_participants_dataframe(
+    con: sqlite3.Connection,
+    contact_records: list[ContactRecord],
+) -> pd.DataFrame:
+    """
+    Return a pandas dataframe representing the participants in a particular
+    conversation, excluding the host user (i.e. "me")
+    """
+    return pd.DataFrame(contact_records)
+
+
 def get_dataframes(
     contacts: list[str],
     timezone: Optional[str] = None,
@@ -269,11 +272,21 @@ def get_dataframes(
     """
     Return all dataframes for a specific macOS Messages conversation
     """
+    contact_records = get_contact_records(contacts)
+
     with sqlite3.connect(f"file:{DB_PATH}?mode=ro", uri=True) as con:
-        chat_ids = get_chat_ids_for_contacts(con, contacts)
+        chat_ids = get_chat_ids_for_contacts(con, contact_records)
+        if not chat_ids:
+            raise ConversationNotFoundError(
+                'No conversation found for the contact(s) "{}"'.format(
+                    ", ".join(contacts)
+                )
+            )
+
         dfs = DataFrameNamespace(
             messages=get_messages_dataframe(con, chat_ids, timezone),
             attachments=get_attachments_dataframe(con, chat_ids, timezone),
+            participants=get_participants_dataframe(con, contact_records),
         )
         if dfs.messages.empty:
             raise ConversationNotFoundError(
