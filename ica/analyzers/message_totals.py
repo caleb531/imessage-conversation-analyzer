@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-
 import datetime
+from typing import Optional
 
 import pandas as pd
 
@@ -18,6 +18,12 @@ def get_sums_by_day(dfs: ica.DataFrameNamespace) -> pd.DataFrame:
     """
     Calculate the text message sums, grouped by date
     """
+    if dfs.messages.empty:
+        return pd.DataFrame(
+            columns=pd.Index(
+                ["message_count", "is_from_me", "is_from_them"], dtype="object"
+            )
+        ).rename_axis(index="date")
     return (
         dfs.messages.assign(message_count=1)
         .resample("D", on="datetime")
@@ -49,23 +55,23 @@ def get_noreply_count(sums_by_day: pd.DataFrame) -> int:
     )
 
 
-def main() -> None:
+def calculate_totals(
+    dfs: ica.DataFrameNamespace, to_date: Optional[str] = None
+) -> pd.DataFrame:
     """
-    Generate a summary of message and reaction counts, by person and in total,
-    as well as other insightful metrics
+    Calculate the totals for the given dataframes
     """
-    cli_args = ica.get_cli_parser().parse_args(namespace=ica.TypedCLIArguments())
-    dfs = ica.get_dataframes(
-        contacts=cli_args.contacts,
-        timezone=cli_args.timezone,
-        from_date=cli_args.from_date,
-        to_date=cli_args.to_date,
-        from_person=cli_args.from_person,
-    )
-
     first_message_date = get_first_message_date(dfs)
     today = pd.Timestamp(datetime.date.today())
-    total_days = (today - first_message_date).days + 1
+    if to_date:
+        date_upper_bound = min(today, pd.Timestamp(to_date).replace(tzinfo=None))
+    else:
+        date_upper_bound = today
+
+    if pd.isna(first_message_date):
+        total_days = 0
+    else:
+        total_days = (date_upper_bound - first_message_date).days + 1
 
     sums_by_day = get_sums_by_day(dfs)
     days_messaged_count = get_days_messaged_count(sums_by_day)
@@ -84,10 +90,27 @@ def main() -> None:
         "days_missed": total_days - days_messaged_count,
         "days_with_no_reply": get_noreply_count(sums_by_day),
     }
+    return pd.DataFrame(
+        {"metric": tuple(totals_map.keys()), "total": tuple(totals_map.values())},
+    ).set_index("metric")
+
+
+def main() -> None:
+    """
+    Generate a summary of message and reaction counts, by person and in total,
+    as well as other insightful metrics
+    """
+    cli_args = ica.get_cli_parser().parse_args(namespace=ica.TypedCLIArguments())
+    dfs = ica.get_dataframes(
+        contacts=cli_args.contacts,
+        timezone=cli_args.timezone,
+        from_date=cli_args.from_date,
+        to_date=cli_args.to_date,
+        from_person=cli_args.from_person,
+    )
+
     ica.output_results(
-        pd.DataFrame(
-            {"metric": tuple(totals_map.keys()), "total": tuple(totals_map.values())},
-        ).set_index("metric"),
+        calculate_totals(dfs, to_date=cli_args.to_date),
         format=cli_args.format,
         output=cli_args.output,
     )
