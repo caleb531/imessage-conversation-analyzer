@@ -288,10 +288,6 @@ def get_dataframes(
             attachments=get_attachments_dataframe(con, chat_ids, timezone),
             participants=get_participants_dataframe(con, contact_records),
         )
-        if dfs.messages.empty:
-            raise ConversationNotFoundError(
-                f'No conversation found for the contact(s) "{", ".join(contacts)}"'
-            )
         dfs.messages = filter_dataframe(
             dfs.messages,
             from_date,
