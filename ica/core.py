@@ -76,66 +76,51 @@ def decode_message_attributedbody(data: bytes) -> str:
     return ""
 
 
-def get_all_chats_participants(con: sqlite3.Connection) -> pd.DataFrame:
-    """
-    Retrieve a dataframe containing all chat IDs and their associated participant
-    handles.
-    """
-    query = """
-    SELECT chat_id, id
-    FROM chat_handle_join
-    JOIN handle ON chat_handle_join.handle_id = handle.ROWID
-    """
-    return pd.read_sql_query(query, con)
-
-
-def do_participants_match_contacts(
-    participants: set[str], contact_identifier_sets: list[set[str]]
-) -> bool:
-    """
-    Determine if the given set of chat participants corresponds exactly to the
-    list of contacts (where each contact is represented by a set of handles).
-    """
-    if len(participants) != len(contact_identifier_sets):
-        return False
-
-    matched_contacts_indices = set()
-
-    for participant in participants:
-        found_contact = False
-        for i, handles in enumerate(contact_identifier_sets):
-            if participant in handles:
-                matched_contacts_indices.add(i)
-                found_contact = True
-                break
-        if not found_contact:
-            return False
-
-    return len(matched_contacts_indices) == len(contact_identifier_sets)
-
-
 def get_chat_ids_for_contacts(
     con: sqlite3.Connection, contact_records: list[ContactRecord]
 ) -> list[str]:
     """
     Find the chat IDs for the chat(s) involving exactly the specified contacts.
     """
-    # Each contact is represented by a set of handles (phone numbers/emails)
-    contact_identifier_sets = [record.get_identifiers() for record in contact_records]
-    # Retrieve the mapping between each handle ID and the ID of the chat it
-    # belongs to
-    chats_handles_df = get_all_chats_participants(con)
+    if not contact_records:
+        return []
 
-    # Any matching chats will have the exact participants as the specified
-    # contacts, so we must check each chat's participants against the list of
-    # contact identifiers
-    valid_chat_ids = []
-    for chat_id, group in chats_handles_df.groupby("chat_id"):
-        participants = set(group["id"])
-        if do_participants_match_contacts(participants, contact_identifier_sets):
-            valid_chat_ids.append(chat_id)
+    # We need to construct a SQL query that finds chats where:
+    # 1. The number of participants matches the number of contacts
+    # 2. Each contact is represented by at least one of their handles in the
+    #    chat
 
-    return valid_chat_ids
+    contact_checks = []
+    query_params = []
+
+    for record in contact_records:
+        identifiers = list(record.get_identifiers())
+        if not identifiers:
+            # If a contact has no identifiers, they can't be in a chat
+            return []
+
+        placeholders = ", ".join("?" for _ in identifiers)
+        contact_checks.append(
+            f"MAX(CASE WHEN handle.id IN ({placeholders}) THEN 1 ELSE 0 END)"
+        )
+        query_params.extend(identifiers)
+
+    # The query ensures that the total participant count matches the number of
+    # contacts, and that the number of *matched* contacts also equals the number
+    # of contacts (implying every contact is present)
+    query = f"""
+    SELECT chat_id
+    FROM chat_handle_join
+    JOIN handle ON chat_handle_join.handle_id = handle.ROWID
+    GROUP BY chat_id
+    HAVING COUNT(handle.id) = ?
+       AND ({" + ".join(contact_checks)}) = ?
+    """
+
+    # Add the count parameters (one for COUNT check, one for SUM check)
+    full_params = [len(contact_records)] + query_params + [len(contact_records)]
+
+    return [row[0] for row in con.execute(query, full_params).fetchall()]
 
 
 def get_messages_dataframe(
