@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import datetime
-from typing import Optional
 
 import pandas as pd
 
@@ -55,16 +54,26 @@ def get_noreply_count(sums_by_day: pd.DataFrame) -> int:
     )
 
 
-def calculate_totals(
-    dfs: ica.DataFrameNamespace, to_date: Optional[str] = None
-) -> pd.DataFrame:
+def main() -> None:
     """
-    Calculate the totals for the given dataframes
+    Generate a summary of message and reaction counts, by person and in total,
+    as well as other insightful metrics
     """
+    cli_args = ica.get_cli_parser().parse_args(namespace=ica.TypedCLIArguments())
+    dfs = ica.get_dataframes(
+        contacts=cli_args.contacts,
+        timezone=cli_args.timezone,
+        from_date=cli_args.from_date,
+        to_date=cli_args.to_date,
+        from_person=cli_args.from_person,
+    )
+
     first_message_date = get_first_message_date(dfs)
     today = pd.Timestamp(datetime.date.today())
-    if to_date:
-        date_upper_bound = min(today, pd.Timestamp(to_date).replace(tzinfo=None))
+    if cli_args.to_date:
+        date_upper_bound = min(
+            today, pd.Timestamp(cli_args.to_date).replace(tzinfo=None)
+        )
     else:
         date_upper_bound = today
 
@@ -90,27 +99,11 @@ def calculate_totals(
         "days_missed": total_days - days_messaged_count,
         "days_with_no_reply": get_noreply_count(sums_by_day),
     }
-    return pd.DataFrame(
-        {"metric": tuple(totals_map.keys()), "total": tuple(totals_map.values())},
-    ).set_index("metric")
-
-
-def main() -> None:
-    """
-    Generate a summary of message and reaction counts, by person and in total,
-    as well as other insightful metrics
-    """
-    cli_args = ica.get_cli_parser().parse_args(namespace=ica.TypedCLIArguments())
-    dfs = ica.get_dataframes(
-        contacts=cli_args.contacts,
-        timezone=cli_args.timezone,
-        from_date=cli_args.from_date,
-        to_date=cli_args.to_date,
-        from_person=cli_args.from_person,
-    )
 
     ica.output_results(
-        calculate_totals(dfs, to_date=cli_args.to_date),
+        pd.DataFrame(
+            {"metric": tuple(totals_map.keys()), "total": tuple(totals_map.values())},
+        ).set_index("metric"),
         format=cli_args.format,
         output=cli_args.output,
     )
