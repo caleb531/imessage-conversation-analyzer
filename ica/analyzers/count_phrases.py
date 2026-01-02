@@ -15,10 +15,6 @@ class CountPhrasesArgumentParser(ica.TypedCLIArguments):
     case_sensitive: bool
 
 
-# class CountPhrasesArgumentParser(ica.ICAArgumentParser):
-#     pass
-
-
 def get_phrase_counts(
     messages_df: pd.DataFrame,
     phrases: list[str],
