@@ -8,6 +8,7 @@ from tempfile import gettempdir
 import pytest
 
 import ica
+from ica.contact import ContactRecord, coalesce_contact_records
 from tests.mock_db_utils import create_mock_db
 
 
@@ -123,3 +124,43 @@ def test_contact_with_same_name_error() -> None:
 
     with pytest.raises(ica.ContactWithSameNameError):
         ica.get_dataframes(contacts=["Daniel Brightingale"])
+
+
+def test_coalesce_contact_records_name_merging() -> None:
+    """
+    Should merge first and last names when coalescing contact records if the
+    existing record has missing name fields.
+    """
+    records = [
+        # Case 1: Existing record has no first name, new record does
+        ContactRecord(first_name="", last_name="Pinerose", phone_numbers=["123"]),
+        ContactRecord(first_name="Jennifer", last_name="", phone_numbers=["123"]),
+        # Case 2: Existing record has no last name, new record does
+        ContactRecord(first_name="Jen", last_name="", phone_numbers=["456"]),
+        ContactRecord(first_name="", last_name="Windhelm", phone_numbers=["456"]),
+        # Case 3: Existing record has names, new record has different names
+        # (should preserve existing)
+        ContactRecord(
+            first_name="Alice", last_name="Wonderland", phone_numbers=["789"]
+        ),
+        ContactRecord(first_name="Bob", last_name="Builder", phone_numbers=["789"]),
+    ]
+
+    coalesced = coalesce_contact_records(records)
+
+    assert len(coalesced) == 3
+
+    # Check Case 1
+    record1 = next(r for r in coalesced if "123" in r.phone_numbers)
+    assert record1.first_name == "Jennifer"
+    assert record1.last_name == "Pinerose"
+
+    # Check Case 2
+    record2 = next(r for r in coalesced if "456" in r.phone_numbers)
+    assert record2.first_name == "Jen"
+    assert record2.last_name == "Windhelm"
+
+    # Check Case 3
+    record3 = next(r for r in coalesced if "789" in r.phone_numbers)
+    assert record3.first_name == "Alice"
+    assert record3.last_name == "Wonderland"
