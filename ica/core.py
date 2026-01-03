@@ -57,7 +57,7 @@ class DataFrameNamespace:
 
     messages: pd.DataFrame
     attachments: pd.DataFrame
-    participants: pd.DataFrame
+    handles: pd.DataFrame
 
 
 def decode_message_attributedbody(data: bytes) -> str:
@@ -234,20 +234,26 @@ def get_attachments_dataframe(
     )
 
 
-def get_participants_dataframe(
+def get_handles_dataframe(
     con: sqlite3.Connection,
     contact_records: list[ContactRecord],
 ) -> pd.DataFrame:
     """
-    Return a pandas dataframe representing the participants in a particular
-    conversation, normalized so that each row represents a unique handle ID
-    associated with a contact. This allows for easy joining with the messages
-    dataframe.
+    Return a pandas dataframe representing the handles associated with the
+    participants in a particular conversation. This allows for easy joining with
+    the messages dataframe.
     """
     # 1. Collect all identifiers to query
     all_identifiers = set()
     for record in contact_records:
         all_identifiers.update(record.get_identifiers())
+
+    if not all_identifiers:
+        return pd.DataFrame(
+            columns=pd.Index(
+                ["handle_id", "name", "first_name", "last_name", "identifier"]
+            )
+        )
 
     # 2. Query for handle IDs
     placeholders = ", ".join("?" for _ in all_identifiers)
@@ -302,7 +308,7 @@ def get_dataframes(
         dfs = DataFrameNamespace(
             messages=get_messages_dataframe(con, chat_ids, timezone),
             attachments=get_attachments_dataframe(con, chat_ids, timezone),
-            participants=get_participants_dataframe(con, contact_records),
+            handles=get_handles_dataframe(con, contact_records),
         )
         dfs.messages = filter_dataframe(
             dfs.messages,

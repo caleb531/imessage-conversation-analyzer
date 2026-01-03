@@ -85,8 +85,8 @@ def main() -> None:
     sums_by_day = get_sums_by_day(dfs)
     days_messaged_count = get_days_messaged_count(sums_by_day)
 
-    # Merge messages with participants to attach names to every message
-    merged_df = dfs.messages.merge(dfs.participants, on="handle_id", how="left")
+    # Merge messages with handles to attach names to every message
+    merged_df = dfs.messages.merge(dfs.handles, on="handle_id", how="left")
 
     messages_only = merged_df[~merged_df["is_reaction"]]
     reactions_only = merged_df[merged_df["is_reaction"]]
