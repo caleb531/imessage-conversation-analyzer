@@ -1,10 +1,6 @@
 [
   {
     "ZOWNER": "user-jane",
-    "ZADDRESS": "jane.fernbrook@example.com"
-  },
-  {
-    "ZOWNER": "user-jane",
     "ZADDRESS": ""
   },
   {

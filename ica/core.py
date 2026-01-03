@@ -82,8 +82,6 @@ def get_chat_ids_for_contacts(
     """
     Find the chat IDs for the chat(s) involving exactly the specified contacts.
     """
-    if not contact_records:
-        return []
 
     # We need to construct a SQL query that finds chats where:
     # 1. The number of participants matches the number of contacts
@@ -242,9 +240,42 @@ def get_participants_dataframe(
 ) -> pd.DataFrame:
     """
     Return a pandas dataframe representing the participants in a particular
-    conversation, excluding the host user (i.e. "me")
+    conversation, normalized so that each row represents a unique handle ID
+    associated with a contact. This allows for easy joining with the messages
+    dataframe.
     """
-    return pd.DataFrame(contact_records)
+    # 1. Collect all identifiers to query
+    all_identifiers = set()
+    for record in contact_records:
+        all_identifiers.update(record.get_identifiers())
+
+    # 2. Query for handle IDs
+    placeholders = ", ".join("?" for _ in all_identifiers)
+    query = f"SELECT id, ROWID FROM handle WHERE id IN ({placeholders})"
+
+    # Map identifier string -> handle_id (int)
+    # Note: handle.id is the string (phone/email), handle.ROWID is the int
+    handle_map = dict(con.execute(query, list(all_identifiers)).fetchall())
+
+    # 3. Build rows for the dataframe
+    return pd.DataFrame(
+        [
+            {
+                "handle_id": handle_map[identifier],
+                "name": getattr(
+                    record,
+                    "full_name",
+                    f"{record.first_name} {record.last_name}".strip(),
+                ),
+                "first_name": record.first_name,
+                "last_name": record.last_name,
+                "identifier": identifier,
+            }
+            for record in contact_records
+            for identifier in record.get_identifiers()
+            if identifier in handle_map
+        ]
+    )
 
 
 def get_dataframes(

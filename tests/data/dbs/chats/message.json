@@ -1,268 +1,306 @@
 [
   {
     "ROWID": "67d1d980-4db8-4005-b644-cd269402dd29",
-    "text": "Hey Daniel, I just wanted to confirm what date the party was! 🎉",
+    "text": "Hey Daniel, I just wanted to confirm what date the party was! \ud83c\udf89",
     "attributedBody": "",
     "date": 727379229507062144,
-    "is_from_me": true
+    "is_from_me": true,
+    "handle_id": 0
   },
   {
     "ROWID": "17f5642d-68df-4604-9c1c-43fd63a54f2e",
-    "text": "Oh hey, John! Sure, the party is on the 30th! 🎊",
+    "text": "Oh hey, John! Sure, the party is on the 30th! \ud83c\udf8a",
     "attributedBody": "",
     "date": 727379249287274624,
-    "is_from_me": false
+    "is_from_me": false,
+    "handle_id": "user-daniel"
   },
   {
     "ROWID": "7fc5ac48-a5d4-4f8a-a749-f085bf246c1a",
-    "text": "Perfect, thanks man! 👍👍🏻👍🏼👍🏽👍🏾👍🏿",
+    "text": "Perfect, thanks man! \ud83d\udc4d\ud83d\udc4d\ud83c\udffb\ud83d\udc4d\ud83c\udffc\ud83d\udc4d\ud83c\udffd\ud83d\udc4d\ud83c\udffe\ud83d\udc4d\ud83c\udfff",
     "attributedBody": "",
     "date": 727379298702376320,
-    "is_from_me": true
+    "is_from_me": true,
+    "handle_id": 0
   },
   {
     "ROWID": "5ab162b0-e4c7-4e77-9623-c2396bb81d73",
-    "text": "Hey Jane, how's your day going? 😊",
+    "text": "Hey Jane, how's your day going? \ud83d\ude0a",
     "attributedBody": "",
     "date": 726338979942786944,
-    "is_from_me": true
+    "is_from_me": true,
+    "handle_id": 0
   },
   {
     "ROWID": "31a32e77-87c7-4c04-9fab-d7f42ba9484c",
-    "text": "Reacted 👋 to “Hey Jane, how's your day going? 😊”",
+    "text": "Reacted \ud83d\udc4b to \u201cHey Jane, how's your day going? \ud83d\ude0a\u201d",
     "attributedBody": "",
     "date": 726442400302259968,
-    "is_from_me": false
+    "is_from_me": false,
+    "handle_id": "user-jane"
   },
   {
     "ROWID": "ef073cec-fcd5-4fdb-b400-c2f54a7cb974",
-    "text": "Hey John, it's been great so far! 😀 Just finished a productive meeting. What about you?",
+    "text": "Hey John, it's been great so far! \ud83d\ude00 Just finished a productive meeting. What about you?",
     "attributedBody": "",
     "date": 726442407346190720,
-    "is_from_me": false
+    "is_from_me": false,
+    "handle_id": "user-jane"
   },
   {
     "ROWID": "a8221838-fc7e-4096-94af-a71282081449",
-    "text": "Sounds good! I'm just taking a quick break before diving into some coding. 👨‍💻",
+    "text": "Sounds good! I'm just taking a quick break before diving into some coding. \ud83d\udc68\u200d\ud83d\udcbb",
     "attributedBody": "",
     "date": 726522868945607168,
-    "is_from_me": true
+    "is_from_me": true,
+    "handle_id": 0
   },
   {
     "ROWID": "90b09b75-b098-4ff7-9271-c27f6b1efc75",
-    "text": "That sounds exciting! 😀 What are you working on?",
+    "text": "That sounds exciting! \ud83d\ude00 What are you working on?",
     "attributedBody": "",
     "date": 726522900219992192,
-    "is_from_me": false
+    "is_from_me": false,
+    "handle_id": "user-jane"
   },
   {
     "ROWID": "a872294d-5758-4e51-a25a-3c6cac425081",
-    "text": "Building a new feature for our app. It should make things a lot easier for users. 🙌",
+    "text": "Building a new feature for our app. It should make things a lot easier for users. \ud83d\ude4c",
     "attributedBody": "",
     "date": 726689916631041792,
-    "is_from_me": true
+    "is_from_me": true,
+    "handle_id": 0
   },
   {
     "ROWID": "ef65772c-730f-4536-ae42-0ea2bc1adbc5",
-    "text": "Emphasized “Building a new feature for our app. It should make things a lot easier for users. 🙌”",
+    "text": "Emphasized \u201cBuilding a new feature for our app. It should make things a lot easier for users. \ud83d\ude4c\u201d",
     "attributedBody": "",
     "date": 726689955617652480,
-    "is_from_me": false
+    "is_from_me": false,
+    "handle_id": "user-jane"
   },
   {
     "ROWID": "bc033640-98c1-4a8f-b09f-9d0a8c4c71cb",
-    "text": "Hey John! What's up? 👊",
+    "text": "Hey John! What's up? \ud83d\udc4a",
     "attributedBody": "",
     "date": 726361900437000064,
-    "is_from_me": false
+    "is_from_me": false,
+    "handle_id": "user-thomas"
   },
   {
     "ROWID": "662ceec7-bb4a-4e30-9357-b96eb633b3d1",
-    "text": "Loved “Hey John! What's up? 👊”",
+    "text": "Loved \u201cHey John! What's up? \ud83d\udc4a\u201d",
     "attributedBody": "",
     "date": 726362122374000128,
-    "is_from_me": true
+    "is_from_me": true,
+    "handle_id": 0
   },
   {
     "ROWID": "3bdbefe4-2d18-47da-93a4-524593cc8fec",
-    "text": "Hey Thomas! Not much, just chatting with Jane. ☺️ What's going on with you?",
+    "text": "Hey Thomas! Not much, just chatting with Jane. \u263a\ufe0f What's going on with you?",
     "attributedBody": "",
     "date": 726456930474000000,
-    "is_from_me": true
+    "is_from_me": true,
+    "handle_id": 0
   },
   {
     "ROWID": "db50d4a8-638c-44e4-ba5b-f6675e1b4aa9",
-    "text": "That's awesome! 😀😀😀 I can't wait to see it. 😊 In the meantime, I'm gonna grab some lunch.",
+    "text": "That's awesome! \ud83d\ude00\ud83d\ude00\ud83d\ude00 I can't wait to see it. \ud83d\ude0a In the meantime, I'm gonna grab some lunch.",
     "attributedBody": "",
     "date": 726950535810231168,
-    "is_from_me": false
+    "is_from_me": false,
+    "handle_id": "user-jane"
   },
   {
     "ROWID": "1c745f90-5cab-4e25-a65a-c6b6209fb6f3",
-    "text": "Just finished up a coding session myself. Feeling a bit brain-fried, but also kind of accomplished. 😎",
+    "text": "Just finished up a coding session myself. Feeling a bit brain-fried, but also kind of accomplished. \ud83d\ude0e",
     "attributedBody": "",
     "date": 726703624406149632,
-    "is_from_me": false
+    "is_from_me": false,
+    "handle_id": "user-thomas"
   },
   {
     "ROWID": "7560b9f5-4b09-484b-a485-c81b39c9e41a",
-    "text": "Sounds like a good plan! 🍎 Enjoy your lunch!",
+    "text": "Sounds like a good plan! \ud83c\udf4e Enjoy your lunch!",
     "attributedBody": "",
     "date": 727118724365438976,
-    "is_from_me": true
+    "is_from_me": true,
+    "handle_id": 0
   },
   {
     "ROWID": "eb95d508-cc5d-4f5d-9fa7-bee604bd0dd1",
-    "text": "Thanks! I will. Talk to you later! ☺️",
+    "text": "Thanks! I will. Talk to you later! \u263a\ufe0f",
     "attributedBody": "",
     "date": 727218371085356672,
-    "is_from_me": false
+    "is_from_me": false,
+    "handle_id": "user-jane"
   },
   {
     "ROWID": "4279e14b-f787-44fb-93c9-8185ec348770",
-    "text": "￼",
+    "text": "\ufffc",
     "attributedBody": "",
     "date": 727317821465999872,
-    "is_from_me": true
+    "is_from_me": true,
+    "handle_id": 0
   },
   {
     "ROWID": "855c1f22-2ac0-46e2-ae76-e4c164d4236e",
-    "text": "Yeah, I definitely needed a break. 😌 What are you working on these days?",
+    "text": "Yeah, I definitely needed a break. \ud83d\ude0c What are you working on these days?",
     "attributedBody": "",
     "date": 726769943348052736,
-    "is_from_me": false
+    "is_from_me": false,
+    "handle_id": "user-thomas"
   },
   {
     "ROWID": "968e4e64-bb66-42fa-9bc3-379ec1dbdb87",
-    "text": "I'm building a new feature for our app at work! It's been a challenge, but https://open.spotify.com/playlist/37i9dQZF1DWWQRwui0ExPn has been helping 🎧",
+    "text": "I'm building a new feature for our app at work! It's been a challenge, but https://open.spotify.com/playlist/37i9dQZF1DWWQRwui0ExPn has been helping \ud83c\udfa7",
     "attributedBody": "",
     "date": 726777291571192064,
-    "is_from_me": true
+    "is_from_me": true,
+    "handle_id": 0
   },
   {
     "ROWID": "f0b4da10-4f43-4cc8-b131-b29a8df9d0ed",
-    "text": "Liked “I'm building a new feature for our app at work! It's been a challenge, but https://open.spotify.com/playlist/37i9dQZF1DWWQRwui0ExPn has been helping 🎧”",
+    "text": "Liked \u201cI'm building a new feature for our app at work! It's been a challenge, but https://open.spotify.com/playlist/37i9dQZF1DWWQRwui0ExPn has been helping \ud83c\udfa7\u201d",
     "attributedBody": "",
     "date": 726777298531000192,
-    "is_from_me": false
+    "is_from_me": false,
+    "handle_id": "user-thomas"
   },
   {
     "ROWID": "09942383-4155-4cb4-9360-8b54e0b643c9",
     "text": "That's so cool! And great playlist. It reminds me of https://www.youtube.com/watch?v=sF80I-TQiW0 and https://www.youtube.com/watch?v=jfKfPfyJRdk",
     "attributedBody": "",
     "date": 726777306887309056,
-    "is_from_me": false
+    "is_from_me": false,
+    "handle_id": "user-thomas"
   },
   {
     "ROWID": "409279d7-5efc-482f-b8eb-feed621431c9",
-    "text": "Loved “That's so cool! And great playlist. It reminds me of https://www.youtube.com/watch?v=3yx2G8GMT9I and https://www.youtube.com/watch?v=jfKfPfyJRdk”",
+    "text": "Loved \u201cThat's so cool! And great playlist. It reminds me of https://www.youtube.com/watch?v=3yx2G8GMT9I and https://www.youtube.com/watch?v=jfKfPfyJRdk\u201d",
     "attributedBody": "",
     "date": 726777405792999936,
-    "is_from_me": true
+    "is_from_me": true,
+    "handle_id": 0
   },
   {
     "ROWID": "53e399eb-b1f6-4a2a-93ea-a77d30cc8fbc",
     "text": "Oh wow! I haven't listened to these before! These are great!",
     "attributedBody": "",
     "date": 726777446593999872,
-    "is_from_me": true
+    "is_from_me": true,
+    "handle_id": 0
   },
   {
     "ROWID": "e9927687-e199-4031-a4c5-c69f4e734fdf",
     "text": "Kinda reminds me of:",
     "attributedBody": "",
     "date": 726784706461334912,
-    "is_from_me": true
+    "is_from_me": true,
+    "handle_id": 0
   },
   {
     "ROWID": "71a4a961-1695-4605-bbc6-367b5edccd15",
     "text": "https://www.youtube.com/watch?v=tONVgIvdk0A and https://music.apple.com/us/station/lo-fi-station/ra.1569482000",
     "attributedBody": "",
     "date": 726784720391002368,
-    "is_from_me": true
+    "is_from_me": true,
+    "handle_id": 0
   },
   {
     "ROWID": "5ad21286-3ed9-496e-a8ee-b0df99ca1902",
     "text": "Oh yeah that's a good one too!",
     "attributedBody": "",
     "date": 726784803225128832,
-    "is_from_me": false
+    "is_from_me": false,
+    "handle_id": "user-thomas"
   },
   {
     "ROWID": "3b7470a5-11b9-441a-b8e5-d486cc674214",
     "text": "On the topic of lo-fi, have you seen https://www.youtube.com/watch?v=ovw8a-RfVpA ?",
     "attributedBody": "",
     "date": 726784833411200512,
-    "is_from_me": false
+    "is_from_me": false,
+    "handle_id": "user-thomas"
   },
   {
     "ROWID": "78469913-ef30-4b2d-aac0-1e19d765b2a2",
-    "text": "Disliked “On the topic of lo-fi, have you seen https://www.youtube.com/watch?v=ovw8a-RfVpA ?”",
+    "text": "Disliked \u201cOn the topic of lo-fi, have you seen https://www.youtube.com/watch?v=ovw8a-RfVpA ?\u201d",
     "attributedBody": "",
     "date": 726785488238000128,
-    "is_from_me": true
+    "is_from_me": true,
+    "handle_id": 0
   },
   {
     "ROWID": "00110e8b-7da6-4f0a-88b6-58c50df3b060",
     "text": "Oh gosh this is terrible.. I can't even stand to listen to it lol",
     "attributedBody": "",
     "date": 726785493717000064,
-    "is_from_me": true
+    "is_from_me": true,
+    "handle_id": 0
   },
   {
     "ROWID": "4a92c212-8c5b-4a18-89fc-e64997239bce",
-    "text": "Questioned “Oh gosh this is terrible.. I can't even stand to listen to it lol”",
+    "text": "Questioned \u201cOh gosh this is terrible.. I can't even stand to listen to it lol\u201d",
     "attributedBody": "",
     "date": 726785497902000128,
-    "is_from_me": false
+    "is_from_me": false,
+    "handle_id": "user-thomas"
   },
   {
     "ROWID": "c6e63761-69e9-406b-a1f8-4265e9c1e69d",
-    "text": "Ha really? I totally love it. Maybe I'm crazy 😅",
+    "text": "Ha really? I totally love it. Maybe I'm crazy \ud83d\ude05",
     "attributedBody": "",
     "date": 726785548624000128,
-    "is_from_me": false
+    "is_from_me": false,
+    "handle_id": "user-thomas"
   },
   {
     "ROWID": "ed0e06dc-4ccf-4922-a413-af027bbcfc7d",
-    "text": "Laughed at “Ha really? I totally love it. Maybe I'm crazy 😅”",
+    "text": "Laughed at \u201cHa really? I totally love it. Maybe I'm crazy \ud83d\ude05\u201d",
     "attributedBody": "",
     "date": 726785662811000064,
-    "is_from_me": true
+    "is_from_me": true,
+    "handle_id": 0
   },
   {
     "ROWID": "c18f855d-7293-4e26-b5c2-5844e74b5be4",
-    "text": "Maybe just a little 🤏😝🤣",
+    "text": "Maybe just a little \ud83e\udd0f\ud83d\ude1d\ud83e\udd23",
     "attributedBody": "",
     "date": 726785898617999744,
-    "is_from_me": true
+    "is_from_me": true,
+    "handle_id": 0
   },
   {
     "ROWID": "58c56cea-4704-4262-bf6c-be1175203f44",
-    "text": "Anyway, man, I gotta go, but I enjoyed this conversation 😆",
+    "text": "Anyway, man, I gotta go, but I enjoyed this conversation \ud83d\ude06",
     "attributedBody": "",
     "date": 726787156239343360,
-    "is_from_me": true
+    "is_from_me": true,
+    "handle_id": 0
   },
   {
     "ROWID": "3d49862a-5cc1-44d4-a148-c5c9338b7dfd",
-    "text": "Same here! 🤣 Catch you later!",
+    "text": "Same here! \ud83e\udd23 Catch you later!",
     "attributedBody": "",
     "date": 726787191071867648,
-    "is_from_me": false
+    "is_from_me": false,
+    "handle_id": "user-thomas"
   },
   {
     "ROWID": "9368cfd3-ad0c-4110-8658-0b81b08e71eb",
     "text": null,
     "attributedBody": "base64:BAtzdHJlYW10eXBlZIHoA4QBQISEhBlOU011dGFibGVBdHRyaWJ1dGVkU3RyaW5nAISEEk5TQXR0cmlidXRlZFN0cmluZwCEhAhOU09iamVjdACFkoSEhA9OU011dGFibGVTdHJpbmcBhIQITlNTdHJpbmcBlYQBKyxMb3ZlZCDigJxTYW1lIGhlcmUhIPCfpKMgQ2F0Y2ggeW91IGxhdGVyIeKAnYaEAmlJASaShISEDE5TRGljdGlvbmFyeQCVhAFpAZKEmJgdX19rSU1NZXNzYWdlUGFydEF0dHJpYnV0ZU5hbWWGkoSEhAhOU051bWJlcgCEhAdOU1ZhbHVlAJWEASqEm5sAhoaG",
     "date": 726787260392262912,
-    "is_from_me": false
+    "is_from_me": false,
+    "handle_id": "user-thomas"
   },
   {
     "ROWID": "0af51fdf-6c5f-4248-8c78-92cebb271c5e",
     "text": "Hello everyone!",
     "attributedBody": "",
     "date": 727379229507062145,
-    "is_from_me": true
+    "is_from_me": true,
+    "handle_id": 0
   }
 ]

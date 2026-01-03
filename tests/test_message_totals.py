@@ -17,7 +17,7 @@ def test_message_counts(output_results: MagicMock) -> None:
     df: pd.DataFrame = output_results.call_args[0][0]
     assert df.loc["messages"]["total"] == 9
     assert df.loc["messages_from_me"]["total"] == 5
-    assert df.loc["messages_from_them"]["total"] == 4
+    assert df.loc["messages_from_jane"]["total"] == 4
 
 
 @patch("ica.output_results")
@@ -29,7 +29,7 @@ def test_reaction_counts(output_results: MagicMock) -> None:
     df: pd.DataFrame = output_results.call_args[0][0]
     assert df.loc["reactions"]["total"] == 2
     assert df.loc["reactions_from_me"]["total"] == 0
-    assert df.loc["reactions_from_them"]["total"] == 2
+    assert df.loc["reactions_from_jane"]["total"] == 2
 
 
 @patch("ica.output_results")

@@ -8,10 +8,6 @@
     "ZFULLNUMBER": "223-456-7890"
   },
   {
-    "ZOWNER": "user-jane",
-    "ZFULLNUMBER": "234-567-8901"
-  },
-  {
     "ZOWNER": "user-evelyn",
     "ZFULLNUMBER": "345-678-9012"
   }

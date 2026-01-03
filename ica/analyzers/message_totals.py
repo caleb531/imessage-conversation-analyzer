@@ -85,20 +85,41 @@ def main() -> None:
     sums_by_day = get_sums_by_day(dfs)
     days_messaged_count = get_days_messaged_count(sums_by_day)
 
-    messages_only = dfs.messages[~dfs.messages["is_reaction"]]
-    reactions_only = dfs.messages[dfs.messages["is_reaction"]]
+    # Merge messages with participants to attach names to every message
+    merged_df = dfs.messages.merge(dfs.participants, on="handle_id", how="left")
+
+    messages_only = merged_df[~merged_df["is_reaction"]]
+    reactions_only = merged_df[merged_df["is_reaction"]]
 
     totals_map = {
         "messages": len(messages_only),
         "messages_from_me": messages_only["is_from_me"].sum(),
-        "messages_from_them": (~messages_only["is_from_me"]).sum(),
-        "reactions": len(reactions_only),
-        "reactions_from_me": reactions_only["is_from_me"].sum(),
-        "reactions_from_them": (~reactions_only["is_from_me"]).sum(),
-        "days_messaged": days_messaged_count,
-        "days_missed": total_days - days_messaged_count,
-        "days_with_no_reply": get_noreply_count(sums_by_day),
     }
+
+    # Add per-participant message counts
+    participant_message_counts = (
+        messages_only[~messages_only["is_from_me"]].groupby("first_name").size()
+    )
+    for name, count in participant_message_counts.items():
+        totals_map[f"messages_from_{str(name).lower()}"] = count
+
+    totals_map["reactions"] = len(reactions_only)
+    totals_map["reactions_from_me"] = reactions_only["is_from_me"].sum()
+
+    # Add per-participant reaction counts
+    participant_reaction_counts = (
+        reactions_only[~reactions_only["is_from_me"]].groupby("first_name").size()
+    )
+    for name, count in participant_reaction_counts.items():
+        totals_map[f"reactions_from_{str(name).lower()}"] = count
+
+    totals_map.update(
+        {
+            "days_messaged": days_messaged_count,
+            "days_missed": total_days - days_messaged_count,
+            "days_with_no_reply": get_noreply_count(sums_by_day),
+        }
+    )
 
     ica.output_results(
         pd.DataFrame(
