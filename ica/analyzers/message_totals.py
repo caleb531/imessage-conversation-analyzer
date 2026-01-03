@@ -91,7 +91,12 @@ def main() -> None:
     # we found for the contact (e.g. if there are duplicate handles in the DB),
     # but the identifier string should match.
     merged_df = dfs.messages.merge(
-        dfs.handles, left_on="sender_name", right_on="identifier", how="left"
+        dfs.handles,
+        left_on="sender_name",
+        right_on="identifier",
+        # Use a left join to keep messages from "me" (which won't have a
+        # matching handle in the handles dataframe)
+        how="left",
     )
 
     messages_only = merged_df[~merged_df["is_reaction"]]

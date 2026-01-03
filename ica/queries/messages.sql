@@ -7,6 +7,8 @@ SELECT
     datetime("message"."date" / 1000000000 + strftime("%s", "2001-01-01") ,"unixepoch") as "datetime",
     "is_from_me"
 FROM "message"
+-- Use a left join to keep messages from "me" (which often have handle_id=0 and
+-- no corresponding row in the handle table)
 LEFT JOIN "handle" ON "message"."handle_id" = "handle"."ROWID"
 WHERE "message"."ROWID" IN (
     -- Get all messages tied to chat
