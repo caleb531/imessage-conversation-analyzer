@@ -37,6 +37,15 @@ def test_has_contact_info_but_no_conversation() -> None:
         ica.get_dataframes(contacts=["Evelyn Oakhaven"])
 
 
+def test_no_contact_info() -> None:
+    """
+    Should raise a ConversationNotFoundError if contact is missing info (so
+    implicitly no chat, either)
+    """
+    with pytest.raises(ica.ConversationNotFoundError):
+        ica.get_dataframes(contacts=["Matthew Whisperton"])
+
+
 def test_contact_not_found_error() -> None:
     """Should raise a ContactNotFoundError when a contact is not found."""
     with pytest.raises(ica.ContactNotFoundError):
