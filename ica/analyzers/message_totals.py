@@ -4,6 +4,7 @@ import datetime
 import pandas as pd
 
 import ica
+import ica.contact
 
 
 def get_first_message_date(dfs: ica.DataFrameNamespace) -> pd.Timestamp:
@@ -85,22 +86,8 @@ def main() -> None:
     sums_by_day = get_sums_by_day(dfs)
     days_messaged_count = get_days_messaged_count(sums_by_day)
 
-    # Merge messages with handles to attach names to every message We merge on
-    # the identifier string (e.g. phone number) rather than the handle ID,
-    # because the handle ID in the message table might not match the handle ID
-    # we found for the contact (e.g. if there are duplicate handles in the DB),
-    # but the identifier string should match.
-    merged_df = dfs.messages.merge(
-        dfs.handles,
-        left_on="sender_name",
-        right_on="identifier",
-        # Use a left join to keep messages from "me" (which won't have a
-        # matching handle in the handles dataframe)
-        how="left",
-    )
-
-    messages_only = merged_df[~merged_df["is_reaction"]]
-    reactions_only = merged_df[merged_df["is_reaction"]]
+    messages_only = dfs.messages[~dfs.messages["is_reaction"]]
+    reactions_only = dfs.messages[dfs.messages["is_reaction"]]
 
     totals_map = {
         "messages": len(messages_only),
@@ -108,27 +95,27 @@ def main() -> None:
     }
 
     # Add per-participant message counts
-    participant_message_counts = (
-        messages_only[~messages_only["is_from_me"]].groupby("first_name").size()
-    )
-    for name, count in participant_message_counts.items():
-        totals_map[f"messages_from_{str(name).lower()}"] = count
+    message_counts = messages_only["sender_display_name"].value_counts()
+    for record in dfs.contact_records:
+        display_name = ica.contact.get_unique_contact_display_name(
+            dfs.contact_records, record
+        )
+        totals_map[f"messages_from_{display_name.lower()}"] = message_counts.get(
+            display_name, 0
+        )
 
     totals_map["reactions"] = len(reactions_only)
     totals_map["reactions_from_me"] = reactions_only["is_from_me"].sum()
 
     # Add per-participant reaction counts
-    participant_reaction_counts = (
-        reactions_only[~reactions_only["is_from_me"]].groupby("first_name").size()
-    )
-    for name, count in participant_reaction_counts.items():
-        totals_map[f"reactions_from_{str(name).lower()}"] = count
-
-    # Ensure all participants are represented, even if the count is zero
-    for name in dfs.handles["first_name"].unique():
-        key = f"reactions_from_{str(name).lower()}"
-        if key not in totals_map:
-            totals_map[key] = 0
+    reaction_counts = reactions_only["sender_display_name"].value_counts()
+    for record in dfs.contact_records:
+        display_name = ica.contact.get_unique_contact_display_name(
+            dfs.contact_records, record
+        )
+        totals_map[f"reactions_from_{display_name.lower()}"] = reaction_counts.get(
+            display_name, 0
+        )
 
     totals_map.update(
         {

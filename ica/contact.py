@@ -84,6 +84,10 @@ class ContactRecord:
     phone_numbers: list[str] = field(default_factory=list)
     email_addresses: list[str] = field(default_factory=list)
 
+    @property
+    def full_name(self) -> str:
+        return f"{self.first_name} {self.last_name}".strip()
+
     def get_identifiers(self) -> set[str]:
         """
         Retrieve the identifiers for the contact that may be stored on the
@@ -167,6 +171,52 @@ def coalesce_contact_records(records: list[ContactRecord]) -> list[ContactRecord
         if not found:
             unique_records.append(record)
     return unique_records
+
+
+def get_unique_contact_display_name(
+    contact_records: Sequence[ContactRecord], contact_record: ContactRecord
+) -> str:
+    """
+    Determine the unique display name for the given contact record, falling back
+    to more specific identifiers if necessary to avoid ambiguity
+    """
+    # 1. First name
+    first_name_count = sum(
+        1 for c in contact_records if c.first_name == contact_record.first_name
+    )
+    if first_name_count == 1:
+        return contact_record.first_name
+
+    # 2. Full name
+    full_name_count = sum(
+        1 for c in contact_records if c.full_name == contact_record.full_name
+    )
+    if full_name_count == 1:
+        return contact_record.full_name
+
+    # 3. Phone number
+    if contact_record.phone_numbers:
+        phone_number = contact_record.phone_numbers[0]
+        phone_number_count = sum(
+            1
+            for c in contact_records
+            if c.phone_numbers and c.phone_numbers[0] == phone_number
+        )
+        if phone_number_count == 1:
+            return phone_number
+
+    # 4. Email address
+    if contact_record.email_addresses:
+        email_address = contact_record.email_addresses[0]
+        email_address_count = sum(
+            1
+            for c in contact_records
+            if c.email_addresses and c.email_addresses[0] == email_address
+        )
+        if email_address_count == 1:
+            return email_address
+
+    return contact_record.full_name or contact_record.first_name or "Unknown"
 
 
 def validate_contact_records(

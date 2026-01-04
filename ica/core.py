@@ -18,6 +18,7 @@ import pandas as pd
 import tzlocal
 from typedstream.stream import TypedStreamReader
 
+import ica.contact
 from ica.contact import ContactRecord, get_contact_records
 from ica.exceptions import (
     ConversationNotFoundError,
@@ -58,6 +59,7 @@ class DataFrameNamespace:
     messages: pd.DataFrame
     attachments: pd.DataFrame
     handles: pd.DataFrame
+    contact_records: list[ContactRecord]
 
 
 def decode_message_attributedbody(data: bytes) -> str:
@@ -124,6 +126,7 @@ def get_chat_ids_for_contacts(
 def get_messages_dataframe(
     con: sqlite3.Connection,
     chat_ids: list[str],
+    contact_records: list[ContactRecord],
     timezone: Optional[str] = None,
 ) -> pd.DataFrame:
     """
@@ -136,6 +139,15 @@ def get_messages_dataframe(
         timezone = tzlocal.get_localzone().key
 
     chat_ids_placeholder = ", ".join(f"'{cid}'" for cid in chat_ids)
+
+    # Create a mapping from identifier to display name for efficient aggregation
+    identifier_to_display_name = {}
+    for record in contact_records:
+        display_name = ica.contact.get_unique_contact_display_name(
+            contact_records, record
+        )
+        for identifier in record.get_identifiers():
+            identifier_to_display_name[identifier] = display_name
 
     return (
         pd.read_sql_query(
@@ -176,6 +188,13 @@ def get_messages_dataframe(
         )
         # Convert 'is_from_me' values from integers to proper booleans
         .assign(is_from_me=lambda df: df["is_from_me"].astype(bool))
+        # Add sender display name
+        .assign(
+            sender_display_name=lambda df: df["sender_handle"]
+            .map(identifier_to_display_name)
+            .fillna("Me")
+            .where(df["is_from_me"].eq(False), "Me")
+        )
     )
 
 
@@ -306,9 +325,10 @@ def get_dataframes(
             )
 
         dfs = DataFrameNamespace(
-            messages=get_messages_dataframe(con, chat_ids, timezone),
+            messages=get_messages_dataframe(con, chat_ids, contact_records, timezone),
             attachments=get_attachments_dataframe(con, chat_ids, timezone),
             handles=get_handles_dataframe(con, contact_records),
+            contact_records=contact_records,
         )
         dfs.messages = filter_dataframe(
             dfs.messages,

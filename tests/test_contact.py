@@ -8,7 +8,11 @@ from tempfile import gettempdir
 import pytest
 
 import ica
-from ica.contact import ContactRecord, coalesce_contact_records
+from ica.contact import (
+    ContactRecord,
+    coalesce_contact_records,
+    get_unique_contact_display_name,
+)
 from tests.mock_db_utils import create_mock_db
 
 
@@ -173,3 +177,89 @@ def test_coalesce_contact_records_name_merging() -> None:
     record3 = next(r for r in coalesced if "789" in r.phone_numbers)
     assert record3.first_name == "Alice"
     assert record3.last_name == "Wonderland"
+
+
+def test_get_unique_contact_display_name_unique_first_name() -> None:
+    """
+    Should return the first name if it is unique among the contact records.
+    """
+    records = [
+        ContactRecord(first_name="Alice", last_name="Smith"),
+        ContactRecord(first_name="Bob", last_name="Jones"),
+    ]
+    display_name = get_unique_contact_display_name(records, records[0])
+    assert display_name == "Alice"
+
+
+def test_get_unique_contact_display_name_duplicate_first_name() -> None:
+    """
+    Should return the full name if the first name is not unique.
+    """
+    records = [
+        ContactRecord(first_name="Alice", last_name="Smith"),
+        ContactRecord(first_name="Alice", last_name="Jones"),
+    ]
+    display_name = get_unique_contact_display_name(records, records[0])
+    assert display_name == "Alice Smith"
+
+
+def test_get_unique_contact_display_name_duplicate_full_name() -> None:
+    """
+    Should return the phone number if the full name is not unique.
+    """
+    records = [
+        ContactRecord(
+            first_name="Alice", last_name="Smith", phone_numbers=["+15551234567"]
+        ),
+        ContactRecord(
+            first_name="Alice", last_name="Smith", phone_numbers=["+15559876543"]
+        ),
+    ]
+    display_name = get_unique_contact_display_name(records, records[0])
+    assert display_name == "+15551234567"
+
+
+def test_get_unique_contact_display_name_email_fallback() -> None:
+    """
+    Should return the email address if the contact has no phone number and the
+    name is not unique.
+    """
+    records = [
+        ContactRecord(
+            first_name="Alice",
+            last_name="Smith",
+            phone_numbers=[],
+            email_addresses=["alice.smith@example.com"],
+        ),
+        ContactRecord(
+            first_name="Alice",
+            last_name="Smith",
+            phone_numbers=["+15551234567"],
+            email_addresses=[],
+        ),
+    ]
+    display_name = get_unique_contact_display_name(records, records[0])
+    assert display_name == "alice.smith@example.com"
+
+
+def test_get_unique_contact_display_name_fallback() -> None:
+    """
+    Should fall back to full name if all identifiers are duplicates (unlikely
+    but possible).
+    """
+    records = [
+        ContactRecord(
+            first_name="Alice",
+            last_name="Smith",
+            phone_numbers=["+15551234567"],
+            email_addresses=["alice.smith@example.com"],
+        ),
+        ContactRecord(
+            first_name="Alice",
+            last_name="Smith",
+            phone_numbers=["+15551234567"],
+            email_addresses=["alice.smith@example.com"],
+        ),
+    ]
+    display_name = get_unique_contact_display_name(records, records[0])
+    assert display_name == "Alice Smith"
