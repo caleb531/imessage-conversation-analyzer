@@ -124,6 +124,12 @@ def main() -> None:
     for name, count in participant_reaction_counts.items():
         totals_map[f"reactions_from_{str(name).lower()}"] = count
 
+    # Ensure all participants are represented, even if the count is zero
+    for name in dfs.handles["first_name"].unique():
+        key = f"reactions_from_{str(name).lower()}"
+        if key not in totals_map:
+            totals_map[key] = 0
+
     totals_map.update(
         {
             "days_messaged": days_messaged_count,
