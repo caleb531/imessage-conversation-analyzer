@@ -290,3 +290,23 @@ def test_output_results_empty_output_string() -> None:
             stdout.getvalue()
             == Path(f"tests/data/output/txt/output_results_{test_name}.txt").read_text()
         )
+
+
+def test_output_results_prettified_label_override() -> None:
+    """
+    Should use the provided label overrides when prettifying header names.
+    """
+    df = pd.DataFrame(
+        {
+            "foo_bar": [1, 2, 3],
+            "baz_qux": [4, 5, 6],
+        }
+    )
+    with redirect_stdout(StringIO()) as stdout:
+        ica.output_results(
+            df,
+            prettified_label_overrides={"foo_bar": "Foo Bar (Overridden)"},
+        )
+        output = stdout.getvalue()
+        assert "Foo Bar (Overridden)" in output
+        assert "Baz Qux" in output
