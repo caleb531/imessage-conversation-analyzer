@@ -4,7 +4,6 @@ import datetime
 import pandas as pd
 
 import ica
-import ica.contact
 
 
 def get_first_message_date(dfs: ica.DataFrameNamespace) -> pd.Timestamp:
@@ -96,10 +95,7 @@ def main() -> None:
 
     # Add per-participant message counts
     message_counts = messages_only["sender_display_name"].value_counts()
-    for record in dfs.contact_records:
-        display_name = ica.contact.get_unique_contact_display_name(
-            dfs.contact_records, record
-        )
+    for display_name in dfs.handles["display_name"].unique():
         totals_map[f"messages_from_{display_name.lower()}"] = message_counts.get(
             display_name, 0
         )
@@ -109,10 +105,7 @@ def main() -> None:
 
     # Add per-participant reaction counts
     reaction_counts = reactions_only["sender_display_name"].value_counts()
-    for record in dfs.contact_records:
-        display_name = ica.contact.get_unique_contact_display_name(
-            dfs.contact_records, record
-        )
+    for display_name in dfs.handles["display_name"].unique():
         totals_map[f"reactions_from_{display_name.lower()}"] = reaction_counts.get(
             display_name, 0
         )

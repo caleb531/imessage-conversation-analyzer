@@ -146,17 +146,25 @@ def test_coalesce_contact_records_name_merging() -> None:
     """
     records = [
         # Case 1: Existing record has no first name, new record does
-        ContactRecord(first_name="", last_name="Pinerose", phone_numbers=["123"]),
-        ContactRecord(first_name="Jennifer", last_name="", phone_numbers=["123"]),
+        ContactRecord(
+            id="1", first_name="", last_name="Pinerose", phone_numbers=["123"]
+        ),
+        ContactRecord(
+            id="2", first_name="Jennifer", last_name="", phone_numbers=["123"]
+        ),
         # Case 2: Existing record has no last name, new record does
-        ContactRecord(first_name="Jen", last_name="", phone_numbers=["456"]),
-        ContactRecord(first_name="", last_name="Windhelm", phone_numbers=["456"]),
+        ContactRecord(id="3", first_name="Jen", last_name="", phone_numbers=["456"]),
+        ContactRecord(
+            id="4", first_name="", last_name="Windhelm", phone_numbers=["456"]
+        ),
         # Case 3: Existing record has names, new record has different names
         # (should preserve existing)
         ContactRecord(
-            first_name="Alice", last_name="Wonderland", phone_numbers=["789"]
+            id="5", first_name="Alice", last_name="Wonderland", phone_numbers=["789"]
         ),
-        ContactRecord(first_name="Bob", last_name="Builder", phone_numbers=["789"]),
+        ContactRecord(
+            id="6", first_name="Bob", last_name="Builder", phone_numbers=["789"]
+        ),
     ]
 
     coalesced = coalesce_contact_records(records)
@@ -184,8 +192,8 @@ def test_get_unique_contact_display_name_unique_first_name() -> None:
     Should return the first name if it is unique among the contact records.
     """
     records = [
-        ContactRecord(first_name="Alice", last_name="Smith"),
-        ContactRecord(first_name="Bob", last_name="Jones"),
+        ContactRecord(id="1", first_name="Alice", last_name="Smith"),
+        ContactRecord(id="2", first_name="Bob", last_name="Jones"),
     ]
     display_name = get_unique_contact_display_name(records, records[0])
     assert display_name == "Alice"
@@ -196,8 +204,8 @@ def test_get_unique_contact_display_name_duplicate_first_name() -> None:
     Should return the full name if the first name is not unique.
     """
     records = [
-        ContactRecord(first_name="Alice", last_name="Smith"),
-        ContactRecord(first_name="Alice", last_name="Jones"),
+        ContactRecord(id="1", first_name="Alice", last_name="Smith"),
+        ContactRecord(id="2", first_name="Alice", last_name="Jones"),
     ]
     display_name = get_unique_contact_display_name(records, records[0])
     assert display_name == "Alice Smith"
@@ -209,10 +217,16 @@ def test_get_unique_contact_display_name_duplicate_full_name() -> None:
     """
     records = [
         ContactRecord(
-            first_name="Alice", last_name="Smith", phone_numbers=["+15551234567"]
+            id="1",
+            first_name="Alice",
+            last_name="Smith",
+            phone_numbers=["+15551234567"],
         ),
         ContactRecord(
-            first_name="Alice", last_name="Smith", phone_numbers=["+15559876543"]
+            id="2",
+            first_name="Alice",
+            last_name="Smith",
+            phone_numbers=["+15559876543"],
         ),
     ]
     display_name = get_unique_contact_display_name(records, records[0])
@@ -226,12 +240,14 @@ def test_get_unique_contact_display_name_email_fallback() -> None:
     """
     records = [
         ContactRecord(
+            id="1",
             first_name="Alice",
             last_name="Smith",
             phone_numbers=[],
             email_addresses=["alice.smith@example.com"],
         ),
         ContactRecord(
+            id="2",
             first_name="Alice",
             last_name="Smith",
             phone_numbers=["+15551234567"],
@@ -249,12 +265,14 @@ def test_get_unique_contact_display_name_fallback() -> None:
     """
     records = [
         ContactRecord(
+            id="1",
             first_name="Alice",
             last_name="Smith",
             phone_numbers=["+15551234567"],
             email_addresses=["alice.smith@example.com"],
         ),
         ContactRecord(
+            id="2",
             first_name="Alice",
             last_name="Smith",
             phone_numbers=["+15551234567"],

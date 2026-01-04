@@ -77,6 +77,8 @@ def normalize_contact_identifier(contact_identifier: str) -> str:
 
 @dataclass
 class ContactRecord:
+    # The unique identifier for the contact in the AddressBook database
+    id: str
     # The first and last name of the contact
     first_name: str
     last_name: str
@@ -113,7 +115,7 @@ def get_contact_record(
     if rows.empty:
         return records
 
-    for _, group in rows.groupby("contact_id"):
+    for contact_id, group in rows.groupby("contact_id"):
         first_name = group["ZFIRSTNAME"].iloc[0] or ""
         last_name = group["ZLASTNAME"].iloc[0] or ""
 
@@ -134,6 +136,7 @@ def get_contact_record(
                 last_name=last_name,
                 phone_numbers=phone_numbers,
                 email_addresses=email_addresses,
+                id=str(contact_id),
             )
         )
 
@@ -165,6 +168,8 @@ def coalesce_contact_records(records: list[ContactRecord]) -> list[ContactRecord
                     unique_record.first_name = record.first_name
                 if not unique_record.last_name and record.last_name:
                     unique_record.last_name = record.last_name
+                if unique_record.id is None and record.id is not None:
+                    unique_record.id = record.id
                 found = True
                 break
         # If no overlapping record was found, add as new

@@ -59,7 +59,6 @@ class DataFrameNamespace:
     messages: pd.DataFrame
     attachments: pd.DataFrame
     handles: pd.DataFrame
-    contact_records: list[ContactRecord]
 
 
 def decode_message_attributedbody(data: bytes) -> str:
@@ -270,7 +269,14 @@ def get_handles_dataframe(
     if not all_identifiers:
         return pd.DataFrame(
             columns=pd.Index(
-                ["handle_id", "name", "first_name", "last_name", "identifier"]
+                [
+                    "handle_id",
+                    "first_name",
+                    "last_name",
+                    "identifier",
+                    "contact_id",
+                    "display_name",
+                ]
             )
         )
 
@@ -295,6 +301,10 @@ def get_handles_dataframe(
                 "first_name": record.first_name,
                 "last_name": record.last_name,
                 "identifier": identifier,
+                "contact_id": record.id,
+                "display_name": ica.contact.get_unique_contact_display_name(
+                    contact_records, record
+                ),
             }
             for record in contact_records
             for identifier in record.get_identifiers()
@@ -328,7 +338,6 @@ def get_dataframes(
             messages=get_messages_dataframe(con, chat_ids, contact_records, timezone),
             attachments=get_attachments_dataframe(con, chat_ids, timezone),
             handles=get_handles_dataframe(con, contact_records),
-            contact_records=contact_records,
         )
         dfs.messages = filter_dataframe(
             dfs.messages,

@@ -16,12 +16,14 @@ def mock_db_connection() -> sqlite3.Connection:
 def test_get_handles_dataframe(mock_db_connection: sqlite3.Connection) -> None:
     contact_records = [
         ContactRecord(
+            id="1",
             first_name="Jane",
             last_name="Fernbrook",
             phone_numbers=["+12234567890"],
             email_addresses=[],
         ),
         ContactRecord(
+            id="2",
             first_name="John",
             last_name="Doe",
             phone_numbers=[],
@@ -40,6 +42,8 @@ def test_get_handles_dataframe(mock_db_connection: sqlite3.Connection) -> None:
         "first_name",
         "last_name",
         "identifier",
+        "contact_id",
+        "display_name",
     ]
 
     # Check Jane's row
@@ -56,6 +60,7 @@ def test_get_handles_dataframe(mock_db_connection: sqlite3.Connection) -> None:
 
     contact_records_2 = [
         ContactRecord(
+            id="1",
             first_name="Daniel",
             last_name="Brightingale",
             phone_numbers=["+12123456789"],
@@ -75,8 +80,9 @@ def test_get_handles_dataframe_empty(mock_db_connection: sqlite3.Connection) -> 
     assert handles.empty
     assert list(handles.columns) == [
         "handle_id",
-        "name",
         "first_name",
         "last_name",
         "identifier",
+        "contact_id",
+        "display_name",
     ]
