@@ -78,8 +78,8 @@ def main() -> None:
         columns=lambda col: "count_from_me" if col == "Me" else f"count_from_{col}"
     )
 
-    # Calculate total count
-    results["count"] = results.sum(axis=1)
+    # Calculate total count and insert as first column
+    results.insert(0, "count", results.sum(axis=1))
 
     # Sort by total count and take top N
     # Note: We sort by index (emoji) secondarily to ensure deterministic ordering
