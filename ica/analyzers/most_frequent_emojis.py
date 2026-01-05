@@ -63,10 +63,7 @@ def main() -> None:
     emoji_data.loc[emoji_data["is_from_me"], "sender_column"] = "Me"
 
     # Create a pivot table of counts
-    if emoji_data.empty:
-        results = pd.DataFrame()
-    else:
-        results = pd.crosstab(emoji_data["emoji"], emoji_data["sender_column"])
+    results = pd.crosstab(emoji_data["emoji"], emoji_data["sender_column"])
 
     # Ensure all participants (and "Me") are represented as columns
     all_participants = sorted(dfs.handles["display_name"].unique())
