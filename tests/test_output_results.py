@@ -2,6 +2,7 @@
 """test the message_totals built-in analyzer"""
 
 import itertools
+import locale
 from contextlib import redirect_stdout
 from enum import Enum
 from io import BytesIO, StringIO
@@ -310,3 +311,39 @@ def test_output_results_prettified_label_override() -> None:
         output = stdout.getvalue()
         assert "Foo Bar (Overridden)" in output
         assert "Baz Qux" in output
+
+
+def test_output_results_locale_aware_separators() -> None:
+    """
+    Should use locale-aware thousands separators when printing numbers.
+    """
+    df = pd.DataFrame(
+        {
+            "metric": ["Messages", "Reactions"],
+            "total": [12345, 6789012],
+        }
+    ).set_index("metric")
+
+    # Test with German locale (uses periods as thousands separators)
+    try:
+        locale.setlocale(locale.LC_ALL, "de_DE.UTF-8")
+    except locale.Error:
+        pytest.skip("de_DE.UTF-8 locale not supported")
+
+    with redirect_stdout(StringIO()) as stdout:
+        ica.output_results(df)
+        output = stdout.getvalue()
+        assert "12.345" in output
+        assert "6.789.012" in output
+
+    # Test with US English locale (uses commas as thousands separators)
+    try:
+        locale.setlocale(locale.LC_ALL, "en_US.UTF-8")
+    except locale.Error:
+        pytest.skip("en_US.UTF-8 locale not supported")
+
+    with redirect_stdout(StringIO()) as stdout:
+        ica.output_results(df)
+        output = stdout.getvalue()
+        assert "12,345" in output
+        assert "6,789,012" in output

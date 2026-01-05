@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
+import contextlib
 import functools
 import importlib.machinery
 import importlib.resources
 import importlib.util
+import locale
 import os
 import sqlite3
 import sys
@@ -446,6 +448,13 @@ def output_results(
     """
     Print the dataframe provided by an analyzer module
     """
+    # Set the locale to the user's default setting to ensure that numbers are
+    # formatted correctly (e.g. with thousands separators); however, if the
+    # locale has already been set (e.g. by a test), do not override it
+    with contextlib.suppress(locale.Error):
+        if locale.getlocale(locale.LC_NUMERIC) == (None, None):
+            locale.setlocale(locale.LC_ALL, "")
+
     is_default_index = not analyzer_df.index.name
     output_df = prepare_df_for_output(
         analyzer_df, prettified_label_overrides=prettified_label_overrides
@@ -501,8 +510,9 @@ def output_results(
                 output,
                 index=True,
                 line_width=100000,
+                # Format numbers with thousands separators
                 formatters={
-                    col: "{:,}".format
+                    col: "{:n}".format
                     for col in output_df.select_dtypes(include="number").columns
                 },
             )
