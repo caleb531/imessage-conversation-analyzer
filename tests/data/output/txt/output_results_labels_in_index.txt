@@ -1,4 +1,4 @@
-Metric       Total
-Messages       987
-Reactions      654
-Attachments    321
+Metric      Total
+Messages      987
+Reactions     654
+Attachments   321

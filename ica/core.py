@@ -497,7 +497,15 @@ def output_results(
             # the index (source: <https://stackoverflow.com/a/43635736/560642>)
             .rename_axis(columns=output_df.index.name)
             .rename_axis(index=None)
-            .to_string(output, index=True, line_width=100000)
+            .to_string(
+                output,
+                index=True,
+                line_width=100000,
+                formatters={
+                    col: "{:,}".format
+                    for col in output_df.select_dtypes(include="number").columns
+                },
+            )
         )
 
     # Print output if no output file path was supplied

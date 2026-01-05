@@ -1,5 +1,5 @@
 Generating SQL with AI ({MODEL})...
 Token usage information not available.
 Running query...
-   Total Messages
-1              11
+  Total Messages
+1             11
