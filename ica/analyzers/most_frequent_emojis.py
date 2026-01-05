@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-from typing import TypedDict
-
 import emoji
 import pandas as pd
 
@@ -18,36 +16,6 @@ class MostFrequentEmojisCLIArguments(ica.TypedCLIArguments):
     result_count: int
 
 
-class EmojiMatch(TypedDict):
-    """Type definition for the dictionary returned by emoji.emoji_list()"""
-
-    emoji: str
-    match_start: int
-    match_end: int
-
-
-def get_concatenated_messages(messages: pd.DataFrame) -> str:
-    """
-    Retrieve and concatenate all non-reaction message texts into a single string.
-    """
-    text = messages[messages["is_reaction"].eq(False)].get("text")
-    return text.str.cat(sep=" ")
-
-
-def filter_skin_tones(found_emojis: list[EmojiMatch]) -> list[str]:
-    """
-    Extract emojis from the emoji_list result and strip skin tone modifiers.
-    """
-    # str.maketrans(x, y, z) creates a translation table. The first two
-    # arguments are for mapping characters (x -> y). The third argument (z)
-    # specifies characters to delete. Here, we pass empty strings for x and y
-    # because we don't want to replace anything, only delete the skin tone
-    # characters provided in the third argument.
-    translation_table = str.maketrans("", "", "".join(skin_tones))
-    return [item["emoji"].translate(translation_table) for item in found_emojis]
-
-
-# Output the occurrences of specific emojis
 def main() -> None:
     """
     Generates count data for the top 10 most frequently used emojis across the
@@ -69,19 +37,71 @@ def main() -> None:
         from_person=cli_args.from_person,
     )
 
-    full_text = get_concatenated_messages(dfs.messages)
-    found_emojis = emoji.emoji_list(full_text)
-    cleaned_emojis = filter_skin_tones(found_emojis)
+    # Filter out reactions as they are not part of the message text analysis
+    messages = dfs.messages[~dfs.messages["is_reaction"]].copy()
+
+    # Create a translation table to remove skin tones
+    translation_table = str.maketrans("", "", "".join(skin_tones))
+
+    def extract_emojis(text: str) -> list[str]:
+        if isinstance(text, str):
+            return [
+                item["emoji"].translate(translation_table)
+                for item in emoji.emoji_list(text)
+            ]
+        return []
+
+    # Extract emojis from all messages at once
+    messages["emoji"] = messages["text"].apply(extract_emojis)
+
+    # Explode the list of emojis so each emoji has its own row
+    emoji_data = messages.explode("emoji")
+
+    # Drop rows with no emojis
+    emoji_data = emoji_data.dropna(subset=["emoji"])
+
+    # Normalize sender column for pivoting
+    # We want columns for "Me" and each participant
+    emoji_data["sender_column"] = emoji_data["sender_display_name"]
+    emoji_data.loc[emoji_data["is_from_me"], "sender_column"] = "Me"
+
+    # Create a pivot table of counts
+    if emoji_data.empty:
+        results = pd.DataFrame()
+    else:
+        results = pd.crosstab(emoji_data["emoji"], emoji_data["sender_column"])
+
+    # Ensure all participants (and "Me") are represented as columns
+    all_participants = sorted(dfs.handles["display_name"].unique())
+    expected_cols = ["Me"] + all_participants
+    results = results.reindex(columns=expected_cols, fill_value=0)
+
+    # Rename columns to match expected output format
+    results = results.rename(
+        columns=lambda col: "count_from_me" if col == "Me" else f"count_from_{col}"
+    )
+
+    # Calculate total count
+    results["count"] = results.sum(axis=1)
+
+    # Sort by total count and take top N
+    # Note: We sort by index (emoji) secondarily to ensure deterministic ordering
+    # when counts are tied
+    results.index.name = "emoji"
+    results = (
+        results.sort_values(["count", "emoji"], ascending=[False, True])
+        .head(cli_args.result_count)
+        .astype(int)
+    )
 
     ica.output_results(
-        (
-            pd.DataFrame({"emoji": pd.Series(cleaned_emojis).value_counts()})
-            .rename(columns={"emoji": "count"})
-            .rename_axis(index="emoji")
-            .head(cli_args.result_count)
-        ),
+        results,
         format=cli_args.format,
         output=cli_args.output,
+        prettified_label_overrides={
+            f"count_from_{display_name}": f"Count From {display_name}"
+            for display_name in all_participants
+        },
     )
 
 

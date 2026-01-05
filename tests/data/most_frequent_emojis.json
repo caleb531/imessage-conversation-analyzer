@@ -1,20 +1,32 @@
 {
     "😀": {
-        "count": 5
+        "count": 5,
+        "count_from_me": 0,
+        "count_from_Jane": 5
     },
     "😊": {
-        "count": 2
+        "count": 2,
+        "count_from_me": 1,
+        "count_from_Jane": 1
     },
     "👨‍💻": {
-        "count": 1
+        "count": 1,
+        "count_from_me": 1,
+        "count_from_Jane": 0
     },
     "🙌": {
-        "count": 1
+        "count": 1,
+        "count_from_me": 1,
+        "count_from_Jane": 0
     },
     "🍎": {
-        "count": 1
+        "count": 1,
+        "count_from_me": 1,
+        "count_from_Jane": 0
     },
     "☺️": {
-        "count": 1
+        "count": 1,
+        "count_from_me": 0,
+        "count_from_Jane": 1
     }
 }

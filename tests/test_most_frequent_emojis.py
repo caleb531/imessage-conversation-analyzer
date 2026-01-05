@@ -25,7 +25,7 @@ def test_most_frequent_emojis(output_results: MagicMock) -> None:
 @patch("ica.output_results")
 @patch(
     "sys.argv",
-    [most_frequent_emojis.__file__, "-c", "Jane Fernbrook", "--result-count", "3"],
+    [most_frequent_emojis.__file__, "-c", "Jane Fernbrook", "--result-count", "5"],
 )
 def test_most_frequent_emojis_result_count(output_results: MagicMock) -> None:
     """
@@ -40,7 +40,7 @@ def test_most_frequent_emojis_result_count(output_results: MagicMock) -> None:
         for k, v in json.loads(
             Path("tests/data/most_frequent_emojis.json").read_text()
         ).items()
-        if k in ["😀", "😊", "👨‍💻"]
+        if k in ["😀", "😊", "☺️", "🍎", "👨‍💻"]
     }
 
 
