@@ -269,6 +269,8 @@ A list of all messages in the conversation, including text messages and reaction
 | `ROWID` | `int` | The unique identifier of the message |
 | `text` | `str` | The content of the message |
 | `datetime` | `datetime.datetime` | The timestamp of the message whose timezone is based on the `timezone` parameter you pass to `get_dataframes()` (defaults to the system's local timezone) |
+| `sender_display_name` | `str` | A display name representing the sender of the message; can be a first name, full name, phone number, email address, or "Me" if `is_from_me` is true for that message |
+| `sender_handle` | `str` | The specific handle (phone number or email address) from which the sender sent the message |
 | `is_from_me` | `bool` | Whether the message was sent by you (`True`) or another participant (`False`) |
 | `is_reaction` | `bool` | Whether the message is a reaction (e.g. "Loved ...") |
 
@@ -285,16 +287,21 @@ A list of all attachments in the conversation, including images, videos, audio\,
 | `datetime` | `datetime.datetime` | The localized timestamp of the message |
 | `is_from_me` | `bool` | Whether the attachment was sent by you (`True`) or another participant (`False`) |
 
-#### `participants`
+#### `handles`
 
-A list of all participants in the conversation other than you (the host user).
+A list of all handles (phone numbers and email addresses) associated with the
+participants of the conversation (other than the host user / "me"). This allows
+for easy joining with the `messages` dataframe.
 
 | Column | Type | Description |
 | :--- | :--- | :--- |
-| `first_name` | `str` | The first name of the participant |
-| `last_name` | `str` | The last name of the participant |
-| `phone_numbers` | `list[str]` | A list of phone numbers associated with the participant |
-| `email_addresses` | `list[str]` | A list of email addresses associated with the participant |
+| `handle_id` | `int` | The unique numeric ID of the handle |
+| `name` | `str` | The full name of the contact associated with the handle |
+| `first_name` | `str` | The first name of the participant (as found on their contact record) |
+| `last_name` | `str` | The last name of the participant (as found on their contact record) |
+| `identifier` | `str` | The specific handle (phone number or email address) belonging to the participant |
+| `contact_id` | `str` | The unique identifier of the contact record |
+| `display_name` | `str` | A unique display name for the participant; can be a first name, full name, phone number, or email address (to ensure uniqueness) |
 
 ## Developer Setup
 
