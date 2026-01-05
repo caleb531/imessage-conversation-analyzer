@@ -1,139 +1,139 @@
 [
   {
     "timestamp": "2024-01-07T23:11:40.000Z",
-    "is_from_me": "No",
+    "sender": "Thomas",
     "is_reaction": "No",
     "message": "Hey John! What's up? 👊"
   },
   {
     "timestamp": "2024-01-07T23:15:22.000Z",
-    "is_from_me": "Yes",
+    "sender": "Me",
     "is_reaction": "Yes",
     "message": "Loved “Hey John! What's up? 👊”"
   },
   {
     "timestamp": "2024-01-09T01:35:30.000Z",
-    "is_from_me": "Yes",
+    "sender": "Me",
     "is_reaction": "No",
     "message": "Hey Thomas! Not much, just chatting with Jane. ☺️ What's going on with you?"
   },
   {
     "timestamp": "2024-01-11T22:07:04.000Z",
-    "is_from_me": "No",
+    "sender": "Thomas",
     "is_reaction": "No",
     "message": "Just finished up a coding session myself. Feeling a bit brain-fried, but also kind of accomplished. 😎"
   },
   {
     "timestamp": "2024-01-12T16:32:23.000Z",
-    "is_from_me": "No",
+    "sender": "Thomas",
     "is_reaction": "No",
     "message": "Yeah, I definitely needed a break. 😌 What are you working on these days?"
   },
   {
     "timestamp": "2024-01-12T18:34:51.000Z",
-    "is_from_me": "Yes",
+    "sender": "Me",
     "is_reaction": "No",
     "message": "I'm building a new feature for our app at work! It's been a challenge, but https://open.spotify.com/playlist/37i9dQZF1DWWQRwui0ExPn has been helping 🎧"
   },
   {
     "timestamp": "2024-01-12T18:34:58.000Z",
-    "is_from_me": "No",
+    "sender": "Thomas",
     "is_reaction": "Yes",
     "message": "Liked “I'm building a new feature for our app at work! It's been a challenge, but https://open.spotify.com/playlist/37i9dQZF1DWWQRwui0ExPn has been helping 🎧”"
   },
   {
     "timestamp": "2024-01-12T18:35:06.000Z",
-    "is_from_me": "No",
+    "sender": "Thomas",
     "is_reaction": "No",
     "message": "That's so cool! And great playlist. It reminds me of https://www.youtube.com/watch?v=sF80I-TQiW0 and https://www.youtube.com/watch?v=jfKfPfyJRdk"
   },
   {
     "timestamp": "2024-01-12T18:36:45.000Z",
-    "is_from_me": "Yes",
+    "sender": "Me",
     "is_reaction": "Yes",
     "message": "Loved “That's so cool! And great playlist. It reminds me of https://www.youtube.com/watch?v=3yx2G8GMT9I and https://www.youtube.com/watch?v=jfKfPfyJRdk”"
   },
   {
     "timestamp": "2024-01-12T18:37:26.000Z",
-    "is_from_me": "Yes",
+    "sender": "Me",
     "is_reaction": "No",
     "message": "Oh wow! I haven't listened to these before! These are great!"
   },
   {
     "timestamp": "2024-01-12T20:38:26.000Z",
-    "is_from_me": "Yes",
+    "sender": "Me",
     "is_reaction": "No",
     "message": "Kinda reminds me of:"
   },
   {
     "timestamp": "2024-01-12T20:38:40.000Z",
-    "is_from_me": "Yes",
+    "sender": "Me",
     "is_reaction": "No",
     "message": "https://www.youtube.com/watch?v=tONVgIvdk0A and https://music.apple.com/us/station/lo-fi-station/ra.1569482000"
   },
   {
     "timestamp": "2024-01-12T20:40:03.000Z",
-    "is_from_me": "No",
+    "sender": "Thomas",
     "is_reaction": "No",
     "message": "Oh yeah that's a good one too!"
   },
   {
     "timestamp": "2024-01-12T20:40:33.000Z",
-    "is_from_me": "No",
+    "sender": "Thomas",
     "is_reaction": "No",
     "message": "On the topic of lo-fi, have you seen https://www.youtube.com/watch?v=ovw8a-RfVpA ?"
   },
   {
     "timestamp": "2024-01-12T20:51:28.000Z",
-    "is_from_me": "Yes",
+    "sender": "Me",
     "is_reaction": "Yes",
     "message": "Disliked “On the topic of lo-fi, have you seen https://www.youtube.com/watch?v=ovw8a-RfVpA ?”"
   },
   {
     "timestamp": "2024-01-12T20:51:33.000Z",
-    "is_from_me": "Yes",
+    "sender": "Me",
     "is_reaction": "No",
     "message": "Oh gosh this is terrible.. I can't even stand to listen to it lol"
   },
   {
     "timestamp": "2024-01-12T20:51:37.000Z",
-    "is_from_me": "No",
+    "sender": "Thomas",
     "is_reaction": "Yes",
     "message": "Questioned “Oh gosh this is terrible.. I can't even stand to listen to it lol”"
   },
   {
     "timestamp": "2024-01-12T20:52:28.000Z",
-    "is_from_me": "No",
+    "sender": "Thomas",
     "is_reaction": "No",
     "message": "Ha really? I totally love it. Maybe I'm crazy 😅"
   },
   {
     "timestamp": "2024-01-12T20:54:22.000Z",
-    "is_from_me": "Yes",
+    "sender": "Me",
     "is_reaction": "Yes",
     "message": "Laughed at “Ha really? I totally love it. Maybe I'm crazy 😅”"
   },
   {
     "timestamp": "2024-01-12T20:58:18.000Z",
-    "is_from_me": "Yes",
+    "sender": "Me",
     "is_reaction": "No",
     "message": "Maybe just a little 🤏😝🤣"
   },
   {
     "timestamp": "2024-01-12T21:19:16.000Z",
-    "is_from_me": "Yes",
+    "sender": "Me",
     "is_reaction": "No",
     "message": "Anyway, man, I gotta go, but I enjoyed this conversation 😆"
   },
   {
     "timestamp": "2024-01-12T21:19:51.000Z",
-    "is_from_me": "No",
+    "sender": "Thomas",
     "is_reaction": "No",
     "message": "Same here! 🤣 Catch you later!"
   },
   {
     "timestamp": "2024-01-12T21:21:00.000Z",
-    "is_from_me": "No",
+    "sender": "Thomas",
     "is_reaction": "Yes",
     "message": "Loved “Same here! 🤣 Catch you later!”"
   }

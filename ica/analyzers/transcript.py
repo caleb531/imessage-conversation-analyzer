@@ -19,7 +19,7 @@ def main() -> None:
     ica.output_results(
         dfs.messages.assign(
             timestamp=lambda df: df["datetime"],
-            is_from_me=lambda df: df["is_from_me"].map({True: "Yes", False: "No"}),
+            sender=lambda df: df["sender_display_name"],
             is_reaction=lambda df: df["is_reaction"].map({True: "Yes", False: "No"}),
             # U+FFFC is the object replacement character, which appears as the
             # textual message for every attachment
@@ -28,7 +28,7 @@ def main() -> None:
             ),
         )
         # Output only the following columns and in this particular order
-        .loc[:, ["timestamp", "is_from_me", "is_reaction", "message"]],
+        .loc[:, ["timestamp", "sender", "is_reaction", "message"]],
         format=cli_args.format,
         output=cli_args.output,
     )
