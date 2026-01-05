@@ -3,11 +3,13 @@
 
 import itertools
 import locale
+import os
 from contextlib import redirect_stdout
 from enum import Enum
 from io import BytesIO, StringIO
 from pathlib import Path
 from typing import Optional
+from unittest.mock import patch
 
 import pandas as pd
 import pytest
@@ -347,3 +349,49 @@ def test_output_results_locale_aware_separators() -> None:
         output = out.getvalue()
         assert "12,345" in output
         assert "6,789,012" in output
+
+
+def test_output_results_initializes_numeric_locale() -> None:
+    """
+    Should initialize the numeric locale even if the default locale (LC_CTYPE)
+    is already set.
+    """
+    # Save current locale to restore later
+    saved_locale = locale.setlocale(locale.LC_ALL)
+
+    try:
+        # Reset to C locale first
+        locale.setlocale(locale.LC_ALL, "C")
+
+        # Set only LC_CTYPE to a specific locale (e.g. en_US.UTF-8)
+        # This simulates the state where getlocale() returns a value, but
+        # LC_NUMERIC might still be C
+        try:
+            locale.setlocale(locale.LC_CTYPE, "en_US.UTF-8")
+        except locale.Error:
+            pytest.skip("en_US.UTF-8 locale not supported")
+
+        # Verify preconditions
+        # getlocale() (which defaults to LC_CTYPE) should return en_US
+        assert locale.getlocale()[0] == "en_US"
+        # getlocale(LC_NUMERIC) should be (None, None) for C locale
+        assert locale.getlocale(locale.LC_NUMERIC) == (None, None)
+
+        df = pd.DataFrame(
+            {
+                "metric": ["Messages"],
+                "total": [12345],
+            }
+        ).set_index("metric")
+
+        # Ensure environment variable is set so setlocale(LC_ALL, "") picks it up
+        with patch.dict(os.environ, {"LC_ALL": "en_US.UTF-8"}):
+            with redirect_stdout(StringIO()) as stdout:
+                ica.output_results(df)
+                output = stdout.getvalue()
+                # Should have commas now because output_results should have
+                # called setlocale(LC_ALL, "")
+                assert "12,345" in output
+
+    finally:
+        locale.setlocale(locale.LC_ALL, saved_locale)
