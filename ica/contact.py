@@ -143,7 +143,7 @@ def get_contact_record(
     return records
 
 
-def coalesce_contact_records(records: list[ContactRecord]) -> list[ContactRecord]:
+def coalesce_contact_records(records: Sequence[ContactRecord]) -> list[ContactRecord]:
     """
     Merge contact records that share at least one identifier (phone number or
     email address)
@@ -224,7 +224,7 @@ def get_unique_contact_display_name(
 
 
 def validate_contact_records(
-    contact_records: list[ContactRecord], contact_identifiers: Sequence[str]
+    contact_records: Sequence[ContactRecord], contact_identifiers: Sequence[str]
 ) -> None:
     """
     Validate that at least one contact record was found; if multiple records

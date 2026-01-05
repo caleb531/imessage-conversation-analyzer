@@ -6,7 +6,7 @@ import importlib.util
 import os
 import sqlite3
 import sys
-from collections.abc import Generator
+from collections.abc import Generator, Sequence
 from contextlib import contextmanager
 from dataclasses import dataclass
 from io import BytesIO, StringIO
@@ -78,7 +78,7 @@ def decode_message_attributedbody(data: bytes) -> str:
 
 
 def get_chat_ids_for_contacts(
-    con: sqlite3.Connection, contact_records: list[ContactRecord]
+    con: sqlite3.Connection, contact_records: Sequence[ContactRecord]
 ) -> list[str]:
     """
     Find the chat IDs for the chat(s) involving exactly the specified contacts.
@@ -124,8 +124,8 @@ def get_chat_ids_for_contacts(
 
 def get_messages_dataframe(
     con: sqlite3.Connection,
-    chat_ids: list[str],
-    contact_records: list[ContactRecord],
+    chat_ids: Sequence[str],
+    contact_records: Sequence[ContactRecord],
     timezone: Optional[str] = None,
 ) -> pd.DataFrame:
     """
@@ -224,7 +224,7 @@ def filter_dataframe(
 
 def get_attachments_dataframe(
     con: sqlite3.Connection,
-    chat_ids: list[str],
+    chat_ids: Sequence[str],
     timezone: Optional[str] = None,
 ) -> pd.DataFrame:
     """
@@ -254,7 +254,7 @@ def get_attachments_dataframe(
 
 def get_handles_dataframe(
     con: sqlite3.Connection,
-    contact_records: list[ContactRecord],
+    contact_records: Sequence[ContactRecord],
 ) -> pd.DataFrame:
     """
     Return a pandas dataframe representing the handles associated with the
@@ -314,7 +314,7 @@ def get_handles_dataframe(
 
 
 def get_dataframes(
-    contacts: list[str],
+    contacts: Sequence[str],
     timezone: Optional[str] = None,
     from_date: Optional[str] = None,
     to_date: Optional[str] = None,
