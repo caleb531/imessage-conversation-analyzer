@@ -165,11 +165,24 @@ def test_coalesce_contact_records_name_merging() -> None:
         ContactRecord(
             id="6", first_name="Bob", last_name="Builder", phone_numbers=["789"]
         ),
+        # Case 4: Existing record has no ID, new record does
+        ContactRecord(
+            id="7",
+            first_name="Charlie",
+            last_name="Watermarsh",
+            phone_numbers=["+15550000000"],
+        ),
+        ContactRecord(
+            id="8",
+            first_name="Charlie",
+            last_name="Watermarsh",
+            phone_numbers=["+15550000000"],
+        ),
     ]
 
     coalesced = coalesce_contact_records(records)
 
-    assert len(coalesced) == 3
+    assert len(coalesced) == 4
 
     # Check Case 1
     record1 = next(r for r in coalesced if "123" in r.phone_numbers)
@@ -185,6 +198,10 @@ def test_coalesce_contact_records_name_merging() -> None:
     record3 = next(r for r in coalesced if "789" in r.phone_numbers)
     assert record3.first_name == "Alice"
     assert record3.last_name == "Wonderland"
+
+    # Check Case 4
+    record4 = next(r for r in coalesced if "+15550000000" in r.phone_numbers)
+    assert record4.id == "8"
 
 
 def test_get_unique_contact_display_name_unique_first_name() -> None:

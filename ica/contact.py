@@ -168,8 +168,7 @@ def coalesce_contact_records(records: list[ContactRecord]) -> list[ContactRecord
                     unique_record.first_name = record.first_name
                 if not unique_record.last_name and record.last_name:
                     unique_record.last_name = record.last_name
-                if unique_record.id is None and record.id is not None:
-                    unique_record.id = record.id
+                unique_record.id = record.id
                 found = True
                 break
         # If no overlapping record was found, add as new
