@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 import emoji
 import pandas as pd
 
@@ -44,12 +43,10 @@ def main() -> None:
     translation_table = str.maketrans("", "", "".join(skin_tones))
 
     def extract_emojis(text: str) -> list[str]:
-        if isinstance(text, str):
-            return [
-                item["emoji"].translate(translation_table)
-                for item in emoji.emoji_list(text)
-            ]
-        return []
+        return [
+            item["emoji"].translate(translation_table)
+            for item in emoji.emoji_list(text)
+        ]
 
     # Extract emojis from all messages at once
     messages["emoji"] = messages["text"].apply(extract_emojis)
