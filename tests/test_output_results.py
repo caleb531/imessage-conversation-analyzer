@@ -84,10 +84,10 @@ def test_output_results(
     """Should print a dataframe to stdout."""
     test_name, df, use_default_index = test_case
     format, ext, df_read_method_name = output_type
-    with redirect_stdout(StringIO()) as stdout:
+    with redirect_stdout(StringIO()) as out:
         ica.output_results(df, format=format)
         assert (
-            stdout.getvalue()
+            out.getvalue()
             == Path(
                 f"tests/data/output/{ext}/output_results_{test_name}.{ext}"
             ).read_text()
@@ -106,16 +106,16 @@ def test_output_results_bytes(
     Should print the dataframe to stdout as binary Excel data.
     """
     test_name, df, use_default_index = test_case
-    with redirect_stdout(StdoutMockWithBuffer()) as stdout:
+    with redirect_stdout(StdoutMockWithBuffer()) as out:
         ica.output_results(
             df,
             format=format,
         )
-        assert stdout.getvalue() == ""
+        assert out.getvalue() == ""
         expected_df = prepare_df_for_output(df)
         actual_df = prepare_df_for_output(
             pd.read_excel(
-                stdout.buffer,
+                out.buffer,
                 index_col=None if use_default_index.value else 0,
             )
         )
@@ -282,13 +282,13 @@ def test_output_results_empty_output_string() -> None:
     Should print to stdout using default format if output is an empty string.
     """
     test_name, df, use_default_index = test_cases[0]
-    with redirect_stdout(StringIO()) as stdout:
+    with redirect_stdout(StringIO()) as out:
         ica.output_results(
             df,
             output="",
         )
         assert (
-            stdout.getvalue()
+            out.getvalue()
             == Path(f"tests/data/output/txt/output_results_{test_name}.txt").read_text()
         )
 
@@ -303,12 +303,12 @@ def test_output_results_prettified_label_override() -> None:
             "baz_qux": [4, 5, 6],
         }
     )
-    with redirect_stdout(StringIO()) as stdout:
+    with redirect_stdout(StringIO()) as out:
         ica.output_results(
             df,
             prettified_label_overrides={"foo_bar": "Foo Bar (Overridden)"},
         )
-        output = stdout.getvalue()
+        output = out.getvalue()
         assert "Foo Bar (Overridden)" in output
         assert "Baz Qux" in output
 
@@ -330,9 +330,9 @@ def test_output_results_locale_aware_separators() -> None:
     except locale.Error:
         pytest.skip("de_DE.UTF-8 locale not supported")
 
-    with redirect_stdout(StringIO()) as stdout:
+    with redirect_stdout(StringIO()) as out:
         ica.output_results(df)
-        output = stdout.getvalue()
+        output = out.getvalue()
         assert "12.345" in output
         assert "6.789.012" in output
 
@@ -342,8 +342,8 @@ def test_output_results_locale_aware_separators() -> None:
     except locale.Error:
         pytest.skip("en_US.UTF-8 locale not supported")
 
-    with redirect_stdout(StringIO()) as stdout:
+    with redirect_stdout(StringIO()) as out:
         ica.output_results(df)
-        output = stdout.getvalue()
+        output = out.getvalue()
         assert "12,345" in output
         assert "6,789,012" in output

@@ -104,9 +104,9 @@ def test_cli_contact_not_found() -> None:
 @patch("sys.argv", [cli.__file__, "message_totals", "-c", "Jane Fernbrook"])
 def test_keyboardinterrupt(spec_from_loader: MagicMock) -> None:
     """Should print a newline when user presses control-C."""
-    with redirect_stdout(StringIO()) as stdout:
+    with redirect_stdout(StringIO()) as out:
         cli.main()
-    assert stdout.getvalue() == "\n"
+    assert out.getvalue() == "\n"
 
 
 @patch("sys.argv", [cli.__file__, "message_totals", "-c", "Jane Fernbrook"])
@@ -124,9 +124,9 @@ def test_cli_get_cli_args() -> None:
 @patch("sys.argv", [cli.__file__, "--version"])
 def test_cli_version(mock_version: MagicMock) -> None:
     """Should print the version number."""
-    with redirect_stdout(StringIO()) as stdout, pytest.raises(SystemExit):
+    with redirect_stdout(StringIO()) as out, pytest.raises(SystemExit):
         cli.main()
-    assert "1.2.3" in stdout.getvalue()
+    assert "1.2.3" in out.getvalue()
 
 
 @patch(
@@ -136,6 +136,6 @@ def test_cli_version(mock_version: MagicMock) -> None:
 @patch("sys.argv", [cli.__file__, "--version"])
 def test_cli_version_fallback(mock_version: MagicMock) -> None:
     """Should print 0.0.0 if package version cannot be obtained."""
-    with redirect_stdout(StringIO()) as stdout, pytest.raises(SystemExit):
+    with redirect_stdout(StringIO()) as out, pytest.raises(SystemExit):
         cli.main()
-    assert "0.0.0" in stdout.getvalue()
+    assert "0.0.0" in out.getvalue()
