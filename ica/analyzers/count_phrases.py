@@ -18,33 +18,39 @@ class CountPhrasesArgumentParser(ica.TypedCLIArguments):
 def get_phrase_counts(
     messages_df: pd.DataFrame,
     phrases: list[str],
+    all_participants: list[str],
     use_regex: bool = False,
     case_sensitive: bool = False,
 ) -> pd.DataFrame:
     patterns = [phrase if use_regex else re.escape(phrase) for phrase in phrases]
     flags = 0 if case_sensitive else re.IGNORECASE
 
-    # Filter dataframes once to avoid repeated filtering in the loop
-    messages_from_me = messages_df[messages_df["is_from_me"]]
-    messages_from_them = messages_df[~messages_df["is_from_me"]]
+    # Initialize data dictionary with total counts
+    data = {
+        "phrase": phrases,
+        "count": [
+            messages_df["text"].str.count(pattern, flags=flags).sum()
+            for pattern in patterns
+        ],
+        "count_from_me": [
+            messages_df[messages_df["is_from_me"]]["text"]
+            .str.count(pattern, flags=flags)
+            .sum()
+            for pattern in patterns
+        ],
+    }
 
-    return pd.DataFrame(
-        {
-            "phrase": phrases,
-            "count": (
-                messages_df["text"].str.count(pattern, flags=flags).sum()
-                for pattern in patterns
-            ),
-            "count_from_me": (
-                messages_from_me["text"].str.count(pattern, flags=flags).sum()
-                for pattern in patterns
-            ),
-            "count_from_them": (
-                messages_from_them["text"].str.count(pattern, flags=flags).sum()
-                for pattern in patterns
-            ),
-        }
-    ).set_index("phrase")
+    # Add counts for each participant
+    for participant in all_participants:
+        participant_msgs = messages_df[
+            messages_df["sender_display_name"] == participant
+        ]
+        data[f"count_from_{participant}"] = [
+            participant_msgs["text"].str.count(pattern, flags=flags).sum()
+            for pattern in patterns
+        ]
+
+    return pd.DataFrame(data).set_index("phrase")
 
 
 def main() -> None:
@@ -71,16 +77,26 @@ def main() -> None:
         from_person=cli_args.from_person,
     )
 
+    all_participants = sorted(dfs.handles["display_name"].unique())
+    results = get_phrase_counts(
+        dfs.messages[~dfs.messages["is_reaction"]],
+        phrases=cli_args.phrases,
+        all_participants=all_participants,
+        use_regex=cli_args.use_regex,
+        case_sensitive=cli_args.case_sensitive,
+    )
+
     ica.output_results(
-        get_phrase_counts(
-            dfs.messages[~dfs.messages["is_reaction"]],
-            phrases=cli_args.phrases,
-            use_regex=cli_args.use_regex,
-            case_sensitive=cli_args.case_sensitive,
-        ),
+        results,
         format=cli_args.format,
         output=cli_args.output,
-        prettified_label_overrides={phrase: phrase for phrase in cli_args.phrases},
+        prettified_label_overrides={
+            **{phrase: phrase for phrase in cli_args.phrases},
+            **{
+                f"count_from_{display_name}": f"Count From {display_name}"
+                for display_name in all_participants
+            },
+        },
     )
 
 

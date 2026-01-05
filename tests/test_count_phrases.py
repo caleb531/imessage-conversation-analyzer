@@ -48,10 +48,10 @@ def test_emoji(output_results: MagicMock) -> None:
     phrases = sys.argv[1:3]
     assert df.loc[phrases[0]]["count"] == 2
     assert df.loc[phrases[0]]["count_from_me"] == 1
-    assert df.loc[phrases[0]]["count_from_them"] == 1
+    assert df.loc[phrases[0]]["count_from_Thomas"] == 1
     assert df.loc[phrases[1]]["count"] == 1
     assert df.loc[phrases[1]]["count_from_me"] == 0
-    assert df.loc[phrases[1]]["count_from_them"] == 1
+    assert df.loc[phrases[1]]["count_from_Thomas"] == 1
 
 
 @patch("ica.output_results")
@@ -66,7 +66,7 @@ def test_whitespace(output_results: MagicMock) -> None:
     phrase = sys.argv[1]
     assert df.loc[phrase]["count"] == 90
     assert df.loc[phrase]["count_from_me"] == 43
-    assert df.loc[phrase]["count_from_them"] == 47
+    assert df.loc[phrase]["count_from_Jane"] == 47
 
 
 @patch("ica.output_results")
@@ -81,7 +81,7 @@ def test_special_characters(output_results: MagicMock) -> None:
     phrase = sys.argv[1]
     assert df.loc[phrase]["count"] == 9
     assert df.loc[phrase]["count_from_me"] == 2
-    assert df.loc[phrase]["count_from_them"] == 7
+    assert df.loc[phrase]["count_from_Thomas"] == 7
 
 
 @patch("ica.output_results")
@@ -99,4 +99,4 @@ def test_regex(output_results: MagicMock) -> None:
     phrase = sys.argv[1]
     assert df.loc[phrase]["count"] == 3
     assert df.loc[phrase]["count_from_me"] == 1
-    assert df.loc[phrase]["count_from_them"] == 2
+    assert df.loc[phrase]["count_from_Thomas"] == 2
