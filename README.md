@@ -50,12 +50,12 @@ minimum required arguments are:
    2. You can also pass any phone number or email address associated with the
       contact; keep in mind that analysis will still run on all phone numbers /
       email addresses associated with the contact, not just the one you specify
-   3. For group chats, simply pass multiple contacts (e.g. `-c 'Jane Fernbrook' 'Thomas Riverstone'`)
+   3. For group chats, simply pass multiple contacts (e.g. `-c 'Thomas Riverstone' 'Daniel Brightingale'`)
 
 #### Example
 
 ```sh
-ica message_totals -c 'Jane Fernbrook'
+ica message_totals -c 'Thomas Riverstone'
 ```
 
 The following outputs a table like:
@@ -108,7 +108,7 @@ There are several built-in flags you can use to filter messages and attachments.
 
 
 ```sh
-ica message_totals -c 'Jane Fernbrook' --from-date 2024-12-01 --to-date 2025-01-01 --from-person them
+ica message_totals -c 'Thomas Riverstone' --from-date 2024-12-01 --to-date 2025-01-01 --from-person them
 ```
 
 #### Other formats
@@ -117,11 +117,11 @@ You can optionally pass the `-f`/`--format` flag to output to a specific format
 like CSV (supported formats include `csv`, `excel`/`xlsx`, `markdown`/`md`, and `json`).
 
 ```sh
-ica message_totals -c 'Jane Fernbrook' -f csv
+ica message_totals -c 'Thomas Riverstone' -f csv
 ```
 
 ```sh
-ica ./my_custom_analyzer.py -c 'Jane Fernbrook' -f csv
+ica ./my_custom_analyzer.py -c 'Thomas Riverstone' -f csv
 ```
 
 #### Writing to a file
@@ -328,5 +328,5 @@ installed into the virtual environment that uv creates for you. This allows you
 to make changes to the source code and continue to invoke `ica` like normal:
 
 ```sh
-ica message_totals -c 'Jane Fernbrook'
+ica message_totals -c 'Thomas Riverstone'
 ```
