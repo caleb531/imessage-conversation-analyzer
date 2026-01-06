@@ -50,7 +50,7 @@ minimum required arguments are:
    2. You can also pass any phone number or email address associated with the
       contact; keep in mind that analysis will still run on all phone numbers /
       email addresses associated with the contact, not just the one you specify
-   3. For group chats, simply pass multiple contacts (e.g. `-c 'Jane Fernbrook' 'John Doe'`)
+   3. For group chats, simply pass multiple contacts (e.g. `-c 'Jane Fernbrook' 'Thomas Riverstone'`)
 
 #### Example
 
