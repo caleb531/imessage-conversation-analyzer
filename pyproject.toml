@@ -11,7 +11,7 @@ maintainers = [
     {name = 'Caleb Evans', email = 'caleb@calebevans.me'}
 ]
 license = "MIT"
-keywords = ["apple", "imessage", "macos", "conversation", "chat", "analysis", "pandas"]
+keywords = ["apple", "imessage", "messages", "macos", "conversation", "chat", "analysis", "pandas"]
 dependencies = [
     "pandas",
     "pyarrow",
