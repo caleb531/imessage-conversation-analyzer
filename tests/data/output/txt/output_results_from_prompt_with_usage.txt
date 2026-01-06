@@ -1,6 +1,0 @@
-Generating SQL with AI ({MODEL})...
-Input Tokens: 10
-Output Tokens: 2
-Running query...
-  Total Messages
-1             11

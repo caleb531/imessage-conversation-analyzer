@@ -94,10 +94,6 @@ ICA includes several built-in analyzers out of the box:
    for all phrases you specify
 7. `from_sql`: execute an arbitrary SQL query against the conversation data
    (messages and attachments), using an in-memory SQLite database
-8. `from_prompt`: generates a custom analyzer based on a natural language prompt
-   using AI; requires an OpenAI API key via the `--api-key` / `-k` option; you
-   can also write the generated SQL query to disk by supplying the `--write` /
-   `-w` option with a file path
 
 #### Filtering
 
