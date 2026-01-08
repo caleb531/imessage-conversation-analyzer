@@ -15,10 +15,6 @@ Much of this program was inspired by and built using findings from [this blog po
 
 [blog-post]: https://medium.com/@yaskalidis/heres-how-you-can-access-your-entire-imessage-history-on-your-mac-f8878276c6e9
 
-### Caveats
-
-- This program only runs on macOS
-
 ## Installation
 
 Open a Terminal and run the following:
