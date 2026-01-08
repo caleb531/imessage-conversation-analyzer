@@ -98,9 +98,15 @@ class ContactRecord:
         return set(self.phone_numbers + self.email_addresses)
 
 
-def get_contact_record(
+def get_contact_records_for_source(
     con: sqlite3.Connection, contact_identifier: str
 ) -> list[ContactRecord]:
+    """
+    Fetch the contact records matching the identifier and SQL database
+    connection; the user-supplied identifier could be a full name, phone number,
+    or email address; multiple contacts may be returned if the identifier is
+    ambiguous
+    """
     contact_identifier = normalize_contact_identifier(contact_identifier)
 
     rows = pd.read_sql_query(
@@ -224,17 +230,12 @@ def get_unique_contact_display_name(
 
 
 def validate_contact_records(
-    contact_records: Sequence[ContactRecord], contact_identifiers: Sequence[str]
+    contact_records: Sequence[ContactRecord],
 ) -> None:
     """
     Validate that at least one contact record was found; if multiple records
     have the same full name, raise an error.
     """
-    if not contact_records:
-        raise ContactNotFoundError(
-            "No contact found for {}".format(", ".join(contact_identifiers))
-        )
-
     # Check for duplicate full names
     # Check for duplicate contacts with the same name but different identifiers
     name_counts = Counter(
@@ -259,12 +260,25 @@ def get_contact_records(
     unique ContactRecord objects.
     """
     all_records: list[ContactRecord] = []
+    found_identifiers: set[str] = set()
+
     for db_path in glob.iglob(str(DB_GLOB)):
         with sqlite3.connect(f"file:{db_path}?mode=ro", uri=True) as con:
             for contact_identifier in contact_identifiers:
-                all_records.extend(get_contact_record(con, contact_identifier))
+                records_for_source = get_contact_records_for_source(
+                    con, contact_identifier
+                )
+                if records_for_source:
+                    all_records.extend(records_for_source)
+                    found_identifiers.add(contact_identifier)
+
+    missing_identifiers = set(contact_identifiers) - found_identifiers
+    if missing_identifiers:
+        raise ContactNotFoundError(
+            "No contact(s) found for: {}".format(", ".join(sorted(missing_identifiers)))
+        )
 
     # Coalesce all records across all identifiers and sources
     unique_records = coalesce_contact_records(all_records)
-    validate_contact_records(unique_records, contact_identifiers)
+    validate_contact_records(unique_records)
     return unique_records

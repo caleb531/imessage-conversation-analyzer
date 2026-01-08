@@ -51,9 +51,21 @@ def test_no_contact_info() -> None:
 
 
 def test_contact_not_found_error() -> None:
-    """Should raise a ContactNotFoundError when a contact is not found."""
-    with pytest.raises(ica.ContactNotFoundError):
-        ica.get_dataframes(contacts=["Imaginary Person"])
+    """
+    Should raise a ContactNotFoundError when at least one contact is missing, even
+    if others are valid.
+    """
+    # "Thomas Riverstone" exists in the mock DB, "Imaginary Person" does not.
+    # This ensures we catch partial failures.
+    with pytest.raises(ica.ContactNotFoundError) as excinfo:
+        ica.get_dataframes(contacts=["Thomas Riverstone", "Imaginary Person"])
+
+    error_msg = str(excinfo.value)
+    # The error should mention the missing contact
+    assert "Imaginary Person" in error_msg
+    # The error generally shouldn't mention the found contact (though checking
+    # for its absence defends against "No contact found for Thomas, Imaginary")
+    assert "Thomas Riverstone" not in error_msg
 
 
 @pytest.mark.parametrize(
