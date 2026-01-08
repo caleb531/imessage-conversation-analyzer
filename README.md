@@ -23,11 +23,13 @@ Open a Terminal and run the following:
 pip3 install imessage-conversation-analyzer
 ```
 
-You can also install ICA via uv:
+You can also install ICA via [uv][uv]:
 
 ```sh
 uv tool install imessage-conversation-analyzer
 ```
+
+[uv]: https://docs.astral.sh/uv/
 
 ## Usage
 
