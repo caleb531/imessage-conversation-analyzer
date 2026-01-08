@@ -48,24 +48,26 @@ minimum required arguments are:
    2. You can also pass any phone number or email address associated with the
       contact; keep in mind that analysis will still run on all phone numbers /
       email addresses associated with the contact, not just the one you specify
-   3. For group chats, simply pass multiple contact flags (e.g. `-c 'Thomas Riverstone' -c 'Daniel Brightingale'`)
+   3. For group chats, simply pass multiple `--contact` / `-c` flags
 
 #### Example
 
 ```sh
-ica message_totals -c 'Thomas Riverstone'
+ica message_totals -c 'Thomas Riverstone' -c 'Daniel Brightingale'
 ```
 
 The following outputs a table like:
 
 ```
 Metric               Total
-Messages             14535
-Messages From Me      7289
-Messages From Them    7246
-Reactions             5050
-Reactions From Me     3901
-Reactions From Them   1149
+Messages             20036
+Messages From Me      7000
+Messages From Daniel  6501
+Messages From Thomas  6535
+Reactions             4880
+Reactions From Me     1700
+Reactions From Daniel 1675
+Reactions From Thomas 1505
 Days Messaged          115
 Days Missed              0
 Days With No Reply       0
