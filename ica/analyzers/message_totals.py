@@ -65,7 +65,7 @@ def main() -> None:
         timezone=cli_args.timezone,
         from_date=cli_args.from_date,
         to_date=cli_args.to_date,
-        from_person=cli_args.from_person,
+        from_people=cli_args.from_people,
     )
 
     first_message_date = get_first_message_date(dfs)

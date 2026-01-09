@@ -14,7 +14,7 @@ def main() -> None:
         timezone=cli_args.timezone,
         from_date=cli_args.from_date,
         to_date=cli_args.to_date,
-        from_person=cli_args.from_person,
+        from_people=cli_args.from_people,
     )
     ica.output_results(
         dfs.messages.assign(

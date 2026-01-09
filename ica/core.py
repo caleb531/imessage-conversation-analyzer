@@ -23,6 +23,8 @@ from typedstream.stream import TypedStreamReader
 import ica.contact
 from ica.contact import ContactRecord, get_contact_records
 from ica.exceptions import (
+    ContactNotFoundError,
+    ContactWithSameNameError,
     ConversationNotFoundError,
     DateRangeInvalidError,
     FormatNotSupportedError,
@@ -199,11 +201,60 @@ def get_messages_dataframe(
     )
 
 
+def resolve_sender_identifiers(
+    contact_records: Sequence[ContactRecord],
+    from_people: Sequence[str],
+) -> tuple[bool, set[str]]:
+    """
+    Resolve the user-supplied 'from_people' filters into a set of allowed
+    handle identifiers (e.g. phone numbers, email addresses)
+    """
+    include_me = False
+    allowed_handles: set[str] = set()
+
+    for person_filter in from_people:
+        if person_filter.lower() == "me":
+            include_me = True
+            continue
+
+        # Check against contacts
+        matching_contacts = []
+        for contact in contact_records:
+            # Check name (case-insensitive startswith)
+            if contact.first_name.lower().startswith(
+                person_filter.lower()
+            ) or contact.full_name.lower().startswith(person_filter.lower()):
+                matching_contacts.append(contact)
+                continue
+
+            # Check identifiers (exact match)
+            if any(
+                identifier.lower() == person_filter.lower()
+                for identifier in contact.get_identifiers()
+            ):
+                matching_contacts.append(contact)
+                continue
+
+        if not matching_contacts:
+            raise ContactNotFoundError(f"No contact found matching '{person_filter}'")
+
+        if len({c.id for c in matching_contacts}) > 1:
+            raise ContactWithSameNameError(
+                f"Multiple contacts found matching '{person_filter}'"
+            )
+
+        # Add all identifiers for the matched contact
+        allowed_handles.update(matching_contacts[0].get_identifiers())
+
+    return include_me, allowed_handles
+
+
 def filter_dataframe(
     df: pd.DataFrame,
+    contact_records: Sequence[ContactRecord],
     from_date: Optional[str] = None,
     to_date: Optional[str] = None,
-    from_person: Optional[str] = None,
+    from_people: Optional[Sequence[str]] = None,
 ) -> pd.DataFrame:
     """
     Return a copy of the messages dataframe that has been filtered by the
@@ -214,10 +265,23 @@ def filter_dataframe(
     if from_date and to_date and pd.Timestamp(from_date) > pd.Timestamp(to_date):
         raise DateRangeInvalidError("Date range is backwards")
 
+    # If no person filter is supplied, or if "all" is specified, return values
+    # from all senders
+    if not from_people or "all" in (p.lower() for p in from_people):
+        return df.pipe(
+            lambda df: df[df["datetime"] >= from_date] if from_date else df
+        ).pipe(lambda df: df[df["datetime"] <= to_date] if to_date else df)
+
+    include_me, allowed_handles = resolve_sender_identifiers(
+        contact_records, from_people
+    )
+
     return (
-        df.pipe(lambda df: df[df["is_from_me"].eq(True)] if from_person == "me" else df)
-        .pipe(
-            lambda df: (df[df["is_from_me"].eq(False)] if from_person == "them" else df)
+        df.pipe(
+            lambda df: df[
+                (df["is_from_me"] & include_me)
+                | (df["sender_handle"].isin(allowed_handles))
+            ]
         )
         .pipe(lambda df: df[df["datetime"] >= from_date] if from_date else df)
         .pipe(lambda df: df[df["datetime"] <= to_date] if to_date else df)
@@ -251,6 +315,7 @@ def get_attachments_dataframe(
             .dt.tz_localize("UTC")
             .dt.tz_convert(timezone)
         )
+        .assign(is_from_me=lambda df: df["is_from_me"].astype(bool))
     )
 
 
@@ -320,7 +385,7 @@ def get_dataframes(
     timezone: Optional[str] = None,
     from_date: Optional[str] = None,
     to_date: Optional[str] = None,
-    from_person: Optional[str] = None,
+    from_people: Optional[Sequence[str]] = None,
 ) -> DataFrameNamespace:
     """
     Return all dataframes for a specific macOS Messages conversation
@@ -343,15 +408,17 @@ def get_dataframes(
         )
         dfs.messages = filter_dataframe(
             dfs.messages,
+            contact_records,
             from_date,
             to_date,
-            from_person,
+            from_people,
         )
         dfs.attachments = filter_dataframe(
             dfs.attachments,
+            contact_records,
             from_date,
             to_date,
-            from_person,
+            from_people,
         )
         return dfs
 

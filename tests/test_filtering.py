@@ -163,12 +163,12 @@ def test_from_person_me(output_results: MagicMock) -> None:
         "-t",
         "UTC",
         "--from-person",
-        "them",
+        "Thomas",
     ],
 )
-def test_from_person_them(output_results: MagicMock) -> None:
+def test_from_person_name(output_results: MagicMock) -> None:
     """
-    Should filter the results to those sent by the other participant.
+    Should filter the results to those sent by the specified contact name.
     """
     attachment_totals.main()
     df: pd.DataFrame = output_results.call_args[0][0]
@@ -186,11 +186,55 @@ def test_from_person_them(output_results: MagicMock) -> None:
         "Thomas Riverstone",
         "-t",
         "UTC",
-        "--from-person",
-        "both",
+        "-p",
+        "Thomas Riverstone",
     ],
 )
-def test_from_person_both(output_results: MagicMock) -> None:
+def test_from_person_fullname(output_results: MagicMock) -> None:
+    """
+    Should filter the results to those sent by the specified contact full name.
+    """
+    attachment_totals.main()
+    df: pd.DataFrame = output_results.call_args[0][0]
+    assert df.loc["youtube_videos"]["total"] == 3
+
+
+@patch("ica.output_results")
+@patch(
+    "sys.argv",
+    [
+        attachment_totals.__file__,
+        "-c",
+        "Thomas Riverstone",
+        "-t",
+        "UTC",
+        "-p",
+        "thomas.riverstone@example.com",
+    ],
+)
+def test_from_person_email(output_results: MagicMock) -> None:
+    """
+    Should filter the results to those sent by the specified contact identifier.
+    """
+    attachment_totals.main()
+    df: pd.DataFrame = output_results.call_args[0][0]
+    assert df.loc["youtube_videos"]["total"] == 3
+
+
+@patch("ica.output_results")
+@patch(
+    "sys.argv",
+    [
+        attachment_totals.__file__,
+        "-c",
+        "Thomas Riverstone",
+        "-t",
+        "UTC",
+        "--from-person",
+        "all",
+    ],
+)
+def test_from_person_all(output_results: MagicMock) -> None:
     """
     Should filter the results to those sent by either participant (i.e. no
     filtering is applied).
@@ -200,3 +244,24 @@ def test_from_person_both(output_results: MagicMock) -> None:
     assert df.loc["youtube_videos"]["total"] == 4
     assert df.loc["apple_music"]["total"] == 1
     assert df.loc["spotify"]["total"] == 1
+
+
+@patch("ica.output_results")
+@patch(
+    "sys.argv",
+    [
+        attachment_totals.__file__,
+        "-c",
+        "Thomas Riverstone",
+        "-t",
+        "UTC",
+        "--from-person",
+        "Bad Name",
+    ],
+)
+def test_from_person_not_found(output_results: MagicMock) -> None:
+    """
+    Should raise ContactNotFoundError for invalid name.
+    """
+    with pytest.raises(ica.ContactNotFoundError):
+        attachment_totals.main()

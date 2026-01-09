@@ -103,12 +103,14 @@ There are several built-in flags you can use to filter messages and attachments.
   be ISO 8601-compliant, e.g. YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS
 - `--to-date`: An end date to filter messages by (exclusive); the format must be
   ISO 8601-compliant, e.g. YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS
-- `--from-person`: A reference to the person by whom to filter messages;
-  accepted values can be `me`, `them`, or `both` (the default)
+- `--from-person` / `-p`: A reference to the person by whom to filter messages;
+  accepted values can be `me`, `all`, or a contact's first name, full name,
+  phone number, or email address (defaults to `all`); you can specify this flag
+  multiple times to filter by multiple people
 
 
 ```sh
-ica message_totals -c 'Thomas Riverstone' --from-date 2024-12-01 --to-date 2025-01-01 --from-person them
+ica message_totals -c 'Thomas Riverstone' --from-date 2024-12-01 --to-date 2025-01-01 --from-person 'Thomas'
 ```
 
 #### Other formats
@@ -168,7 +170,7 @@ def main() -> None:
         timezone=cli_args.timezone,
         from_date=cli_args.from_date,
         to_date=cli_args.to_date,
-        from_person=cli_args.from_person,
+        from_people=cli_args.from_people,
     )
     # Send the results to stdout (or to file) in the given format
     ica.output_results(
@@ -282,6 +284,7 @@ A list of all attachments in the conversation, including images, videos, audio\,
 | `message_id` | `int` | The `ROWID` of the associated message |
 | `datetime` | `datetime.datetime` | The localized timestamp of the message |
 | `is_from_me` | `bool` | Whether the attachment was sent by you (`True`) or another participant (`False`) |
+| `sender_handle` | `str` | The specific handle (phone number or email address) from which the sender sent the attachment |
 
 #### `handles`
 

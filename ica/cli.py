@@ -31,7 +31,7 @@ class TypedCLIArguments(object):
     timezone: Union[str, None]
     from_date: Union[str, None]
     to_date: Union[str, None]
-    from_person: Union[str, None]
+    from_people: Union[list[str], None]
     format: Union[str, None]
     output: Union[str, None]
 
@@ -64,9 +64,9 @@ def get_cli_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--contact",
         "-c",
-        dest="contacts",
         required=True,
         action="append",
+        dest="contacts",
         help="the full name, phone number, or email address of each "
         "macOS contact whose conversation you want to analyze; "
         "you will need to specify --contact/-c for each contact in the "
@@ -90,9 +90,12 @@ def get_cli_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--from-person",
-        choices=["me", "them", "both"],
+        "-p",
+        action="append",
+        dest="from_people",
         help="A reference to the person by whom to filter messages; accepted "
-        "values can be 'me', 'them', or 'both' (the default)",
+        "values can be 'me', 'all', or a contact's first name, full name, "
+        "phone number, or email address; defaults to 'all'",
     )
     parser.add_argument(
         "--format",

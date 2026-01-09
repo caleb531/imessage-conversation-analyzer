@@ -4,12 +4,15 @@ SELECT
     "filename",
     "message_id",
     datetime("message"."date" / 1000000000 + strftime("%s", "2001-01-01") ,"unixepoch") as "datetime",
-    "is_from_me"
+    "is_from_me",
+    "handle"."id" as "sender_handle"
 FROM "attachment"
 INNER JOIN "message_attachment_join"
     ON "attachment"."ROWID" = "attachment_id"
 INNER JOIN "message"
     ON "message"."ROWID" = "message_id"
+LEFT JOIN "handle"
+    ON "message"."handle_id" = "handle"."ROWID"
 WHERE
     "message_id" IN (
         -- Get all messages tied to chat
