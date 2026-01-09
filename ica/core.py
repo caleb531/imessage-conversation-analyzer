@@ -280,7 +280,13 @@ def filter_dataframe(
         df.pipe(
             lambda df: df[
                 (df["is_from_me"] & include_me)
-                | (df["sender_handle"].isin(allowed_handles))
+                # In the macOS Messages database, the handle_id (and thus
+                # sender_handle) for outgoing messages (is_from_me=1) in 1-on-1
+                # chats refers to the recipient, not the sender. Therefore, we
+                # must explicitly exclude messages from "me" when filtering by a
+                # specific contact handle, otherwise we will inadvertently
+                # include messages sent TO that contact.
+                | (df["sender_handle"].isin(allowed_handles) & ~df["is_from_me"])
             ]
         )
         .pipe(lambda df: df[df["datetime"] >= from_date] if from_date else df)

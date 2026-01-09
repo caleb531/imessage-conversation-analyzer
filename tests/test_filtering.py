@@ -9,6 +9,7 @@ import pytest
 import ica
 import ica.analyzers.attachment_totals as attachment_totals
 import ica.analyzers.totals_by_day as totals_by_day
+import ica.core
 
 
 @patch("ica.output_results")
@@ -265,3 +266,15 @@ def test_from_person_not_found(output_results: MagicMock) -> None:
     """
     with pytest.raises(ica.ContactNotFoundError):
         attachment_totals.main()
+
+
+def test_from_person_excluding_my_messages() -> None:
+    """
+    Should exclude messages with is_from_me=True when filtering by a contact
+    """
+    dfs = ica.core.get_dataframes(
+        contacts=["Thomas Riverstone"], from_people=["Thomas"]
+    )
+    assert not dfs.messages["is_from_me"].any(), (
+        "Found messages with is_from_me=True in the filtered dataframe"
+    )
