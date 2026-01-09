@@ -5,7 +5,7 @@
     "attributedBody": "",
     "date": 727379229507062144,
     "is_from_me": true,
-    "handle_id": 0
+    "handle_id": "user-daniel"
   },
   {
     "ROWID": "17f5642d-68df-4604-9c1c-43fd63a54f2e",
@@ -21,7 +21,7 @@
     "attributedBody": "",
     "date": 727379298702376320,
     "is_from_me": true,
-    "handle_id": 0
+    "handle_id": "user-daniel"
   },
   {
     "ROWID": "5ab162b0-e4c7-4e77-9623-c2396bb81d73",
@@ -29,7 +29,7 @@
     "attributedBody": "",
     "date": 726338979942786944,
     "is_from_me": true,
-    "handle_id": 0
+    "handle_id": "user-jane"
   },
   {
     "ROWID": "31a32e77-87c7-4c04-9fab-d7f42ba9484c",
@@ -53,7 +53,7 @@
     "attributedBody": "",
     "date": 726522868945607168,
     "is_from_me": true,
-    "handle_id": 0
+    "handle_id": "user-jane"
   },
   {
     "ROWID": "90b09b75-b098-4ff7-9271-c27f6b1efc75",
@@ -69,7 +69,7 @@
     "attributedBody": "",
     "date": 726689916631041792,
     "is_from_me": true,
-    "handle_id": 0
+    "handle_id": "user-jane"
   },
   {
     "ROWID": "ef65772c-730f-4536-ae42-0ea2bc1adbc5",
@@ -93,7 +93,7 @@
     "attributedBody": "",
     "date": 726362122374000128,
     "is_from_me": true,
-    "handle_id": 0
+    "handle_id": "user-thomas"
   },
   {
     "ROWID": "3bdbefe4-2d18-47da-93a4-524593cc8fec",
@@ -101,7 +101,7 @@
     "attributedBody": "",
     "date": 726456930474000000,
     "is_from_me": true,
-    "handle_id": 0
+    "handle_id": "user-thomas"
   },
   {
     "ROWID": "db50d4a8-638c-44e4-ba5b-f6675e1b4aa9",
@@ -125,7 +125,7 @@
     "attributedBody": "",
     "date": 727118724365438976,
     "is_from_me": true,
-    "handle_id": 0
+    "handle_id": "user-jane"
   },
   {
     "ROWID": "eb95d508-cc5d-4f5d-9fa7-bee604bd0dd1",
@@ -141,7 +141,7 @@
     "attributedBody": "",
     "date": 727317821465999872,
     "is_from_me": true,
-    "handle_id": 0
+    "handle_id": "user-jane"
   },
   {
     "ROWID": "855c1f22-2ac0-46e2-ae76-e4c164d4236e",
@@ -157,7 +157,7 @@
     "attributedBody": "",
     "date": 726777291571192064,
     "is_from_me": true,
-    "handle_id": 0
+    "handle_id": "user-thomas"
   },
   {
     "ROWID": "f0b4da10-4f43-4cc8-b131-b29a8df9d0ed",
@@ -181,7 +181,7 @@
     "attributedBody": "",
     "date": 726777405792999936,
     "is_from_me": true,
-    "handle_id": 0
+    "handle_id": "user-thomas"
   },
   {
     "ROWID": "53e399eb-b1f6-4a2a-93ea-a77d30cc8fbc",
@@ -189,7 +189,7 @@
     "attributedBody": "",
     "date": 726777446593999872,
     "is_from_me": true,
-    "handle_id": 0
+    "handle_id": "user-thomas"
   },
   {
     "ROWID": "e9927687-e199-4031-a4c5-c69f4e734fdf",
@@ -197,7 +197,7 @@
     "attributedBody": "",
     "date": 726784706461334912,
     "is_from_me": true,
-    "handle_id": 0
+    "handle_id": "user-thomas"
   },
   {
     "ROWID": "71a4a961-1695-4605-bbc6-367b5edccd15",
@@ -205,7 +205,7 @@
     "attributedBody": "",
     "date": 726784720391002368,
     "is_from_me": true,
-    "handle_id": 0
+    "handle_id": "user-thomas"
   },
   {
     "ROWID": "5ad21286-3ed9-496e-a8ee-b0df99ca1902",
@@ -229,7 +229,7 @@
     "attributedBody": "",
     "date": 726785488238000128,
     "is_from_me": true,
-    "handle_id": 0
+    "handle_id": "user-thomas"
   },
   {
     "ROWID": "00110e8b-7da6-4f0a-88b6-58c50df3b060",
@@ -237,7 +237,7 @@
     "attributedBody": "",
     "date": 726785493717000064,
     "is_from_me": true,
-    "handle_id": 0
+    "handle_id": "user-thomas"
   },
   {
     "ROWID": "4a92c212-8c5b-4a18-89fc-e64997239bce",
@@ -261,7 +261,7 @@
     "attributedBody": "",
     "date": 726785662811000064,
     "is_from_me": true,
-    "handle_id": 0
+    "handle_id": "user-thomas"
   },
   {
     "ROWID": "c18f855d-7293-4e26-b5c2-5844e74b5be4",
@@ -269,7 +269,7 @@
     "attributedBody": "",
     "date": 726785898617999744,
     "is_from_me": true,
-    "handle_id": 0
+    "handle_id": "user-thomas"
   },
   {
     "ROWID": "58c56cea-4704-4262-bf6c-be1175203f44",
@@ -277,7 +277,7 @@
     "attributedBody": "",
     "date": 726787156239343360,
     "is_from_me": true,
-    "handle_id": 0
+    "handle_id": "user-thomas"
   },
   {
     "ROWID": "3d49862a-5cc1-44d4-a148-c5c9338b7dfd",
