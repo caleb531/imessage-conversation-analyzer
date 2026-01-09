@@ -1,36 +1,21 @@
 #!/usr/bin/env python3
 """test the ability to filter analyzer results by date and person"""
 
-from unittest.mock import MagicMock, patch
-
 import pandas as pd
 import pytest
 
 import ica
-import ica.analyzers.attachment_totals as attachment_totals
-import ica.analyzers.totals_by_day as totals_by_day
-import ica.core
 
 
-@patch("ica.output_results")
-@patch(
-    "sys.argv",
-    [
-        totals_by_day.__file__,
-        "-c",
-        "Jane Fernbrook",
-        "-t",
-        "UTC",
-        "--from-date",
-        "2024-01-11",
-    ],
-)
-def test_from_date(output_results: MagicMock) -> None:
+def test_from_date() -> None:
     """
     Should filter the results to those sent at or after the specified date.
     """
-    totals_by_day.main()
-    df: pd.DataFrame = output_results.call_args[0][0]
+    dfs = ica.get_dataframes(
+        contacts=["Jane Fernbrook"],
+        timezone="UTC",
+        from_date="2024-01-11",
+    )
     expected_dates = [
         "2024-01-11",
         "2024-01-14",
@@ -38,30 +23,19 @@ def test_from_date(output_results: MagicMock) -> None:
         "2024-01-17",
         "2024-01-19",
     ]
-    assert df.index.tolist() == [
-        pd.Timestamp(date, tz="UTC") for date in expected_dates
-    ]
+    unique_dates = sorted(dfs.messages["datetime"].dt.floor("D").unique())
+    assert unique_dates == [pd.Timestamp(date, tz="UTC") for date in expected_dates]
 
 
-@patch("ica.output_results")
-@patch(
-    "sys.argv",
-    [
-        totals_by_day.__file__,
-        "-c",
-        "Jane Fernbrook",
-        "-t",
-        "UTC",
-        "--to-date",
-        "2024-01-17",
-    ],
-)
-def test_to_date(output_results: MagicMock) -> None:
+def test_to_date() -> None:
     """
     Should filter the results to those sent before the specified date.
     """
-    totals_by_day.main()
-    df: pd.DataFrame = output_results.call_args[0][0]
+    dfs = ica.get_dataframes(
+        contacts=["Jane Fernbrook"],
+        timezone="UTC",
+        to_date="2024-01-17",
+    )
     expected_dates = [
         "2024-01-07",
         "2024-01-08",
@@ -70,211 +44,129 @@ def test_to_date(output_results: MagicMock) -> None:
         "2024-01-14",
         "2024-01-16",
     ]
-    assert df.index.tolist() == [
-        pd.Timestamp(date, tz="UTC") for date in expected_dates
-    ]
+    unique_dates = sorted(dfs.messages["datetime"].dt.floor("D").unique())
+    assert unique_dates == [pd.Timestamp(date, tz="UTC") for date in expected_dates]
 
 
-@patch("ica.output_results")
-@patch(
-    "sys.argv",
-    [
-        totals_by_day.__file__,
-        "-c",
-        "Jane Fernbrook",
-        "-t",
-        "UTC",
-        "--from-date",
-        "2024-01-11",
-        "--to-date",
-        "2024-01-17",
-    ],
-)
-def test_date_range(output_results: MagicMock) -> None:
+def test_date_range() -> None:
     """
     Should filter the results to those sent between the specified dates.
     """
-    totals_by_day.main()
-    df: pd.DataFrame = output_results.call_args[0][0]
+    dfs = ica.get_dataframes(
+        contacts=["Jane Fernbrook"],
+        timezone="UTC",
+        from_date="2024-01-11",
+        to_date="2024-01-17",
+    )
     expected_dates = [
         "2024-01-11",
         "2024-01-14",
         "2024-01-16",
     ]
-    assert df.index.tolist() == [
-        pd.Timestamp(date, tz="UTC") for date in expected_dates
-    ]
+    unique_dates = sorted(dfs.messages["datetime"].dt.floor("D").unique())
+    assert unique_dates == [pd.Timestamp(date, tz="UTC") for date in expected_dates]
 
 
-@patch("ica.output_results")
-@patch(
-    "sys.argv",
-    [
-        totals_by_day.__file__,
-        "-c",
-        "Jane Fernbrook",
-        "-t",
-        "UTC",
-        "--from-date",
-        "2024-01-17",
-        "--to-date",
-        "2024-01-11",
-    ],
-)
-def test_invalid_date_range(output_results: MagicMock) -> None:
+def test_invalid_date_range() -> None:
     """
     Should filter the results to those sent between the specified dates.
     """
     with pytest.raises(ica.DateRangeInvalidError):
-        totals_by_day.main()
+        ica.get_dataframes(
+            contacts=["Jane Fernbrook"],
+            timezone="UTC",
+            from_date="2024-01-17",
+            to_date="2024-01-11",
+        )
 
 
-@patch("ica.output_results")
-@patch(
-    "sys.argv",
-    [
-        attachment_totals.__file__,
-        "-c",
-        "Thomas Riverstone",
-        "-t",
-        "UTC",
-        "--from-person",
-        "me",
-    ],
-)
-def test_from_person_me(output_results: MagicMock) -> None:
+def test_from_person_me() -> None:
     """
     Should filter the results to those sent by the person running the
     command.
     """
-    attachment_totals.main()
-    df: pd.DataFrame = output_results.call_args[0][0]
-    assert df.loc["youtube_videos"]["total"] == 1
-    assert df.loc["apple_music"]["total"] == 1
-    assert df.loc["spotify"]["total"] == 1
+    dfs = ica.get_dataframes(
+        contacts=["Thomas Riverstone"],
+        from_people=["me"],
+    )
+    assert len(dfs.messages) == 12
+    assert dfs.messages["sender_display_name"].unique().tolist() == ["Me"]
+
+    assert dfs.messages["is_from_me"].all(), (
+        "Found messages with is_from_me=False in the filtered dataframe"
+    )
 
 
-@patch("ica.output_results")
-@patch(
-    "sys.argv",
-    [
-        attachment_totals.__file__,
-        "-c",
-        "Thomas Riverstone",
-        "-t",
-        "UTC",
-        "--from-person",
-        "Thomas",
-    ],
-)
-def test_from_person_name(output_results: MagicMock) -> None:
+def test_from_person_name() -> None:
     """
     Should filter the results to those sent by the specified contact name.
     """
-    attachment_totals.main()
-    df: pd.DataFrame = output_results.call_args[0][0]
-    assert df.loc["youtube_videos"]["total"] == 3
-    assert df.loc["apple_music"]["total"] == 0
-    assert df.loc["spotify"]["total"] == 0
+    dfs = ica.get_dataframes(
+        contacts=["Thomas Riverstone"],
+        from_people=["Thomas"],
+    )
+    assert len(dfs.messages) == 11
+    assert dfs.messages["sender_display_name"].unique().tolist() == ["Thomas"]
+
+    assert not dfs.messages["is_from_me"].any(), (
+        "Found messages with is_from_me=True in the filtered dataframe"
+    )
 
 
-@patch("ica.output_results")
-@patch(
-    "sys.argv",
-    [
-        attachment_totals.__file__,
-        "-c",
-        "Thomas Riverstone",
-        "-t",
-        "UTC",
-        "-p",
-        "Thomas Riverstone",
-    ],
-)
-def test_from_person_fullname(output_results: MagicMock) -> None:
+def test_from_person_fullname() -> None:
     """
     Should filter the results to those sent by the specified contact full name.
     """
-    attachment_totals.main()
-    df: pd.DataFrame = output_results.call_args[0][0]
-    assert df.loc["youtube_videos"]["total"] == 3
+    dfs = ica.get_dataframes(
+        contacts=["Thomas Riverstone"],
+        from_people=["Thomas Riverstone"],
+    )
+    assert len(dfs.messages) == 11
+    assert dfs.messages["sender_display_name"].unique().tolist() == ["Thomas"]
+
+    assert not dfs.messages["is_from_me"].any(), (
+        "Found messages with is_from_me=True in the filtered dataframe"
+    )
 
 
-@patch("ica.output_results")
-@patch(
-    "sys.argv",
-    [
-        attachment_totals.__file__,
-        "-c",
-        "Thomas Riverstone",
-        "-t",
-        "UTC",
-        "-p",
-        "thomas.riverstone@example.com",
-    ],
-)
-def test_from_person_email(output_results: MagicMock) -> None:
+def test_from_person_email() -> None:
     """
     Should filter the results to those sent by the specified contact identifier.
     """
-    attachment_totals.main()
-    df: pd.DataFrame = output_results.call_args[0][0]
-    assert df.loc["youtube_videos"]["total"] == 3
+    dfs = ica.get_dataframes(
+        contacts=["Thomas Riverstone"],
+        from_people=["thomas.riverstone@example.com"],
+    )
+    assert len(dfs.messages) == 11
+    assert dfs.messages["sender_display_name"].unique().tolist() == ["Thomas"]
+    assert not dfs.messages["is_from_me"].any(), (
+        "Found messages with is_from_me=True in the filtered dataframe"
+    )
 
 
-@patch("ica.output_results")
-@patch(
-    "sys.argv",
-    [
-        attachment_totals.__file__,
-        "-c",
-        "Thomas Riverstone",
-        "-t",
-        "UTC",
-        "--from-person",
-        "all",
-    ],
-)
-def test_from_person_all(output_results: MagicMock) -> None:
+def test_from_person_all() -> None:
     """
     Should filter the results to those sent by either participant (i.e. no
     filtering is applied).
     """
-    attachment_totals.main()
-    df: pd.DataFrame = output_results.call_args[0][0]
-    assert df.loc["youtube_videos"]["total"] == 4
-    assert df.loc["apple_music"]["total"] == 1
-    assert df.loc["spotify"]["total"] == 1
+    dfs = ica.get_dataframes(
+        contacts=["Thomas Riverstone"],
+        from_people=["all"],
+    )
+    assert len(dfs.messages) == 23
+
+    senders = dfs.messages["sender_display_name"].unique().tolist()
+    assert "Thomas" in senders
+    assert "Me" in senders
+
+    assert dfs.messages["is_from_me"].any(), (
+        "Expected messages from me to be included with --from-person all"
+    )
 
 
-@patch("ica.output_results")
-@patch(
-    "sys.argv",
-    [
-        attachment_totals.__file__,
-        "-c",
-        "Thomas Riverstone",
-        "-t",
-        "UTC",
-        "--from-person",
-        "Bad Name",
-    ],
-)
-def test_from_person_not_found(output_results: MagicMock) -> None:
+def test_from_person_not_found() -> None:
     """
     Should raise ContactNotFoundError for invalid name.
     """
     with pytest.raises(ica.ContactNotFoundError):
-        attachment_totals.main()
-
-
-def test_from_person_excluding_my_messages() -> None:
-    """
-    Should exclude messages with is_from_me=True when filtering by a contact
-    """
-    dfs = ica.core.get_dataframes(
-        contacts=["Thomas Riverstone"], from_people=["Thomas"]
-    )
-    assert not dfs.messages["is_from_me"].any(), (
-        "Found messages with is_from_me=True in the filtered dataframe"
-    )
+        ica.get_dataframes(contacts=["Thomas Riverstone"], from_people=["Bad Name"])
