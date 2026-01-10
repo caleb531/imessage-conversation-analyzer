@@ -37,3 +37,14 @@ class StdoutMockWithBuffer(StringIO):
     def __init__(self, initial_value: str = "", newline: str = "\n") -> None:
         super().__init__(initial_value, newline)
         object.__setattr__(self, "buffer", BytesIO())
+
+
+class MockSuccess(Exception):
+    """
+    Raised by a mocked function to abort the command execution early.
+
+    This allows us to verify the arguments passed to the mocked function without
+    needing to execute subsequent operations.
+    """
+
+    pass

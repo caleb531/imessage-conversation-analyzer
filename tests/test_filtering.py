@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
 """test the ability to filter analyzer results by date and person"""
 
+import contextlib
+import importlib
+from typing import Any
+from unittest.mock import patch
+
 import pandas as pd
 import pytest
 
 import ica
+from tests.utils import MockSuccess
 
 
 def test_from_date() -> None:
@@ -170,3 +176,73 @@ def test_from_person_not_found() -> None:
     """
     with pytest.raises(ica.ContactNotFoundError):
         ica.get_dataframes(contacts=["Thomas Riverstone"], from_people=["Bad Name"])
+
+
+@pytest.mark.parametrize(
+    "analyzer_name, required_args",
+    [
+        ("message_totals", []),
+        ("attachment_totals", []),
+        ("most_frequent_emojis", []),
+        ("totals_by_day", []),
+        ("transcript", []),
+        ("count_phrases", ["foo"]),
+        ("from_sql", ["SELECT * FROM foo"]),
+    ],
+)
+@pytest.mark.parametrize(
+    "filter_cli_args, expected_kwargs",
+    [
+        (
+            [],
+            {"from_date": None, "to_date": None, "from_people": None},
+        ),
+        (
+            ["--from-date", "2024-01-01"],
+            {"from_date": "2024-01-01", "to_date": None, "from_people": None},
+        ),
+        (
+            ["--to-date", "2024-01-31"],
+            {"from_date": None, "to_date": "2024-01-31", "from_people": None},
+        ),
+        (
+            ["--from-date", "2024-01-01", "--to-date", "2024-01-31"],
+            {"from_date": "2024-01-01", "to_date": "2024-01-31", "from_people": None},
+        ),
+        (
+            ["--from-person", "Me"],
+            {"from_date": None, "to_date": None, "from_people": ["Me"]},
+        ),
+        (
+            ["--from-person", "Me", "--from-person", "You"],
+            {"from_date": None, "to_date": None, "from_people": ["Me", "You"]},
+        ),
+    ],
+)
+@patch("ica.get_dataframes")
+def test_filter_passing_in_analyzers(
+    mock_get_dataframes: Any,
+    filter_cli_args: list[str],
+    expected_kwargs: dict[str, Any],
+    analyzer_name: str,
+    required_args: list[str],
+) -> None:
+    """
+    Should ensure that the filtering arguments passed to the CLI are correctly
+    parameterized into the ica.get_dataframes() function.
+    """
+    mock_get_dataframes.side_effect = MockSuccess
+
+    # We must always pass a contact to satisfy the rigorous CLI parser requirements
+    base_args = ["ica", "-c", "Test User"]
+
+    with patch("sys.argv", base_args + filter_cli_args + required_args):
+        # Dynamically import and run the analyzer "script"
+        with contextlib.suppress(MockSuccess):
+            importlib.import_module(f"ica.analyzers.{analyzer_name}").main()
+
+    mock_get_dataframes.assert_called_once_with(
+        contacts=["Test User"],
+        timezone=None,
+        **expected_kwargs,
+    )
