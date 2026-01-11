@@ -28,10 +28,10 @@ jobs:
       - name: Check lockfile
         run: uv lock --check
 
-      - name: Run ty
-        run: uv run ty check .
-
       - name: Run ruff
         run: |
           uv run ruff check .
           uv run ruff format --check .
+
+      - name: Run ty
+        run: uv run ty check .
