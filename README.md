@@ -104,7 +104,7 @@ There are several built-in flags you can use to filter messages and attachments.
 - `--to-date`: An end date to filter messages by (exclusive); the format must be
   ISO 8601-compliant, e.g. YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS
 - `--from-person` / `-p`: A reference to the person by whom to filter messages;
-  accepted values can be `me`, `all`, or a contact's first name, full name,
+  accepted values can be `me`, `them`, `all`, or a contact's first name, full name,
   phone number, or email address (defaults to `all`); you can specify this flag
   multiple times to filter by multiple people
 

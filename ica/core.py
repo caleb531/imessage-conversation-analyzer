@@ -217,6 +217,11 @@ def resolve_sender_identifiers(
             include_me = True
             continue
 
+        if person_filter.lower() == "them":
+            for contact in contact_records:
+                allowed_handles.update(contact.get_identifiers())
+            continue
+
         # Check against contacts
         matching_contacts = []
         for contact in contact_records:

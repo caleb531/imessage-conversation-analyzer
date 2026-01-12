@@ -170,6 +170,24 @@ def test_from_person_all() -> None:
     )
 
 
+def test_from_person_them() -> None:
+    """
+    Should filter the results to those sent by anyone except the person running
+    the command.
+    """
+    dfs = ica.get_dataframes(
+        contacts=["Thomas Riverstone"],
+        from_people=["them"],
+    )
+    assert len(dfs.messages) == 11
+
+    assert dfs.messages["sender_display_name"].unique().tolist() == ["Thomas"]
+
+    assert not dfs.messages["is_from_me"].any(), (
+        "Found messages with is_from_me=True in the filtered dataframe"
+    )
+
+
 def test_from_person_not_found() -> None:
     """
     Should raise ContactNotFoundError for invalid name.
