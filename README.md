@@ -113,6 +113,11 @@ There are several built-in flags you can use to filter messages and attachments.
 ica message_totals -c 'Thomas Riverstone' --from-date 2024-12-01 --to-date 2025-01-01 --from-person 'Thomas'
 ```
 
+```sh
+# Filtering by more than one person
+ica message_totals -c 'Thomas Riverstone' -c 'Daniel Brightingale' --from-date 2024-12-01 --to-date 2025-01-01 --from-person 'Thomas' --from-person 'Jane'
+```
+
 #### Other formats
 
 You can optionally pass the `-f`/`--format` flag to output to a specific format
