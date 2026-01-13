@@ -196,6 +196,12 @@ def main() -> None:
         format=cli_args.format,
         # When output is None (the default), ICA will print to stdout
         output=cli_args.output,
+        # Make certain column labels more human-friendly with
+        # prettified_label_overrides
+        prettified_label_overrides={
+            'is_from_me': 'Is from Me?',
+            'is_reaction': 'Is Reaction?'
+        }
     )
 
 
