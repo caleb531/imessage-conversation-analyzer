@@ -314,6 +314,36 @@ for easy joining with the `messages` dataframe.
 | `contact_id` | `str` | The unique identifier of the contact record |
 | `display_name` | `str` | A unique display name for the participant; can be a first name, full name, phone number, or email address (to ensure uniqueness) |
 
+### SQL Functions
+
+The Python API also exposes several powerful functions that allow you to query
+your conversation data using SQL. This is powered by an in-memory SQLite
+database that is automatically populated with the available iMessage dataframes.
+Please refer to the *Data Schema* section above for details on the available
+tables and their columns.
+
+- `get_sql_connection(dfs)`: A context manager which creates a temporary in-memory SQLite database from your ICA dataframes, allowing you to operate on them with the `ica.execute_sql_query()` function (documented below)
+- `execute_sql_query(query, con)`: Executes a SQL query against the connection provided by `get_sql_connection`; returns a pandas dataframe with the results
+
+```python
+import ica
+
+def main() -> None:
+    # Retrieve conversation data
+    dfs = ica.get_dataframes(contacts=["Jane Doe"])
+
+    # Run SQL queries against the data
+    with ica.get_sql_connection(dfs) as con:
+        results = ica.execute_sql_query(
+            "SELECT * FROM messages WHERE is_from_me = 1",
+            con
+        )
+        ica.output_results(results)
+
+if __name__ == "__main__":
+    main()
+```
+
 ## Developer Setup
 
 The following instructions are written for developers who want to run the
