@@ -111,9 +111,10 @@ def test_find_group_conversation() -> None:
     assert "Hello everyone!" in dfs.messages["text"].values
 
 
-def test_duplicate_contact_name_error() -> None:
+def test_contact_record_merging() -> None:
     """
-    Should raise ContactWithSameNameError if multiple contacts share the same name.
+    Should merge contact records if two records share the same name and share at
+    least one common identifier.
     """
     # Create a duplicate contacts database to simulate multiple sources
     # containing the same contact name
