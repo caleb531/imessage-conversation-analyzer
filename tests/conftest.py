@@ -49,6 +49,19 @@ def setup_mock_databases(request: pytest.FixtureRequest) -> Generator[None, None
 
     # Update with marker configuration if present
     if marker := request.node.get_closest_marker("mock_db_config"):
+        if marker.args:
+            raise pytest.UsageError(
+                f"mock_db_config accepts only keyword arguments (contacts, chats), "
+                f"got positional args: {marker.args}"
+            )
+
+        unknown_keys = set(marker.kwargs) - config.keys()
+        if unknown_keys:
+            raise pytest.UsageError(
+                f"mock_db_config got unknown arguments: {unknown_keys}. "
+                f"Allowed: {list(config.keys())}"
+            )
+
         config.update(marker.kwargs)
 
     # Cleanup first (in case of previous test interruption)
