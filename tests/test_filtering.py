@@ -197,7 +197,7 @@ def test_from_person_not_found() -> None:
 
 
 @pytest.mark.parametrize(
-    "analyzer_name, required_args",
+    ("analyzer_name", "required_args"),
     [
         ("message_totals", []),
         ("attachment_totals", []),
@@ -209,7 +209,7 @@ def test_from_person_not_found() -> None:
     ],
 )
 @pytest.mark.parametrize(
-    "filter_cli_args, expected_kwargs",
+    ("filter_cli_args", "expected_kwargs"),
     [
         (
             [],
