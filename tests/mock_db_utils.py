@@ -7,7 +7,7 @@ import json
 import sqlite3
 from collections.abc import Generator
 from pathlib import Path
-from typing import Any, Literal, Union
+from typing import Any, Literal, Optional, Union
 
 MockDatabaseName = Union[Literal["chats"], Literal["contacts"]]
 
@@ -49,10 +49,25 @@ def get_mock_data_for_db(
         )
 
 
-def create_mock_db(db_name: MockDatabaseName, db_path: Path) -> None:
-    """Create and populate a mock database with the given name and path"""
+def create_mock_db(
+    db_name: MockDatabaseName,
+    db_path: Path,
+    db_contents: Optional[dict[str, list[dict]]] = None,
+) -> None:
+    """
+    Create and populate a mock database with the given name and path.
+
+    Args:
+        db_name: The type of database ("chats" or "contacts")
+        db_path: Where to create the SQLite file
+        db_contents: Optional dictionary of table contents to merge with the
+            default file-loaded tables. keys are table names, values are lists
+            of row dictionaries.
+    """
+    merged_data = {**dict(get_mock_data_for_db(db_name)), **(db_contents or {})}
+
     with sqlite3.connect(db_path) as con:
-        for table_name, records in get_mock_data_for_db(db_name):
+        for table_name, records in merged_data.items():
             if not len(records):
                 continue
             cur = con.cursor()

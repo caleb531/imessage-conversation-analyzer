@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """test the message_totals built-in analyzer"""
 
-import sqlite3
 from pathlib import Path
 from tempfile import gettempdir
 
@@ -127,27 +126,23 @@ def test_contact_record_merging() -> None:
     ica.get_dataframes(contacts=["Daniel Brightingale"])
 
 
+@pytest.mark.mock_db_config(
+    contacts={
+        "ZABCDRECORD": [
+            {"Z_PK": 1, "ZFIRSTNAME": "Daniel", "ZLASTNAME": "Brightingale"},
+            {"Z_PK": 2, "ZFIRSTNAME": "Daniel", "ZLASTNAME": "Brightingale"},
+        ],
+        "ZABCDPHONENUMBER": [
+            {"ZOWNER": 1, "ZFULLNUMBER": "212-345-6789"},
+            {"ZOWNER": 2, "ZFULLNUMBER": "555-999-9999"},
+        ],
+    }
+)
 def test_contact_with_same_name_error() -> None:
     """
     Should raise ContactWithSameNameError if multiple contacts share the same name
     but have completely different identifiers.
     """
-    # Create a duplicate contacts database
-    duplicate_db_path = Path(gettempdir()) / "ica" / "duplicate_diff.abcddb"
-
-    # We need to manually insert a record with the same name but different phone
-    with sqlite3.connect(duplicate_db_path) as con:
-        con.execute(
-            "CREATE TABLE ZABCDRECORD (Z_PK INTEGER PRIMARY KEY, ZFIRSTNAME TEXT, ZLASTNAME TEXT)"  # noqa: E501
-        )
-        con.execute("CREATE TABLE ZABCDPHONENUMBER (ZOWNER INTEGER, ZFULLNUMBER TEXT)")
-        con.execute("CREATE TABLE ZABCDEMAILADDRESS (ZOWNER INTEGER, ZADDRESS TEXT)")
-
-        # Insert "Daniel Brightingale" but with a different phone number
-        con.execute("INSERT INTO ZABCDRECORD VALUES (1, 'Daniel', 'Brightingale')")
-        con.execute("INSERT INTO ZABCDPHONENUMBER VALUES (1, '555-999-9999')")
-        con.commit()
-
     with pytest.raises(ica.ContactWithSameNameError):
         ica.get_dataframes(contacts=["Daniel Brightingale"])
 
