@@ -1,13 +1,49 @@
 <script lang="ts">
   import { invoke } from "@tauri-apps/api/core";
+  import { runIcaSidecar } from "../lib/sidecar";
 
   let name = $state("");
   let greetMsg = $state("");
+  let sidecarArgs = $state("--help");
+  let sidecarOutput = $state("");
+  let sidecarError = $state("");
+  let sidecarExitCode = $state<number | null>(null);
+  let sidecarRunning = $state(false);
 
   async function greet(event: Event) {
     event.preventDefault();
     // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
     greetMsg = await invoke("greet", { name });
+  }
+
+  function splitArgs(input: string): string[] {
+    // Support very small subset of shell quoting for convenience in the UI.
+    return (
+      input
+        .match(/(?:"[^"]*"|'[^']*'|\S+)/g)
+        ?.map((token) => token.replace(/^['"]|['"]$/g, "")) ?? []
+    );
+  }
+
+  async function runSidecar(event: Event) {
+    event.preventDefault();
+    sidecarRunning = true;
+    sidecarOutput = "";
+    sidecarError = "";
+    sidecarExitCode = null;
+
+    try {
+      const args = sidecarArgs.trim() ? splitArgs(sidecarArgs) : [];
+      const result = await runIcaSidecar(args);
+      sidecarExitCode = result.code;
+      sidecarOutput = result.stdout.trimEnd();
+      sidecarError = result.stderr.trimEnd();
+    } catch (error) {
+      sidecarExitCode = null;
+      sidecarError = error instanceof Error ? error.message : String(error);
+    } finally {
+      sidecarRunning = false;
+    }
   }
 </script>
 
@@ -32,6 +68,36 @@
     <button type="submit">Greet</button>
   </form>
   <p>{greetMsg}</p>
+
+  <section class="section">
+    <h2>Run Packaged CLI</h2>
+    <form class="column" onsubmit={runSidecar}>
+      <label for="sidecar-args">Arguments</label>
+      <input
+        id="sidecar-args"
+        placeholder="--help"
+        bind:value={sidecarArgs}
+        autocomplete="off"
+      />
+      <button type="submit" disabled={sidecarRunning}>
+        {sidecarRunning ? "Running…" : "Run ica-sidecar"}
+      </button>
+    </form>
+
+    {#if sidecarExitCode !== null}
+      <p class="status">Exit code: {sidecarExitCode}</p>
+    {/if}
+
+    {#if sidecarOutput}
+      <h3>Stdout</h3>
+      <pre>{sidecarOutput}</pre>
+    {/if}
+
+    {#if sidecarError}
+      <h3>Stderr</h3>
+      <pre class="error-log">{sidecarError}</pre>
+    {/if}
+  </section>
 </main>
 
 <style>
@@ -84,6 +150,15 @@
   justify-content: center;
 }
 
+.column {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.75rem;
+  max-width: 30rem;
+  margin: 0 auto;
+}
+
 a {
   font-weight: 500;
   color: #646cff;
@@ -133,6 +208,32 @@ button {
   margin-right: 5px;
 }
 
+.section {
+  margin-top: 3rem;
+}
+
+.status {
+  margin-top: 1rem;
+  font-weight: 600;
+}
+
+pre {
+  text-align: left;
+  white-space: pre-wrap;
+  word-break: break-word;
+  background-color: #ffffff;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #d0d0d0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.error-log {
+  color: #8b0000;
+  background-color: #ffeeee;
+  border-color: #ffb3b3;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     color: #f6f6f6;
@@ -150,6 +251,17 @@ button {
   }
   button:active {
     background-color: #0f0f0f69;
+  }
+
+  pre {
+    background-color: #101010;
+    border-color: #2b2b2b;
+  }
+
+  .error-log {
+    color: #ffb3b3;
+    background-color: #340101;
+    border-color: #7a1e1e;
   }
 }
 
