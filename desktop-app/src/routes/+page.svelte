@@ -5,6 +5,6 @@
 
     onMount(async () => {
         const contact = await getSelectedContact();
-        await goto(contact ? '/call-cli' : '/set-contact');
+        await goto(contact ? '/message-totals' : '/set-contact');
     });
 </script>
