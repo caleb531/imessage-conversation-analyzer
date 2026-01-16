@@ -11,6 +11,6 @@ export interface SidecarResult {
  * Runs the packaged Python CLI as a Tauri sidecar and captures its output.
  */
 export async function runIcaSidecar(args: string[] = []): Promise<SidecarResult> {
-  const command = Command.sidecar("ica-sidecar", args);
+  const command = Command.sidecar("bin/ica-sidecar", args);
   return command.execute();
 }
