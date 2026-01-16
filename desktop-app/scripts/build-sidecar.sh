@@ -26,7 +26,7 @@ if [[ ! -f "$SIDE_CAR_EXTERNAL_EXE" || ! -d "$SIDE_CAR_RUNTIME_DIR" || ! -d "$SI
 else
   if [[ "$PROJECT_ROOT/pyproject.toml" -nt "$SIDE_CAR_EXTERNAL_EXE" || "$PROJECT_ROOT/uv.lock" -nt "$SIDE_CAR_EXTERNAL_EXE" ]]; then
     needs_rebuild=true
-  elif [[ "$SCRIPT_DIR/build-sidecar.sh" -nt "$SIDE_CAR_EXTERNAL_EXE" ]]; then
+  elif [[ "$SCRIPT_DIR/build-sidecar.sh" -nt "$SIDE_CAR_EXTERNAL_EXE" || "$SCRIPT_DIR/sidecar_wrapper.rs" -nt "$SIDE_CAR_EXTERNAL_EXE" ]]; then
     needs_rebuild=true
   elif find "$PROJECT_ROOT/ica" -type f ! -path '*/__pycache__/*' -newer "$SIDE_CAR_EXTERNAL_EXE" -print -quit | grep -q .; then
     needs_rebuild=true
@@ -48,7 +48,7 @@ uv run pyinstaller \
   --collect-submodules ica.analyzers \
   --add-data "$PROJECT_ROOT/ica/analyzers:ica/analyzers" \
   --add-data "$PROJECT_ROOT/ica/queries:ica/queries" \
-  --distpath "$OUTPUT_DIR" \
+  --distpath "$SIDE_CAR_RUNTIME_DIR" \
   --workpath "$BUILD_DIR" \
   --specpath "$BUILD_DIR" \
   --exclude-module pytest \
@@ -58,11 +58,15 @@ uv run pyinstaller \
   --exclude-module pandas.io.formats.style \
   ica/__main__.py
 
-mv "$OUTPUT_DIR/$SIDE_CAR_ENTRY" "$SIDE_CAR_TARGET_DIR"
+# Move the inner directory to the root of _internal to avoid double nesting if needed,
+# or adjust paths below. PyInstaller --onedir creates distpath/name.
+# So we have src-tauri/_internal/ica-sidecar/.
 
-# Surface the executable and Python runtime alongside the Tauri app so the shell
+# Compile the wrapper script (which becomes the externalBin)
+# We compile a small Rust wrapper to avoid issues with signing/bundling shell scripts.
+rustc "$SCRIPT_DIR/sidecar_wrapper.rs" -o "$SIDE_CAR_TARGET_DIR"
+
+# Surface the executable alongside the Tauri app so the shell
 # plugin loads the sidecar without searching inside architecture-specific
 # directories at runtime.
-cp "$SIDE_CAR_TARGET_DIR/$SIDE_CAR_ENTRY" "$SIDE_CAR_EXTERNAL_EXE"
-cp -R "$SIDE_CAR_TARGET_DIR/_internal" "$SIDE_CAR_RUNTIME_DIR"
-cp -R "$SIDE_CAR_TARGET_DIR" "$SIDE_CAR_SUFFIXED_DIR"
+cp "$SIDE_CAR_TARGET_DIR" "$SIDE_CAR_EXTERNAL_EXE"

@@ -12,7 +12,7 @@
       "identifier": "shell:allow-execute",
       "allow": [
         {
-          "name": "ica-sidecar",
+          "name": "bin/ica-sidecar",
           "sidecar": true,
           "args": true
         }
