@@ -34,7 +34,7 @@
             await setSelectedContact(contactSelection);
             buttonLabel = 'Saved contact!';
             await new Promise((resolve) => setTimeout(resolve, successMessageDelay));
-            await goto('/call-cli');
+            await goto('/message-totals');
         } catch (error) {
             saveError = error instanceof Error ? error.message : String(error);
             buttonLabel = 'Save contact';
