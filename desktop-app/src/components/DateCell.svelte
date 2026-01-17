@@ -6,7 +6,7 @@
     >{new Intl.DateTimeFormat('en-US', {
         weekday: 'long',
         year: 'numeric',
-        month: 'long',
+        month: 'short',
         day: 'numeric'
     }).format(new Date(row[column.id]))}</span
 >
