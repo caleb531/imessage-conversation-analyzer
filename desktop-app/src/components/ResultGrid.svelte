@@ -2,18 +2,10 @@
     import { invokeIcaCsv, MissingContactError, type IcaCsvHeader } from '$lib/cli';
     import { Grid, WillowDark } from '@svar-ui/svelte-grid';
     import { InlineNotification, Loading } from 'carbon-components-svelte';
-    import { onMount } from 'svelte';
+    import { onMount, type Snippet } from 'svelte';
     import '../styles/result-grid.css';
     import DateCell from './DateCell.svelte';
     import NumberCell from './NumberCell.svelte';
-
-    interface Props {
-        title: string;
-        description: string;
-        command: string[];
-    }
-
-    let { title, description, command }: Props = $props();
 
     interface GridColumn {
         id: string;
@@ -21,6 +13,15 @@
         width?: number;
         flexgrow?: number;
     }
+
+    interface Props {
+        title: string;
+        description: string;
+        command: string[];
+        chart?: Snippet<[Array<Record<string, unknown>>, GridColumn[]]>;
+    }
+
+    let { title, description, command, chart }: Props = $props();
 
     let loading = $state(true);
     let errorMessage = $state('');
@@ -108,6 +109,11 @@
             <Loading withOverlay={false} />
         </div>
     {:else if rows.length}
+        {#if chart}
+             <div aria-label="Chart area" role="img">
+                {@render chart(rows, columns)}
+             </div>
+        {/if}
         <WillowDark>
             <Grid data={rows} {columns} />
         </WillowDark>
