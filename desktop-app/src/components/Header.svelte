@@ -20,10 +20,10 @@
     });
 </script>
 
-<Header platformName="iMessage Conversation Analyzer">
+<Header platformName="ICA">
     <HeaderNav>
-        <HeaderNavItem href="/message-totals">Message Totals</HeaderNavItem>
-        <HeaderNavItem href="/most-frequent-emojis">Most Frequent Emojis</HeaderNavItem>
+        <HeaderNavItem href="/message-totals">Overall Totals</HeaderNavItem>
+        <HeaderNavItem href="/most-frequent-emojis">Emojis</HeaderNavItem>
         <HeaderNavItem href="/totals-by-day">Totals by Day</HeaderNavItem>
     </HeaderNav>
     <HeaderUtilities>
