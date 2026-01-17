@@ -1,0 +1,85 @@
+/* Minimal utility classes for LayerChart (Tailwind-free) */
+.relative {
+    position: relative;
+}
+.absolute {
+    position: absolute;
+}
+.top-0 {
+    top: 0;
+}
+.left-0 {
+    left: 0;
+}
+.z-50 {
+    z-index: 50;
+}
+.select-none {
+    user-select: none;
+}
+.pointer-events-none {
+    pointer-events: none;
+}
+.overflow-visible {
+    overflow: visible;
+}
+.text-sm {
+    font-size: 0.875rem;
+}
+.py-1 {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+}
+.px-2 {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+.h-full {
+    height: 100%;
+}
+.rounded {
+    border-radius: 0.25rem;
+}
+.border {
+    border-width: 1px;
+    border-style: solid;
+}
+.elevation-1 {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+.transition-opacity {
+    transition: opacity 150ms ease;
+}
+.opacity-50 {
+    opacity: 0.5;
+}
+.backdrop-filter {
+    backdrop-filter: blur(2px);
+}
+.backdrop-blur-\[2px\] {
+    backdrop-filter: blur(2px);
+}
+.bg-surface-100\/90 {
+    background-color: rgba(34, 34, 34, 0.9);
+}
+.bg-surface-300\/90 {
+    background-color: rgba(48, 48, 48, 0.9);
+}
+.text-surface-content {
+    color: #f4f4f4;
+}
+.text-surface-content\/75 {
+    color: rgba(244, 244, 244, 0.75);
+}
+.text-surface-100 {
+    color: #ffffff;
+}
+.text-surface-100\/50 {
+    color: rgba(255, 255, 255, 0.5);
+}
+.border-surface-content {
+    border-color: #525252;
+}
+.dark\:bg-surface-300\/90 {
+    background-color: rgba(48, 48, 48, 0.9);
+}

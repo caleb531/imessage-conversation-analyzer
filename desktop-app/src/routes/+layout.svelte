@@ -4,6 +4,7 @@
     import type { ThemeProps } from 'carbon-components-svelte/src/Theme/Theme.svelte';
     import Header from '../components/Header.svelte';
     import '../styles/layout.css';
+    import '../styles/utility-classes.css';
     const { children } = $props();
     let theme: ThemeProps['theme'] = 'g100';
 </script>

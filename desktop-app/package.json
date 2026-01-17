@@ -18,12 +18,15 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@svar-ui/svelte-grid": "^2.4.0",
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-opener": "^2",
     "@tauri-apps/plugin-shell": "^2",
     "@tauri-apps/plugin-store": "~2.4.1",
-    "@svar-ui/svelte-grid": "^2.4.0",
     "carbon-components-svelte": "^0.85.1",
+    "d3-scale": "^4.0.2",
+    "d3-shape": "^3.2.0",
+    "layerchart": "^1.0.13",
     "papaparse": "^5.4.1",
     "string-argv": "^0.3.2"
   },
