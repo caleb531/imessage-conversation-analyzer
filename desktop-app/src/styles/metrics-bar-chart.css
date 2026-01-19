@@ -4,3 +4,8 @@
     position: relative;
     /* Allow tooltip to overflow if necessary, but chart usually clips */
 }
+
+/* Force Apple Color Emoji to ensure emojis are rendered as graphics, not text */
+.emoji-tick-label {
+    font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
+}
