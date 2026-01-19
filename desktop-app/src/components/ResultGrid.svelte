@@ -4,15 +4,9 @@
     import { InlineNotification, Loading } from 'carbon-components-svelte';
     import { onMount, type Snippet } from 'svelte';
     import '../styles/result-grid.css';
+    import type { GridColumn } from '../types';
     import DateCell from './DateCell.svelte';
     import NumberCell from './NumberCell.svelte';
-
-    interface GridColumn {
-        id: string;
-        header: string;
-        width?: number;
-        flexgrow?: number;
-    }
 
     interface Props {
         title: string;
@@ -111,9 +105,9 @@
         </div>
     {:else if rows.length}
         {#if charts}
-             <div class="result-grid-charts" aria-label="Chart area" role="img">
+            <div class="result-grid-charts" aria-label="Chart area" role="img">
                 {@render charts(rows, columns)}
-             </div>
+            </div>
         {/if}
         <WillowDark>
             <Grid data={rows} {columns} />
