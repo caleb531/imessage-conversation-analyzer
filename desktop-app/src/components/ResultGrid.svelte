@@ -18,10 +18,11 @@
         title: string;
         description: string;
         command: string[];
-        chart?: Snippet<[Array<Record<string, unknown>>, GridColumn[]]>;
+        charts?: Snippet<[Array<Record<string, unknown>>, GridColumn[]]>;
+        children?: Snippet;
     }
 
-    let { title, description, command, chart }: Props = $props();
+    let { title, description, command, charts, children }: Props = $props();
 
     let loading = $state(true);
     let errorMessage = $state('');
@@ -109,9 +110,9 @@
             <Loading withOverlay={false} />
         </div>
     {:else if rows.length}
-        {#if chart}
-             <div aria-label="Chart area" role="img">
-                {@render chart(rows, columns)}
+        {#if charts}
+             <div class="result-grid-charts" aria-label="Chart area" role="img">
+                {@render charts(rows, columns)}
              </div>
         {/if}
         <WillowDark>
