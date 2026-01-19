@@ -1,0 +1,12 @@
+.metrics-pie-chart {
+    --container-size: 160px;
+    width: var(--container-size);
+    height: var(--container-size);
+    position: relative;
+}
+
+.metrics-pie-chart__label {
+    fill: #f4f4f4;
+    font-weight: 600;
+    font-size: 14px;
+}

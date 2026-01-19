@@ -1,11 +1,6 @@
 <script lang="ts">
     import ResultGrid from '../../components/ResultGrid.svelte';
-    import { PieChart } from 'layerchart';
-
-    function formatLabel(key: string) {
-        if (key === 'messagesFromMe') return 'Me';
-        return key.replace(/^messagesFrom/, '');
-    }
+    import MetricsPieChart from '../../components/MetricsPieChart.svelte';
 </script>
 
 <ResultGrid
@@ -13,59 +8,42 @@
     description="Review aggregated conversation metrics like the total number of messages sent and received."
     command={['message_totals']}
 >
-    {#snippet chart(rows, columns)}
+    {#snippet charts(rows, columns)}
         {@const metricCol = columns.find(c => c.header === 'Metric')}
         {@const totalCol = columns.find(c => c.header === 'Total')}
 
         {#if metricCol && totalCol}
-            {@const data = rows
-                .filter(r => {
-                    const label = r[metricCol.id];
+            {@const messageMetrics = rows
+                .filter((row) => {
+                    const label = row[metricCol.id];
                     return typeof label === 'string' && label.startsWith('Messages From ');
                 })
-                .map(r => ({
-                    key: (r[metricCol.id] as string).replace('Messages From ', ''),
-                    value: Number(r[totalCol.id])
+                .map((row) => ({
+                    key: String(row[metricCol.id]).replace('Messages From ', ''),
+                    value: Number(row[totalCol.id])
+                }))
+                .filter((dataPoint) => dataPoint.value > 0)
+                .sort((a, b) => b.value - a.value)
+            }
+            {@const reactionMetrics = rows
+                .filter((row) => {
+                    const label = row[metricCol.id];
+                    return typeof label === 'string' && label.startsWith('Reactions From ');
+                })
+                .map((row) => ({
+                    key: String(row[metricCol.id]).replace('Messages From ', ''),
+                    value: Number(row[totalCol.id])
                 }))
                 .filter(d => d.value > 0)
                 .sort((a, b) => b.value - a.value)
             }
 
-            {#if data.length > 0}
-                <div style="height: 300px; margin-bottom: 2rem; position: relative;">
-                    <PieChart
-                        {data}
-                        key="key"
-                        value="value"
-                        cRange={['#0f62fe', '#8a3ffc', '#00cfda', '#ff0055', '#f1c21b', '#6fdc8c']}
-                        innerRadius={-20}
-                        cornerRadius={4}
-                        padAngle={0.02}
-                        props={{
-                            tooltip: {
-                                root: {
-                                    classes: { root: 'layerchart-tooltip' }
-                                }
-                            }
-                        }}
-                    />
-                </div>
+            {#if messageMetrics.length > 0}
+                <MetricsPieChart data={messageMetrics} label="Messages" />
+            {/if}
+            {#if reactionMetrics.length > 0}
+                <MetricsPieChart data={reactionMetrics} label="Reactions" />
             {/if}
         {/if}
     {/snippet}
-
-<style>
-    :global(.layerchart-tooltip) {
-        position: absolute;
-        z-index: 9999;
-        pointer-events: none;
-        background: rgba(22, 22, 22, 0.9);
-        border: 1px solid #393939;
-        color: white;
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-size: 12px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.5);
-    }
-</style>
 </ResultGrid>
