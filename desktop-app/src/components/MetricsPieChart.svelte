@@ -1,13 +1,9 @@
 <script lang="ts">
     import { PieChart } from 'layerchart';
     import '../styles/metrics-pie-chart.css';
+    import type { DataPoint } from '../types';
 
-    type MetricsPieChartPoint = {
-        key: string;
-        value: number;
-    };
-
-    export let data: MetricsPieChartPoint[] = [];
+    export let data: DataPoint[];
     export let label = '';
     export let colors = ['#0f62fe', '#8a3ffc', '#00cfda', '#ff0055', '#f1c21b', '#6fdc8c'];
     export let innerRadius = -15;
@@ -19,18 +15,15 @@
 {#if data.length > 0}
     <article class="metrics-pie-chart">
         <PieChart
-            data={data}
+            {data}
             key="key"
             value="value"
             cRange={colors}
-            innerRadius={innerRadius}
-            outerRadius={outerRadius}
-            cornerRadius={cornerRadius}
-            padAngle={padAngle}
+            {innerRadius}
+            {outerRadius}
+            {cornerRadius}
+            {padAngle}
             props={{
-                arc: {
-                    strokeWidth: 30
-                },
                 tooltip: {
                     root: {
                         classes: { root: 'layerchart-tooltip' }
