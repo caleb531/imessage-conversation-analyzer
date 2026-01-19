@@ -1,0 +1,44 @@
+{
+  "python.languageServer": "None",
+  "editor.formatOnSave": true,
+  "python.analysis.extraPaths": [".virtualenv"],
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    }
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "rust-analyzer.linkedProjects": ["src-tauri/Cargo.toml"],
+  "[rust]": {
+    "editor.defaultFormatter": "rust-lang.rust-analyzer"
+  },
+  "[svelte]": {
+    "editor.defaultFormatter": "svelte.svelte-vscode"
+  },
+  "[javascript][javascriptreact][typescript][typescriptreact][svelte]": {
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    }
+  },
+  "workbench.editor.labelFormat": "short",
+  "eslint.validate": ["javascript", "typescript", "svelte"],
+  "files.exclude": {
+    "**/.DS_Store": true,
+    "node_modules": true,
+    "build": true,
+    ".svelte-kit": true,
+    "package": true,
+    ".env": true,
+    ".env.*": true,
+    ".env.example": false,
+    "vite.config.js.timestamp-*": true,
+    "vite.config.ts.timestamp-*": true,
+    "src-tauri/bin": true,
+    "src-tauri/_internal": true,
+    "src-tauri/ica-sidecar": true,
+    "src-tauri/ica-sidecar-*": true,
+    "src-tauri/target": true,
+    "src-tauri/gen/schemas": true
+  }
+}
