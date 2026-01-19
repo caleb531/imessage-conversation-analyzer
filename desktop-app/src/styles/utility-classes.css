@@ -83,3 +83,6 @@
 .dark\:bg-surface-300\/90 {
     background-color: rgba(48, 48, 48, 0.9);
 }
+.fill-transparent {
+    fill: transparent;
+}

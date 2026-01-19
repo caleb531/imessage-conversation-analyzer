@@ -3,6 +3,7 @@
     import 'carbon-components-svelte/css/all.css';
     import type { ThemeProps } from 'carbon-components-svelte/src/Theme/Theme.svelte';
     import Header from '../components/Header.svelte';
+    import '../styles/colors.css';
     import '../styles/layout.css';
     import '../styles/utility-classes.css';
     const { children } = $props();

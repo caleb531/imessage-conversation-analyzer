@@ -24,10 +24,12 @@
                 const label = row[metricCol.id];
                 return typeof label === 'string' && columnNamePattern.test(label);
             })
-            .map((row) => ({
-                key: columnNameFormatter(String(row[metricCol.id])),
-                value: Number(row[totalCol.id])
-            }))
+            .map((row) => {
+                return {
+                    key: columnNameFormatter(String(row[metricCol.id])),
+                    value: Number(row[totalCol.id])
+                };
+            })
             .filter((dataPoint) => dataPoint.value > 0)
             .sort((a, b) => b.value - a.value);
     }
