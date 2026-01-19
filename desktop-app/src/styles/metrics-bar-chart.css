@@ -1,0 +1,6 @@
+.metrics-bar-chart {
+    height: 300px;
+    width: 100%;
+    position: relative;
+    /* Allow tooltip to overflow if necessary, but chart usually clips */
+}
