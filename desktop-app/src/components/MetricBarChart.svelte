@@ -21,6 +21,11 @@
                 bars: {
                     radius: 4
                 },
+                xAxis: {
+                    tickLabelProps: {
+                        class: 'emoji-tick-label'
+                    }
+                },
                 yAxis: {
                     ticks: 5
                 },
