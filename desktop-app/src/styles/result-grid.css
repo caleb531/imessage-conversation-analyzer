@@ -24,5 +24,11 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    width: 50%;
+    margin: 0 auto;
     margin-top: -0.5em;
+    fill: none;
+}
+.result-grid-charts text {
+    fill: #fff;
 }
