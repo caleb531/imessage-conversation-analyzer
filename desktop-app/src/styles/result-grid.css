@@ -19,3 +19,9 @@
 .wx-data {
     border-bottom: var(--wx-table-border);
 }
+
+.result-grid-charts {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
