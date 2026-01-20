@@ -15,4 +15,6 @@ WHERE "message"."ROWID" IN (
     SELECT "message_id"
     FROM "chat_message_join"
     WHERE "chat_id" IN ({chat_ids_placeholder})
-) ORDER BY "datetime"
+)
+{date_filter_clause}
+ORDER BY "datetime"
