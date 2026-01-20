@@ -267,20 +267,25 @@ def test_filter_passing_in_analyzers(
     )
 
 
-def test_to_date_inclusive() -> None:
+def test_to_date_exclusive() -> None:
     """
-    Test that to_date filtering includes messages exactly at the boundary.
-    This corresponds to the <= behavior expected by pandas date filtering.
+    Test that to_date filtering excludes messages exactly at the boundary. This
+    corresponds to the < behavior (half-open interval).
     """
-    # The message with ROWID "5ab162b0-e4c7-4e77-9623-c2396bb81d73" has been
-    # explicitly set to 2024-01-08 00:00:00 UTC (726364800000000000 ns)
+    # The message with ROWID "ef073cec-fcd5-4fdb-b400-c2f54a7cb974" has timestamp
+    # 726442407346190720, which is exactly 2024-01-08 21:33:27.346190720 UTC
+    target_date = "2024-01-08 21:33:27.346190720"
     dfs = ica.get_dataframes(
-        contacts=["Jane Fernbrook"], to_date="2024-01-08", timezone="UTC"
+        contacts=["Jane Fernbrook"], to_date=target_date, timezone="UTC"
     )
+
+    # Ensure we actually got some data (messages exists before the boundary)
+    assert len(dfs.messages) > 0, "Should return messages before the boundary"
+
     # Filter to find that specific message
     boundary_msg = dfs.messages[
-        dfs.messages["ROWID"] == "5ab162b0-e4c7-4e77-9623-c2396bb81d73"
+        dfs.messages["ROWID"] == "ef073cec-fcd5-4fdb-b400-c2f54a7cb974"
     ]
-    assert len(boundary_msg) == 1, (
-        "Message at exactly to_date boundary should be included (<= logic)"
+    assert len(boundary_msg) == 0, (
+        "Message at exactly to_date boundary should be excluded (< logic)"
     )

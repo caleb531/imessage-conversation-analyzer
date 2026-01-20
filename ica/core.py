@@ -84,14 +84,18 @@ def build_date_filter_clause(
     if from_date:
         # Convert from_date to iMessage timestamp (nanoseconds since 2001-01-01)
         from_ts = pd.Timestamp(from_date, tz=timezone)
-        from_ns = int((from_ts.timestamp() - IMESSAGE_EPOCH_OFFSET) * 1_000_000_000)
+        # Use integer arithmetic for precision (pd.Timestamp.value is ns since
+        # 1970)
+        from_ns = from_ts.value - int(IMESSAGE_EPOCH_OFFSET * 1_000_000_000)
         clauses.append(f'AND "message"."date" >= {from_ns}')
     if to_date:
-        # Use midnight of to_date (inclusive) to match original API behavior
-        # where df["datetime"] <= "2024-01-17" means <= midnight on 2024-01-17
+        # Use midnight of to_date (exclusive) to match standard half-open
+        # interval behavior (start <= date < end), preventing double-counting at
+        # boundaries
         to_ts = pd.Timestamp(to_date, tz=timezone)
-        to_ns = int((to_ts.timestamp() - IMESSAGE_EPOCH_OFFSET) * 1_000_000_000)
-        clauses.append(f'AND "message"."date" <= {to_ns}')
+        # Use integer arithmetic for precision
+        to_ns = to_ts.value - int(IMESSAGE_EPOCH_OFFSET * 1_000_000_000)
+        clauses.append(f'AND "message"."date" < {to_ns}')
     return " ".join(clauses)
 
 
