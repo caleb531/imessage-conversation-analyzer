@@ -20,3 +20,4 @@ WHERE
         FROM "chat_message_join"
         WHERE "chat_id" IN ({chat_ids_placeholder})
     )
+{date_filter_clause}

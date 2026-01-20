@@ -65,6 +65,35 @@ class DataFrameNamespace:
     handles: pd.DataFrame
 
 
+# iMessage stores dates as nanoseconds since 2001-01-01 (Apple's Core Data epoch)
+IMESSAGE_EPOCH_OFFSET = 978307200  # seconds between 1970-01-01 and 2001-01-01
+
+
+def build_date_filter_clause(
+    from_date: Optional[str] = None,
+    to_date: Optional[str] = None,
+) -> str:
+    """
+    Build a SQL WHERE clause fragment to filter messages by date range.
+    Dates are converted to iMessage's internal format (nanoseconds since 2001-01-01).
+    The to_date filter uses < (exclusive) to match pandas behavior where comparing
+    a datetime to a date string treats the string as midnight.
+    """
+    clauses = []
+    if from_date:
+        # Convert from_date to iMessage timestamp (nanoseconds since 2001-01-01)
+        from_ts = pd.Timestamp(from_date)
+        from_ns = int((from_ts.timestamp() - IMESSAGE_EPOCH_OFFSET) * 1_000_000_000)
+        clauses.append(f'AND "message"."date" >= {from_ns}')
+    if to_date:
+        # Use midnight of to_date (exclusive) to match original pandas behavior
+        # where df["datetime"] <= "2024-01-17" means < midnight on 2024-01-17
+        to_ts = pd.Timestamp(to_date)
+        to_ns = int((to_ts.timestamp() - IMESSAGE_EPOCH_OFFSET) * 1_000_000_000)
+        clauses.append(f'AND "message"."date" < {to_ns}')
+    return " ".join(clauses)
+
+
 def decode_message_attributedbody(data: bytes) -> str:
     """
     The textual contents of some messages are encoded in a special
@@ -131,6 +160,8 @@ def get_messages_dataframe(
     chat_ids: Sequence[str],
     contact_records: Sequence[ContactRecord],
     timezone: Optional[str] = None,
+    from_date: Optional[str] = None,
+    to_date: Optional[str] = None,
 ) -> pd.DataFrame:
     """
     Return a pandas dataframe representing all messages in a particular
@@ -142,6 +173,7 @@ def get_messages_dataframe(
         timezone = tzlocal.get_localzone().key
 
     chat_ids_placeholder = ", ".join(f"'{cid}'" for cid in chat_ids)
+    date_filter_clause = build_date_filter_clause(from_date, to_date)
 
     # Create a mapping from identifier to display name for efficient aggregation
     identifier_to_display_name = {}
@@ -157,7 +189,10 @@ def get_messages_dataframe(
             sql=importlib.resources.files("ica")
             .joinpath(os.path.join("queries", "messages.sql"))
             .read_text()
-            .format(chat_ids_placeholder=chat_ids_placeholder),
+            .format(
+                chat_ids_placeholder=chat_ids_placeholder,
+                date_filter_clause=date_filter_clause,
+            ),
             con=con,
             parse_dates={"datetime": "ISO8601"},
         )
@@ -257,45 +292,33 @@ def resolve_sender_identifiers(
 def filter_dataframe(
     df: pd.DataFrame,
     contact_records: Sequence[ContactRecord],
-    from_date: Optional[str] = None,
-    to_date: Optional[str] = None,
     from_people: Optional[Sequence[str]] = None,
 ) -> pd.DataFrame:
     """
     Return a copy of the messages dataframe that has been filtered by the
-    user-supplied filters
+    user-supplied from_people filter. Date filtering is handled at the SQL level.
     """
-
-    # Raise an exception if the 'from' date is after the 'to' date
-    if from_date and to_date and pd.Timestamp(from_date) > pd.Timestamp(to_date):
-        raise DateRangeInvalidError("Date range is backwards")
 
     # If no person filter is supplied, or if "all" is specified, return values
     # from all senders
     if not from_people or "all" in (p.lower() for p in from_people):
-        return df.pipe(
-            lambda df: df[df["datetime"] >= from_date] if from_date else df
-        ).pipe(lambda df: df[df["datetime"] <= to_date] if to_date else df)
+        return df
 
     include_me, allowed_handles = resolve_sender_identifiers(
         contact_records, from_people
     )
 
-    return (
-        df.pipe(
-            lambda df: df[
-                (df["is_from_me"] & include_me)
-                # In the macOS Messages database, the handle_id (and thus
-                # sender_handle) for outgoing messages (is_from_me=1) in 1-on-1
-                # chats refers to the recipient, not the sender. Therefore, we
-                # must explicitly exclude messages from "me" when filtering by a
-                # specific contact handle, otherwise we will inadvertently
-                # include messages sent TO that contact.
-                | (df["sender_handle"].isin(allowed_handles) & ~df["is_from_me"])
-            ]
-        )
-        .pipe(lambda df: df[df["datetime"] >= from_date] if from_date else df)
-        .pipe(lambda df: df[df["datetime"] <= to_date] if to_date else df)
+    return df.pipe(
+        lambda df: df[
+            (df["is_from_me"] & include_me)
+            # In the macOS Messages database, the handle_id (and thus
+            # sender_handle) for outgoing messages (is_from_me=1) in 1-on-1
+            # chats refers to the recipient, not the sender. Therefore, we
+            # must explicitly exclude messages from "me" when filtering by a
+            # specific contact handle, otherwise we will inadvertently
+            # include messages sent TO that contact.
+            | (df["sender_handle"].isin(allowed_handles) & ~df["is_from_me"])
+        ]
     )
 
 
@@ -303,19 +326,25 @@ def get_attachments_dataframe(
     con: sqlite3.Connection,
     chat_ids: Sequence[str],
     timezone: Optional[str] = None,
+    from_date: Optional[str] = None,
+    to_date: Optional[str] = None,
 ) -> pd.DataFrame:
     """
     Return a pandas dataframe representing all attachments in a particular
     conversation (identified by the given phone number)
     """
     chat_ids_placeholder = ", ".join(f"'{cid}'" for cid in chat_ids)
+    date_filter_clause = build_date_filter_clause(from_date, to_date)
 
     return (
         pd.read_sql_query(
             sql=importlib.resources.files("ica")
             .joinpath(os.path.join("queries", "attachments.sql"))
             .read_text()
-            .format(chat_ids_placeholder=chat_ids_placeholder),
+            .format(
+                chat_ids_placeholder=chat_ids_placeholder,
+                date_filter_clause=date_filter_clause,
+            ),
             con=con,
             parse_dates={"datetime": "ISO8601"},
         )
@@ -401,6 +430,10 @@ def get_dataframes(
     """
     Return all dataframes for a specific macOS Messages conversation
     """
+    # Validate date range before querying
+    if from_date and to_date and pd.Timestamp(from_date) > pd.Timestamp(to_date):
+        raise DateRangeInvalidError("Date range is backwards")
+
     contact_records = get_contact_records(contacts)
 
     with sqlite3.connect(f"file:{DB_PATH}?mode=ro", uri=True) as con:
@@ -413,23 +446,25 @@ def get_dataframes(
             )
 
         dfs = DataFrameNamespace(
-            messages=get_messages_dataframe(con, chat_ids, contact_records, timezone),
-            attachments=get_attachments_dataframe(con, chat_ids, timezone),
+            messages=get_messages_dataframe(
+                con, chat_ids, contact_records, timezone, from_date, to_date
+            ),
+            attachments=get_attachments_dataframe(
+                con, chat_ids, timezone, from_date, to_date
+            ),
             handles=get_handles_dataframe(con, contact_records),
         )
+        # Date filtering is now done in SQL; filter_dataframe only handles
+        # from_people filtering
         dfs.messages = filter_dataframe(
             dfs.messages,
             contact_records,
-            from_date,
-            to_date,
-            from_people,
+            from_people=from_people,
         )
         dfs.attachments = filter_dataframe(
             dfs.attachments,
             contact_records,
-            from_date,
-            to_date,
-            from_people,
+            from_people=from_people,
         )
         return dfs
 
