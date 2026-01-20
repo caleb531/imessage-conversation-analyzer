@@ -281,6 +281,6 @@ def test_to_date_inclusive() -> None:
     boundary_msg = dfs.messages[
         dfs.messages["ROWID"] == "5ab162b0-e4c7-4e77-9623-c2396bb81d73"
     ]
-    assert (
-        len(boundary_msg) == 1
-    ), "Message at exactly to_date boundary should be included (<= logic)"
+    assert len(boundary_msg) == 1, (
+        "Message at exactly to_date boundary should be included (<= logic)"
+    )
