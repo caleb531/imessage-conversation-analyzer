@@ -43,7 +43,8 @@ def test_to_date() -> None:
         to_date="2024-01-17",
     )
     expected_dates = [
-        "2024-01-07",
+        # This date was previously 2024-01-07, but we changed the mock data
+        # timestamp
         "2024-01-08",
         "2024-01-09",
         "2024-01-11",
@@ -264,3 +265,22 @@ def test_filter_passing_in_analyzers(
         timezone=None,
         **expected_kwargs,
     )
+
+
+def test_to_date_inclusive() -> None:
+    """
+    Test that to_date filtering includes messages exactly at the boundary.
+    This corresponds to the <= behavior expected by pandas date filtering.
+    """
+    # The message with ROWID "5ab162b0-e4c7-4e77-9623-c2396bb81d73" has been
+    # explicitly set to 2024-01-08 00:00:00 UTC (726364800000000000 ns)
+    dfs = ica.get_dataframes(
+        contacts=["Jane Fernbrook"], to_date="2024-01-08", timezone="UTC"
+    )
+    # Filter to find that specific message
+    boundary_msg = dfs.messages[
+        dfs.messages["ROWID"] == "5ab162b0-e4c7-4e77-9623-c2396bb81d73"
+    ]
+    assert (
+        len(boundary_msg) == 1
+    ), "Message at exactly to_date boundary should be included (<= logic)"

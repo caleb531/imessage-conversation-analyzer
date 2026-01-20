@@ -86,11 +86,11 @@ def build_date_filter_clause(
         from_ns = int((from_ts.timestamp() - IMESSAGE_EPOCH_OFFSET) * 1_000_000_000)
         clauses.append(f'AND "message"."date" >= {from_ns}')
     if to_date:
-        # Use midnight of to_date (exclusive) to match original pandas behavior
-        # where df["datetime"] <= "2024-01-17" means < midnight on 2024-01-17
+        # Use midnight of to_date (inclusive) to match original API behavior
+        # where df["datetime"] <= "2024-01-17" means <= midnight on 2024-01-17
         to_ts = pd.Timestamp(to_date)
         to_ns = int((to_ts.timestamp() - IMESSAGE_EPOCH_OFFSET) * 1_000_000_000)
-        clauses.append(f'AND "message"."date" < {to_ns}')
+        clauses.append(f'AND "message"."date" <= {to_ns}')
     return " ".join(clauses)
 
 
