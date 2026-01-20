@@ -72,6 +72,7 @@ IMESSAGE_EPOCH_OFFSET = 978307200  # seconds between 1970-01-01 and 2001-01-01
 def build_date_filter_clause(
     from_date: Optional[str] = None,
     to_date: Optional[str] = None,
+    timezone: Optional[str] = None,
 ) -> str:
     """
     Build a SQL WHERE clause fragment to filter messages by date range.
@@ -82,13 +83,13 @@ def build_date_filter_clause(
     clauses = []
     if from_date:
         # Convert from_date to iMessage timestamp (nanoseconds since 2001-01-01)
-        from_ts = pd.Timestamp(from_date)
+        from_ts = pd.Timestamp(from_date, tz=timezone)
         from_ns = int((from_ts.timestamp() - IMESSAGE_EPOCH_OFFSET) * 1_000_000_000)
         clauses.append(f'AND "message"."date" >= {from_ns}')
     if to_date:
         # Use midnight of to_date (inclusive) to match original API behavior
         # where df["datetime"] <= "2024-01-17" means <= midnight on 2024-01-17
-        to_ts = pd.Timestamp(to_date)
+        to_ts = pd.Timestamp(to_date, tz=timezone)
         to_ns = int((to_ts.timestamp() - IMESSAGE_EPOCH_OFFSET) * 1_000_000_000)
         clauses.append(f'AND "message"."date" <= {to_ns}')
     return " ".join(clauses)
@@ -173,7 +174,11 @@ def get_messages_dataframe(
         timezone = tzlocal.get_localzone().key
 
     chat_ids_placeholder = ", ".join(f"'{cid}'" for cid in chat_ids)
-    date_filter_clause = build_date_filter_clause(from_date, to_date)
+    date_filter_clause = build_date_filter_clause(
+        from_date,
+        to_date,
+        timezone=timezone,
+    )
 
     # Create a mapping from identifier to display name for efficient aggregation
     identifier_to_display_name = {}
@@ -334,7 +339,11 @@ def get_attachments_dataframe(
     conversation (identified by the given phone number)
     """
     chat_ids_placeholder = ", ".join(f"'{cid}'" for cid in chat_ids)
-    date_filter_clause = build_date_filter_clause(from_date, to_date)
+    date_filter_clause = build_date_filter_clause(
+        from_date,
+        to_date,
+        timezone=timezone,
+    )
 
     return (
         pd.read_sql_query(

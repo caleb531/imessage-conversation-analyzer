@@ -10,7 +10,7 @@ import ica.analyzers.message_totals as message_totals
 
 
 @patch("ica.output_results")
-@patch("sys.argv", [message_totals.__file__, "-c", "Jane Fernbrook"])
+@patch("sys.argv", [message_totals.__file__, "-c", "Jane Fernbrook", "-t", "UTC"])
 def test_message_counts(output_results: MagicMock) -> None:
     """Should count the number of messages according to various criteria."""
     message_totals.main()
@@ -21,7 +21,7 @@ def test_message_counts(output_results: MagicMock) -> None:
 
 
 @patch("ica.output_results")
-@patch("sys.argv", [message_totals.__file__, "-c", "Jane Fernbrook"])
+@patch("sys.argv", [message_totals.__file__, "-c", "Jane Fernbrook", "-t", "UTC"])
 def test_reaction_counts(output_results: MagicMock) -> None:
     """Should count the number of reactions according to various
     criteria."""
@@ -33,15 +33,15 @@ def test_reaction_counts(output_results: MagicMock) -> None:
 
 
 @patch("ica.output_results")
-@patch("sys.argv", [message_totals.__file__, "-c", "Jane Fernbrook"])
+@patch("sys.argv", [message_totals.__file__, "-c", "Jane Fernbrook", "-t", "UTC"])
 @freeze_time("2024-01-26 9:00:00")
 def test_day_counts(output_results: MagicMock) -> None:
     """Should count the number of days according to various criteria."""
     message_totals.main()
     df: pd.DataFrame = output_results.call_args[0][0]
-    assert df.loc["days_messaged"]["total"] == 8
+    assert df.loc["days_messaged"]["total"] == 7
     assert df.loc["days_missed"]["total"] == 12
-    assert df.loc["days_with_no_reply"]["total"] == 6
+    assert df.loc["days_with_no_reply"]["total"] == 4
 
 
 @patch("ica.output_results")
@@ -51,6 +51,8 @@ def test_day_counts(output_results: MagicMock) -> None:
         message_totals.__file__,
         "-c",
         "Jane Fernbrook",
+        "-t",
+        "UTC",
         "--from-date",
         "2030-01-01",
         "--to-date",
@@ -74,6 +76,8 @@ def test_no_messages(output_results: MagicMock) -> None:
         message_totals.__file__,
         "-c",
         "Jane Fernbrook",
+        "-t",
+        "UTC",
         "--to-date",
         "2024-01-10",
     ],
@@ -87,13 +91,13 @@ def test_date_upper_bound(output_results: MagicMock) -> None:
     message_totals.main()
     df: pd.DataFrame = output_results.call_args[0][0]
 
-    # First message is 2024-01-07.
+    # First message is 2024-01-08
     # to_date is 2024-01-10 (midnight).
-    # Included days: Jan 7, 8, 9, 10. (4 days).
-    # Messages exist on Jan 7, 8, 9. (3 days).
+    # Included days: Jan 8, 9, 10. (3 days).
+    # Messages exist on Jan 8, 9. (2 days).
     # Jan 10 has no messages (because to_date is exclusive for messages after midnight).
 
-    assert df.loc["days_messaged"]["total"] == 3
+    assert df.loc["days_messaged"]["total"] == 2
     assert df.loc["days_missed"]["total"] == 1
 
     # Verify that it's not using "today" (Feb 1)
