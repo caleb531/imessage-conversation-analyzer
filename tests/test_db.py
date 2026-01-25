@@ -34,76 +34,79 @@ def test_db_paths() -> None:
 def test_message_timestamp_uniqueness() -> None:
     """timestamps should be unique across all tables in the chat database"""
     with closing(sqlite3.connect(mock_chats_db_path)) as con:
-        cur = con.cursor()
-        assert not get_duplicates(
-            row[0] for row in cur.execute("SELECT date FROM message")
-        ), "there are duplicate timestamps in the message table"
+        with closing(con.cursor()) as cur:
+            assert not get_duplicates(
+                row[0] for row in cur.execute("SELECT date FROM message")
+            ), "there are duplicate timestamps in the message table"
 
 
 def test_message_id_uniqueness() -> None:
     """IDs should be unique across all tables in the chat database"""
     with closing(sqlite3.connect(mock_chats_db_path)) as con:
-        cur = con.cursor()
-        assert not get_duplicates(
-            row[0] for row in cur.execute("SELECT ROWID FROM message")
-        ), "there are duplicate IDs in the message table"
-        assert not get_duplicates(
-            row[0] for row in cur.execute("SELECT ROWID FROM chat_message_join")
-        ), "there are duplicate IDs in the chat_message_join table"
-        assert not get_duplicates(
-            row[0] for row in cur.execute("SELECT ROWID FROM message_attachment_join")
-        ), "there are duplicate IDs in the attachment_message_join table"
+        with closing(con.cursor()) as cur:
+            assert not get_duplicates(
+                row[0] for row in cur.execute("SELECT ROWID FROM message")
+            ), "there are duplicate IDs in the message table"
+            assert not get_duplicates(
+                row[0] for row in cur.execute("SELECT ROWID FROM chat_message_join")
+            ), "there are duplicate IDs in the chat_message_join table"
+            assert not get_duplicates(
+                row[0]
+                for row in cur.execute("SELECT ROWID FROM message_attachment_join")
+            ), "there are duplicate IDs in the attachment_message_join table"
 
 
 def test_contact_id_uniqueness() -> None:
     """IDs should be unique across all tables in the contact database"""
     with closing(sqlite3.connect(mock_contacts_db_path)) as con:
-        cur = con.cursor()
-        assert not get_duplicates(
-            row[0] for row in cur.execute("SELECT Z_PK FROM ZABCDRECORD")
-        ), "there are duplicate IDs in the ZABCDRECORD table"
+        with closing(con.cursor()) as cur:
+            assert not get_duplicates(
+                row[0] for row in cur.execute("SELECT Z_PK FROM ZABCDRECORD")
+            ), "there are duplicate IDs in the ZABCDRECORD table"
 
 
 def test_chat_db_foreign_keys() -> None:
     """foreign key associations for mock chat database should be correct"""
     with closing(sqlite3.connect(mock_chats_db_path)) as con:
-        cur = con.cursor()
-        message_ids = set(
-            row[0] for row in cur.execute("SELECT ROWID FROM message").fetchall()
-        )
-        chat_message_ids = set(
-            row[0]
-            for row in cur.execute(
-                "SELECT message_id FROM chat_message_join"
-            ).fetchall()
-        )
-        assert chat_message_ids == message_ids
-        attachment_message_ids = set(
-            row[0]
-            for row in cur.execute(
-                "SELECT message_id FROM message_attachment_join"
-            ).fetchall()
-        )
-        assert attachment_message_ids <= message_ids
+        with closing(con.cursor()) as cur:
+            message_ids = set(
+                row[0] for row in cur.execute("SELECT ROWID FROM message").fetchall()
+            )
+            chat_message_ids = set(
+                row[0]
+                for row in cur.execute(
+                    "SELECT message_id FROM chat_message_join"
+                ).fetchall()
+            )
+            assert chat_message_ids == message_ids
+            attachment_message_ids = set(
+                row[0]
+                for row in cur.execute(
+                    "SELECT message_id FROM message_attachment_join"
+                ).fetchall()
+            )
+            assert attachment_message_ids <= message_ids
 
 
 def test_contact_db_foreign_keys() -> None:
     """foreign key associations for mock contact database should be correct"""
     with closing(sqlite3.connect(mock_contacts_db_path)) as con:
-        cur = con.cursor()
-        contact_ids = set(
-            row[0] for row in cur.execute("SELECT Z_PK FROM ZABCDRECORD").fetchall()
-        )
-        phone_contact_ids = set(
-            row[0]
-            for row in cur.execute("SELECT ZOWNER FROM ZABCDPHONENUMBER").fetchall()
-        )
-        # Every contact must have at least one phone number on file for this
-        # program to look up the conversation
-        assert contact_ids >= phone_contact_ids
-        email_contact_ids = set(
-            row[0]
-            for row in cur.execute("SELECT ZOWNER FROM ZABCDEMAILADDRESS").fetchall()
-        )
-        # However, not every contact needs to have an email address on file
-        assert email_contact_ids <= contact_ids
+        with closing(con.cursor()) as cur:
+            contact_ids = set(
+                row[0] for row in cur.execute("SELECT Z_PK FROM ZABCDRECORD").fetchall()
+            )
+            phone_contact_ids = set(
+                row[0]
+                for row in cur.execute("SELECT ZOWNER FROM ZABCDPHONENUMBER").fetchall()
+            )
+            # Every contact must have at least one phone number on file for this
+            # program to look up the conversation
+            assert contact_ids >= phone_contact_ids
+            email_contact_ids = set(
+                row[0]
+                for row in cur.execute(
+                    "SELECT ZOWNER FROM ZABCDEMAILADDRESS"
+                ).fetchall()
+            )
+            # However, not every contact needs to have an email address on file
+            assert email_contact_ids <= contact_ids

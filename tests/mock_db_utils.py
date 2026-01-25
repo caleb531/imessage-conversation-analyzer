@@ -71,10 +71,12 @@ def create_mock_db(
         for table_name, records in merged_data.items():
             if not len(records):
                 continue
-            cur = con.cursor()
-            cur.execute(f"CREATE TABLE {table_name}({', '.join(records[0].keys())})")
-            key_placeholders = ", ".join(f":{key}" for key in records[0].keys())
-            cur.executemany(
-                f"INSERT INTO {table_name} VALUES({key_placeholders})", records
-            )
+            with closing(con.cursor()) as cur:
+                cur.execute(
+                    f"CREATE TABLE {table_name}({', '.join(records[0].keys())})"
+                )
+                key_placeholders = ", ".join(f":{key}" for key in records[0].keys())
+                cur.executemany(
+                    f"INSERT INTO {table_name} VALUES({key_placeholders})", records
+                )
             con.commit()
