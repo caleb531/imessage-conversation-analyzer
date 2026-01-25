@@ -5,6 +5,7 @@ import collections
 import glob
 import sqlite3
 from collections.abc import Generator
+from contextlib import closing
 from typing import Any, Sequence, Union
 
 import ica.contact
@@ -32,7 +33,7 @@ def test_db_paths() -> None:
 
 def test_message_timestamp_uniqueness() -> None:
     """timestamps should be unique across all tables in the chat database"""
-    with sqlite3.connect(mock_chats_db_path) as con:
+    with closing(sqlite3.connect(mock_chats_db_path)) as con:
         cur = con.cursor()
         assert not get_duplicates(
             row[0] for row in cur.execute("SELECT date FROM message")
@@ -41,7 +42,7 @@ def test_message_timestamp_uniqueness() -> None:
 
 def test_message_id_uniqueness() -> None:
     """IDs should be unique across all tables in the chat database"""
-    with sqlite3.connect(mock_chats_db_path) as con:
+    with closing(sqlite3.connect(mock_chats_db_path)) as con:
         cur = con.cursor()
         assert not get_duplicates(
             row[0] for row in cur.execute("SELECT ROWID FROM message")
@@ -56,7 +57,7 @@ def test_message_id_uniqueness() -> None:
 
 def test_contact_id_uniqueness() -> None:
     """IDs should be unique across all tables in the contact database"""
-    with sqlite3.connect(mock_contacts_db_path) as con:
+    with closing(sqlite3.connect(mock_contacts_db_path)) as con:
         cur = con.cursor()
         assert not get_duplicates(
             row[0] for row in cur.execute("SELECT Z_PK FROM ZABCDRECORD")
@@ -65,7 +66,7 @@ def test_contact_id_uniqueness() -> None:
 
 def test_chat_db_foreign_keys() -> None:
     """foreign key associations for mock chat database should be correct"""
-    with sqlite3.connect(mock_chats_db_path) as con:
+    with closing(sqlite3.connect(mock_chats_db_path)) as con:
         cur = con.cursor()
         message_ids = set(
             row[0] for row in cur.execute("SELECT ROWID FROM message").fetchall()
@@ -88,7 +89,7 @@ def test_chat_db_foreign_keys() -> None:
 
 def test_contact_db_foreign_keys() -> None:
     """foreign key associations for mock contact database should be correct"""
-    with sqlite3.connect(mock_contacts_db_path) as con:
+    with closing(sqlite3.connect(mock_contacts_db_path)) as con:
         cur = con.cursor()
         contact_ids = set(
             row[0] for row in cur.execute("SELECT Z_PK FROM ZABCDRECORD").fetchall()

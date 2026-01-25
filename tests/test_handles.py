@@ -1,4 +1,6 @@
 import sqlite3
+from collections.abc import Generator
+from contextlib import closing
 
 import pandas as pd
 import pytest
@@ -9,8 +11,11 @@ from tests.conftest import mock_chats_db_path
 
 
 @pytest.fixture
-def mock_db_connection() -> sqlite3.Connection:
-    return sqlite3.connect(f"file:{mock_chats_db_path}?mode=ro", uri=True)
+def mock_db_connection() -> Generator[sqlite3.Connection, None, None]:
+    with closing(
+        sqlite3.connect(f"file:{mock_chats_db_path}?mode=ro", uri=True)
+    ) as con:
+        yield con
 
 
 def test_get_handles_dataframe(mock_db_connection: sqlite3.Connection) -> None:

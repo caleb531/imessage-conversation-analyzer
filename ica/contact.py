@@ -5,7 +5,7 @@ import os
 import sqlite3
 from collections import Counter
 from collections.abc import Sequence
-from contextlib import suppress
+from contextlib import closing, suppress
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
@@ -263,7 +263,7 @@ def get_contact_records(
     found_identifiers: set[str] = set()
 
     for db_path in glob.iglob(str(DB_GLOB)):
-        with sqlite3.connect(f"file:{db_path}?mode=ro", uri=True) as con:
+        with closing(sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)) as con:
             for contact_identifier in contact_identifiers:
                 records_for_source = get_contact_records_for_source(
                     con, contact_identifier

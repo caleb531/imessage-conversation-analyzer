@@ -6,6 +6,7 @@ import glob
 import json
 import sqlite3
 from collections.abc import Generator
+from contextlib import closing
 from pathlib import Path
 from typing import Any, Literal, Optional, Union
 
@@ -66,7 +67,7 @@ def create_mock_db(
     """
     merged_data = {**dict(get_mock_data_for_db(db_name)), **(db_contents or {})}
 
-    with sqlite3.connect(db_path) as con:
+    with closing(sqlite3.connect(db_path)) as con:
         for table_name, records in merged_data.items():
             if not len(records):
                 continue

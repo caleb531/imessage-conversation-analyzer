@@ -9,7 +9,7 @@ import os
 import sqlite3
 import sys
 from collections.abc import Generator, Sequence
-from contextlib import contextmanager
+from contextlib import closing, contextmanager
 from dataclasses import dataclass
 from io import BytesIO, StringIO
 from pathlib import Path
@@ -449,7 +449,7 @@ def get_dataframes(
 
     contact_records = get_contact_records(contacts)
 
-    with sqlite3.connect(f"file:{DB_PATH}?mode=ro", uri=True) as con:
+    with closing(sqlite3.connect(f"file:{DB_PATH}?mode=ro", uri=True)) as con:
         chat_ids = get_chat_ids_for_contacts(con, contact_records)
         if not chat_ids:
             raise ConversationNotFoundError(
