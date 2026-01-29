@@ -11,6 +11,7 @@ import sys
 from collections.abc import Generator, Sequence
 from contextlib import closing, contextmanager
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from io import BytesIO, StringIO
 from pathlib import Path
 from typing import Hashable, Optional, Union
@@ -65,8 +66,16 @@ class DataFrameNamespace:
     handles: pd.DataFrame
 
 
-# iMessage stores dates as nanoseconds since 2001-01-01 (Apple's Core Data epoch)
-IMESSAGE_EPOCH_OFFSET = 978307200  # seconds between 1970-01-01 and 2001-01-01
+# iMessage stores dates as nanoseconds since 2001-01-01 (Apple's Core Data
+# epoch), so we must precompute the difference between that and the Unix epoch
+S_TO_NS = 1_000_000_000
+IMESSAGE_EPOCH_NS_OFFSET = int(
+    (
+        datetime(2001, 1, 1, tzinfo=timezone.utc)
+        - datetime(1970, 1, 1, tzinfo=timezone.utc)
+    ).total_seconds()
+    * S_TO_NS
+)
 
 
 def build_date_filter_clause(
@@ -86,7 +95,7 @@ def build_date_filter_clause(
         from_ts = pd.Timestamp(from_date, tz=timezone)
         # Use integer arithmetic for precision (pd.Timestamp.value is ns since
         # 1970)
-        from_ns = from_ts.value - int(IMESSAGE_EPOCH_OFFSET * 1_000_000_000)
+        from_ns = from_ts.value - IMESSAGE_EPOCH_NS_OFFSET
         clauses.append(f'AND "message"."date" >= {from_ns}')
     if to_date:
         # Use midnight of to_date (exclusive) to match standard half-open
@@ -94,7 +103,7 @@ def build_date_filter_clause(
         # boundaries
         to_ts = pd.Timestamp(to_date, tz=timezone)
         # Use integer arithmetic for precision
-        to_ns = to_ts.value - int(IMESSAGE_EPOCH_OFFSET * 1_000_000_000)
+        to_ns = to_ts.value - IMESSAGE_EPOCH_NS_OFFSET
         clauses.append(f'AND "message"."date" < {to_ns}')
     return " ".join(clauses)
 
