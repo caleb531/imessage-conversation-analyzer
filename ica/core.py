@@ -25,7 +25,6 @@ import ica.contact
 from ica.contact import ContactRecord, get_contact_records
 from ica.exceptions import (
     ContactNotFoundError,
-    ContactWithSameNameError,
     ConversationNotFoundError,
     DateRangeInvalidError,
     FormatNotSupportedError,
@@ -295,11 +294,6 @@ def resolve_sender_identifiers(
 
         if not matching_contacts:
             raise ContactNotFoundError(f"No contact found matching '{person_filter}'")
-
-        if len({c.id for c in matching_contacts}) > 1:
-            raise ContactWithSameNameError(
-                f"Multiple contacts found matching '{person_filter}'"
-            )
 
         # Add all identifiers for the matched contact
         allowed_handles.update(matching_contacts[0].get_identifiers())
