@@ -493,7 +493,7 @@ def prettify_header_name(
     "Foo Bar")
     """
     if prettified_label_overrides and header_name in prettified_label_overrides:
-        return prettified_label_overrides[header_name]
+        return prettified_label_overrides[str(header_name)]
 
     if header_name and type(header_name) is str:
         return header_name.replace("_", " ").title()
