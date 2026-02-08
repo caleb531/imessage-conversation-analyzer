@@ -243,12 +243,6 @@
             <Loading withOverlay={false} />
         </div>
     {:else}
-        {#if charts && rows.length && !errorMessage}
-            <div class="result-grid-charts" aria-label="Chart area" role="img">
-                {@render charts(rows, columns)}
-            </div>
-        {/if}
-
         <form
             class="result-grid__filters"
             class:result-grid__filters--with-time={enableTimeInput}
@@ -320,11 +314,21 @@
                             <Loading withOverlay={false} small />
                         </div>
                     {/if}
-                    <Button kind="primary" size="small" type="submit">Apply</Button>
-                    <Button kind="secondary" size="small" type="reset">Clear</Button>
+                    <Button kind="primary" size="small" type="submit" disabled={isReloadingData}>
+                        {isReloadingData ? 'Loading...' : 'Apply'}
+                    </Button>
+                    <Button kind="secondary" size="small" type="reset" disabled={isReloadingData}>
+                        Clear
+                    </Button>
                 </div>
             </div>
         </form>
+
+        {#if charts && rows.length && !errorMessage}
+            <div class="result-grid-charts" aria-label="Chart area" role="img">
+                {@render charts(rows, columns)}
+            </div>
+        {/if}
 
         {#if errorMessage}
             <InlineNotification
