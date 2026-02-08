@@ -7,9 +7,9 @@
         DatePickerInput,
         InlineNotification,
         Loading,
-        TimePicker,
-        Toggle
+        TooltipIcon
     } from 'carbon-components-svelte';
+    import Information from 'carbon-icons-svelte/lib/Information.svelte';
     import { onMount, type Snippet } from 'svelte';
     import '../styles/result-grid.css';
     import type { GridColumn } from '../types';
@@ -35,22 +35,13 @@
     type DateFilterState = {
         fromDate: string;
         toDate: string;
-        fromTime: string;
-        toTime: string;
-        enableTime: boolean;
     };
 
     let fromDateInput = $state('');
     let toDateInput = $state('');
-    let fromTimeInput = $state('');
-    let toTimeInput = $state('');
-    let enableTimeInput = $state(false);
     let appliedFilters = $state<DateFilterState>({
         fromDate: '',
-        toDate: '',
-        fromTime: '',
-        toTime: '',
-        enableTime: false
+        toDate: ''
     });
 
     const cellFormatters = [
@@ -117,40 +108,14 @@
         return null;
     }
 
-    function normalizeTimeInput(value: string): string | null {
-        const trimmed = value.trim();
-        if (!trimmed) return null;
-        const match = /^(\d{1,2}):(\d{2})(?::(\d{2}))?$/.exec(trimmed);
-        if (!match) return null;
-        const hours = Number(match[1]);
-        const minutes = Number(match[2]);
-        const seconds = match[3] ? Number(match[3]) : 0;
-        if (Number.isNaN(hours) || Number.isNaN(minutes) || Number.isNaN(seconds)) {
-            return null;
-        }
-        if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59 || seconds < 0 || seconds > 59) {
-            return null;
-        }
-        return `${padTimeUnit(hours)}:${padTimeUnit(minutes)}:${padTimeUnit(seconds)}`;
-    }
-
-    function buildDateValue(
-        dateValue: string,
-        timeValue: string,
-        includeTime: boolean
-    ): string | null {
-        const normalizedDate = normalizeDateInput(dateValue);
-        if (!normalizedDate) return null;
-        if (!includeTime) return normalizedDate;
-        const normalizedTime = normalizeTimeInput(timeValue);
-        if (!normalizedTime) return normalizedDate;
-        return `${normalizedDate}T${normalizedTime}`;
+    function buildDateValue(dateValue: string): string | null {
+        return normalizeDateInput(dateValue);
     }
 
     function buildFilterArgs(filters: DateFilterState): string[] {
         const args: string[] = [];
-        const fromValue = buildDateValue(filters.fromDate, filters.fromTime, filters.enableTime);
-        const toValue = buildDateValue(filters.toDate, filters.toTime, filters.enableTime);
+        const fromValue = buildDateValue(filters.fromDate);
+        const toValue = buildDateValue(filters.toDate);
         if (fromValue) {
             args.push('--from-date', fromValue);
         }
@@ -183,10 +148,7 @@
     function applyFilters() {
         const nextFilters: DateFilterState = {
             fromDate: fromDateInput,
-            toDate: toDateInput,
-            fromTime: fromTimeInput,
-            toTime: toTimeInput,
-            enableTime: enableTimeInput
+            toDate: toDateInput
         };
         appliedFilters = nextFilters;
         void loadData(nextFilters);
@@ -205,26 +167,12 @@
     function clearFilters() {
         fromDateInput = '';
         toDateInput = '';
-        fromTimeInput = '';
-        toTimeInput = '';
-        enableTimeInput = false;
         const cleared: DateFilterState = {
             fromDate: '',
-            toDate: '',
-            fromTime: '',
-            toTime: '',
-            enableTime: false
+            toDate: ''
         };
         appliedFilters = cleared;
         void loadData(cleared);
-    }
-
-    function handleTimeToggle(event: CustomEvent<{ toggled: boolean }>) {
-        enableTimeInput = event.detail.toggled;
-        if (!enableTimeInput) {
-            fromTimeInput = '';
-            toTimeInput = '';
-        }
     }
 
     onMount(() => {
@@ -245,20 +193,10 @@
     {:else}
         <form
             class="result-grid__filters"
-            class:result-grid__filters--with-time={enableTimeInput}
             aria-label="Date filters"
             onsubmit={submitFilters}
             onreset={resetFilters}
         >
-            <div class="result-grid__filters-row">
-                <Toggle
-                    labelText="Include time"
-                    labelA="Date only"
-                    labelB="Date + time"
-                    toggled={enableTimeInput}
-                    on:toggle={handleTimeToggle}
-                />
-            </div>
             <div class="result-grid__filters-row result-grid__filters-row--main">
                 <div class="result-grid__filters-fields">
                     <DatePicker>
@@ -271,19 +209,17 @@
                             on:input={(event) => {
                                 fromDateInput = readInputValue(event);
                             }}
-                        />
+                        >
+                            <span slot="labelText" class="result-grid__date-label">
+                                <span>From date</span>
+                                <TooltipIcon
+                                    tooltipText="Starting from midnight on the specified start date"
+                                >
+                                    <Information />
+                                </TooltipIcon>
+                            </span>
+                        </DatePickerInput>
                     </DatePicker>
-                    {#if enableTimeInput}
-                        <TimePicker
-                            size="sm"
-                            labelText="From time"
-                            placeholder="HH:MM"
-                            bind:value={fromTimeInput}
-                            on:input={(event) => {
-                                fromTimeInput = readInputValue(event);
-                            }}
-                        />
-                    {/if}
                     <DatePicker>
                         <DatePickerInput
                             id="result-grid-to-date"
@@ -294,19 +230,17 @@
                             on:input={(event) => {
                                 toDateInput = readInputValue(event);
                             }}
-                        />
+                        >
+                            <span slot="labelText" class="result-grid__date-label">
+                                <span>To date</span>
+                                <TooltipIcon
+                                    tooltipText="Up to (but not including) the specified end date"
+                                >
+                                    <Information />
+                                </TooltipIcon>
+                            </span>
+                        </DatePickerInput>
                     </DatePicker>
-                    {#if enableTimeInput}
-                        <TimePicker
-                            size="sm"
-                            labelText="To time"
-                            placeholder="HH:MM"
-                            bind:value={toTimeInput}
-                            on:input={(event) => {
-                                toTimeInput = readInputValue(event);
-                            }}
-                        />
-                    {/if}
                 </div>
                 <div class="result-grid__filters-actions">
                     {#if isReloadingData && hasInitiallyLoaded}
