@@ -218,9 +218,9 @@ def get_messages_dataframe(
         # first, we must add the missing timezone information, then we must
         # convert the datetime to the specified timezone
         .assign(
-            datetime=lambda df: df["datetime"]
-            .dt.tz_localize("UTC")
-            .dt.tz_convert(timezone)
+            datetime=lambda df: (
+                df["datetime"].dt.tz_localize("UTC").dt.tz_convert(timezone)
+            )
         )
         # Decode any 'attributedBody' values and merge them into the 'text'
         # column
@@ -245,10 +245,12 @@ def get_messages_dataframe(
         .assign(is_from_me=lambda df: df["is_from_me"].astype(bool))
         # Add sender display name
         .assign(
-            sender_display_name=lambda df: df["sender_handle"]
-            .map(identifier_to_display_name)
-            .fillna("Me")
-            .where(df["is_from_me"].eq(False), "Me")
+            sender_display_name=lambda df: (
+                df["sender_handle"]
+                .map(identifier_to_display_name)
+                .fillna("Me")
+                .where(df["is_from_me"].eq(False), "Me")
+            )
         )
     )
 
@@ -367,9 +369,9 @@ def get_attachments_dataframe(
         # Expose the date/time of the message alongside each attachment record,
         # for convenience
         .assign(
-            datetime=lambda df: df["datetime"]
-            .dt.tz_localize("UTC")
-            .dt.tz_convert(timezone)
+            datetime=lambda df: (
+                df["datetime"].dt.tz_localize("UTC").dt.tz_convert(timezone)
+            )
         )
         .assign(is_from_me=lambda df: df["is_from_me"].astype(bool))
     )
