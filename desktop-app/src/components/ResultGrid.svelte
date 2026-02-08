@@ -39,6 +39,7 @@
 
     let fromDateInput = $state('');
     let toDateInput = $state('');
+    let datePickerResetKey = $state(0);
     let appliedFilters = $state<DateFilterState>({
         fromDate: '',
         toDate: ''
@@ -167,6 +168,7 @@
     function clearFilters() {
         fromDateInput = '';
         toDateInput = '';
+        datePickerResetKey += 1;
         const cleared: DateFilterState = {
             fromDate: '',
             toDate: ''
@@ -198,50 +200,52 @@
             onreset={resetFilters}
         >
             <div class="result-grid__filters-row result-grid__filters-row--main">
-                <div class="result-grid__filters-fields">
-                    <DatePicker>
-                        <DatePickerInput
-                            id="result-grid-from-date"
-                            size="sm"
-                            labelText="From date"
-                            placeholder="mm/dd/yyyy"
-                            bind:value={fromDateInput}
-                            on:input={(event) => {
-                                fromDateInput = readInputValue(event);
-                            }}
-                        >
-                            <span slot="labelText" class="result-grid__date-label">
-                                <span>From date</span>
-                                <TooltipIcon
-                                    tooltipText="Starting from midnight on the specified start date"
-                                >
-                                    <Information />
-                                </TooltipIcon>
-                            </span>
-                        </DatePickerInput>
-                    </DatePicker>
-                    <DatePicker>
-                        <DatePickerInput
-                            id="result-grid-to-date"
-                            size="sm"
-                            labelText="To date"
-                            placeholder="mm/dd/yyyy"
-                            bind:value={toDateInput}
-                            on:input={(event) => {
-                                toDateInput = readInputValue(event);
-                            }}
-                        >
-                            <span slot="labelText" class="result-grid__date-label">
-                                <span>To date</span>
-                                <TooltipIcon
-                                    tooltipText="Up to (but not including) the specified end date"
-                                >
-                                    <Information />
-                                </TooltipIcon>
-                            </span>
-                        </DatePickerInput>
-                    </DatePicker>
-                </div>
+                {#key datePickerResetKey}
+                    <div class="result-grid__filters-fields">
+                        <DatePicker>
+                            <DatePickerInput
+                                id="result-grid-from-date"
+                                size="sm"
+                                labelText="From date"
+                                placeholder="mm/dd/yyyy"
+                                bind:value={fromDateInput}
+                                on:input={(event) => {
+                                    fromDateInput = readInputValue(event);
+                                }}
+                            >
+                                <span slot="labelText" class="result-grid__date-label">
+                                    <span>From date</span>
+                                    <TooltipIcon
+                                        tooltipText="Starting from midnight on the specified start date"
+                                    >
+                                        <Information />
+                                    </TooltipIcon>
+                                </span>
+                            </DatePickerInput>
+                        </DatePicker>
+                        <DatePicker>
+                            <DatePickerInput
+                                id="result-grid-to-date"
+                                size="sm"
+                                labelText="To date"
+                                placeholder="mm/dd/yyyy"
+                                bind:value={toDateInput}
+                                on:input={(event) => {
+                                    toDateInput = readInputValue(event);
+                                }}
+                            >
+                                <span slot="labelText" class="result-grid__date-label">
+                                    <span>To date</span>
+                                    <TooltipIcon
+                                        tooltipText="Up to (but not including) the specified end date"
+                                    >
+                                        <Information />
+                                    </TooltipIcon>
+                                </span>
+                            </DatePickerInput>
+                        </DatePicker>
+                    </div>
+                {/key}
                 <div class="result-grid__filters-actions">
                     {#if isReloadingData && hasInitiallyLoaded}
                         <div class="result-grid__soft-loading" aria-live="polite">
