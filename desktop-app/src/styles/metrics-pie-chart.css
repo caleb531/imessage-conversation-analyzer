@@ -1,12 +1,54 @@
 .metrics-pie-chart {
     --container-size: 160px;
     width: var(--container-size);
-    height: var(--container-size);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
     position: relative;
+}
+
+.metrics-pie-chart__chart {
+    width: var(--container-size);
+    height: var(--container-size);
 }
 
 .metrics-pie-chart__label {
     fill: #f4f4f4;
     font-weight: 600;
     font-size: 14px;
+}
+
+.metrics-pie-chart__legend {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 6px 10px;
+    padding: 0 15px;
+    font-size: 12px;
+    color: #f4f4f4;
+}
+
+.metrics-pie-chart__legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.metrics-pie-chart__legend-swatch {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: var(--legend-color);
+    flex: 0 0 auto;
+}
+
+.metrics-pie-chart__legend-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
