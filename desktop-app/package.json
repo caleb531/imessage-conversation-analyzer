@@ -24,6 +24,7 @@
     "@tauri-apps/plugin-shell": "^2",
     "@tauri-apps/plugin-store": "~2.4.1",
     "carbon-components-svelte": "^0.85.1",
+    "carbon-icons-svelte": "^13.8.0",
     "d3-scale": "^4.0.2",
     "d3-shape": "^3.2.0",
     "layerchart": "^1.0.13",
