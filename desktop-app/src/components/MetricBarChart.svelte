@@ -1,6 +1,6 @@
 <script lang="ts">
     import { BarChart } from 'layerchart';
-    import '../styles/metrics-bar-chart.css';
+    import '../styles/metric-bar-chart.css';
     import type { DataPoint } from '../types';
 
     let {
@@ -48,7 +48,7 @@
 </script>
 
 {#if data.length > 0}
-    <article class="metrics-bar-chart">
+    <article class="metric-bar-chart">
         <BarChart
             {data}
             x={chartX}

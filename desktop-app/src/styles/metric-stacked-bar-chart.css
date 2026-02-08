@@ -1,11 +1,11 @@
-.metrics-stacked-bar-chart__container {
+.metric-stacked-bar-chart__container {
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 100%;
 }
 
-.metrics-stacked-bar-chart__scroll {
+.metric-stacked-bar-chart__scroll {
     width: 100%;
     overflow-x: auto;
     overflow-y: hidden;
@@ -13,12 +13,12 @@
     align-self: stretch;
 }
 
-.metrics-stacked-bar-chart {
+.metric-stacked-bar-chart {
     height: 360px;
     min-width: 100%;
 }
 
-.metrics-stacked-bar-chart__legend {
+.metric-stacked-bar-chart__legend {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -28,7 +28,7 @@
     list-style: none;
 }
 
-.metrics-stacked-bar-chart__legend-item {
+.metric-stacked-bar-chart__legend-item {
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
@@ -36,7 +36,7 @@
     color: #e0e0e0;
 }
 
-.metrics-stacked-bar-chart__legend-swatch {
+.metric-stacked-bar-chart__legend-swatch {
     width: 0.75rem;
     height: 0.75rem;
     border-radius: 0.2rem;

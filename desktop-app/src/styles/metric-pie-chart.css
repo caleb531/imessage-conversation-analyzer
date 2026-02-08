@@ -1,4 +1,4 @@
-.metrics-pie-chart {
+.metric-pie-chart {
     --container-size: 160px;
     width: var(--container-size);
     display: flex;
@@ -8,18 +8,18 @@
     position: relative;
 }
 
-.metrics-pie-chart__chart {
+.metric-pie-chart__chart {
     width: var(--container-size);
     height: var(--container-size);
 }
 
-.metrics-pie-chart__label {
+.metric-pie-chart__label {
     fill: #f4f4f4;
     font-weight: 600;
     font-size: 14px;
 }
 
-.metrics-pie-chart__legend {
+.metric-pie-chart__legend {
     list-style: none;
     padding: 0;
     margin: 0;
@@ -32,14 +32,14 @@
     color: #f4f4f4;
 }
 
-.metrics-pie-chart__legend-item {
+.metric-pie-chart__legend-item {
     display: inline-flex;
     align-items: center;
     gap: 8px;
     min-width: 0;
 }
 
-.metrics-pie-chart__legend-swatch {
+.metric-pie-chart__legend-swatch {
     width: 10px;
     height: 10px;
     border-radius: 999px;
@@ -47,7 +47,7 @@
     flex: 0 0 auto;
 }
 
-.metrics-pie-chart__legend-label {
+.metric-pie-chart__legend-label {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

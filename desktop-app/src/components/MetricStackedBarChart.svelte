@@ -1,6 +1,6 @@
 <script lang="ts">
     import { BarChart } from 'layerchart';
-    import '../styles/metrics-stacked-bar-chart.css';
+    import '../styles/metric-stacked-bar-chart.css';
 
     type StackedDatum = Record<string, string | number>;
     type StackedSeries = { key: string; label: string; color?: string };
@@ -81,9 +81,9 @@
 </script>
 
 {#if data.length > 0 && series.length > 0}
-    <div class="metrics-stacked-bar-chart__container">
-        <div class="metrics-stacked-bar-chart__scroll" bind:clientWidth={containerWidth}>
-            <article class="metrics-stacked-bar-chart" style={`width: ${chartWidth}px;`}>
+    <div class="metric-stacked-bar-chart__container">
+        <div class="metric-stacked-bar-chart__scroll" bind:clientWidth={containerWidth}>
+            <article class="metric-stacked-bar-chart" style={`width: ${chartWidth}px;`}>
                 <BarChart
                     {data}
                     {series}
@@ -106,14 +106,14 @@
             </article>
         </div>
         {#if showLegend}
-            <ul class="metrics-stacked-bar-chart__legend" aria-label="Chart legend">
+            <ul class="metric-stacked-bar-chart__legend" aria-label="Chart legend">
                 {#each series as item}
-                    <li class="metrics-stacked-bar-chart__legend-item">
+                    <li class="metric-stacked-bar-chart__legend-item">
                         <span
-                            class="metrics-stacked-bar-chart__legend-swatch"
+                            class="metric-stacked-bar-chart__legend-swatch"
                             style={`--legend-color: ${item.color ?? '#9aa0a6'}`}
                         ></span>
-                        <span class="metrics-stacked-bar-chart__legend-label">{item.label}</span>
+                        <span class="metric-stacked-bar-chart__legend-label">{item.label}</span>
                     </li>
                 {/each}
             </ul>
