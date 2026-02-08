@@ -26,8 +26,8 @@
 
     let { title, description, command, charts, children }: Props = $props();
 
-    let loading = $state(true);
-    let hasLoaded = $state(false);
+    let isReloadingData = $state(true);
+    let hasInitiallyLoaded = $state(false);
     let errorMessage = $state('');
     let rows = $state<Array<Record<string, unknown>>>([]);
     let columns = $state<GridColumn[]>([]);
@@ -161,7 +161,7 @@
     }
 
     async function loadData(filters: DateFilterState = appliedFilters) {
-        loading = true;
+        isReloadingData = true;
         errorMessage = '';
         try {
             const filterArgs = buildFilterArgs(filters);
@@ -175,8 +175,8 @@
                 errorMessage = error instanceof Error ? error.message : String(error);
             }
         } finally {
-            loading = false;
-            hasLoaded = true;
+            isReloadingData = false;
+            hasInitiallyLoaded = true;
         }
     }
 
@@ -238,7 +238,7 @@
         <p>{description}</p>
     </header>
 
-    {#if loading && !hasLoaded}
+    {#if isReloadingData && !hasInitiallyLoaded}
         <div class="result-grid__loading">
             <Loading withOverlay={false} />
         </div>
@@ -315,7 +315,7 @@
                     {/if}
                 </div>
                 <div class="result-grid__filters-actions">
-                    {#if loading && hasLoaded}
+                    {#if isReloadingData && hasInitiallyLoaded}
                         <div class="result-grid__soft-loading" aria-live="polite">
                             <Loading withOverlay={false} small />
                         </div>
