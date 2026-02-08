@@ -1,5 +1,5 @@
 <script lang="ts">
-    import MetricsPieChart from '../../components/MetricsPieChart.svelte';
+    import MetricPieChart from '../../components/MetricPieChart.svelte';
     import ResultGrid from '../../components/ResultGrid.svelte';
     import type { DataPoint, GridColumn } from '../../types';
 
@@ -41,7 +41,7 @@
     command={['message_totals']}
 >
     {#snippet charts(rows, columns)}
-        <MetricsPieChart
+        <MetricPieChart
             data={getChartDataFromMetrics({
                 rows,
                 columns,
@@ -50,7 +50,7 @@
             })}
             label="Messages"
         />
-        <MetricsPieChart
+        <MetricPieChart
             data={getChartDataFromMetrics({
                 rows,
                 columns,

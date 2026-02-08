@@ -1,6 +1,6 @@
 <script lang="ts">
     import { PieChart } from 'layerchart';
-    import '../styles/metrics-pie-chart.css';
+    import '../styles/metric-pie-chart.css';
     import type { DataPoint } from '../types';
 
     export let data: DataPoint[];
@@ -13,8 +13,8 @@
 </script>
 
 {#if data.length > 0}
-    <article class="metrics-pie-chart">
-        <div class="metrics-pie-chart__chart">
+    <article class="metric-pie-chart">
+        <div class="metric-pie-chart__chart">
             <PieChart
                 {data}
                 key="key"
@@ -38,21 +38,21 @@
                         y={0}
                         text-anchor="middle"
                         dominant-baseline="middle"
-                        class="metrics-pie-chart__label"
+                        class="metric-pie-chart__label"
                     >
                         {label}
                     </text>
                 </svelte:fragment>
             </PieChart>
         </div>
-        <ul class="metrics-pie-chart__legend" aria-label={`${label} legend`}>
+        <ul class="metric-pie-chart__legend" aria-label={`${label} legend`}>
             {#each data as point, index}
-                <li class="metrics-pie-chart__legend-item">
+                <li class="metric-pie-chart__legend-item">
                     <span
-                        class="metrics-pie-chart__legend-swatch"
+                        class="metric-pie-chart__legend-swatch"
                         style={`--legend-color: ${colors[index % colors.length]}`}
                     ></span>
-                    <span class="metrics-pie-chart__legend-label">{point.key}</span>
+                    <span class="metric-pie-chart__legend-label">{point.key}</span>
                 </li>
             {/each}
         </ul>
