@@ -238,18 +238,12 @@
         <p>{description}</p>
     </header>
 
-    {#if errorMessage}
-        <InlineNotification
-            kind="error"
-            title={`Unable to load ${title.toLowerCase()}`}
-            subtitle={errorMessage}
-        />
-    {:else if loading && !hasLoaded}
+    {#if loading && !hasLoaded}
         <div class="result-grid__loading">
             <Loading withOverlay={false} />
         </div>
     {:else}
-        {#if charts}
+        {#if charts && rows.length && !errorMessage}
             <div class="result-grid-charts" aria-label="Chart area" role="img">
                 {@render charts(rows, columns)}
             </div>
@@ -272,7 +266,7 @@
                 />
             </div>
             <div class="result-grid__filters-row result-grid__filters-row--main">
-                <div class="result-grid__filters-dates">
+                <div class="result-grid__filters-fields">
                     <DatePicker>
                         <DatePickerInput
                             id="result-grid-from-date"
@@ -285,6 +279,17 @@
                             }}
                         />
                     </DatePicker>
+                    {#if enableTimeInput}
+                        <TimePicker
+                            size="sm"
+                            labelText="From time"
+                            placeholder="HH:MM"
+                            bind:value={fromTimeInput}
+                            on:input={(event) => {
+                                fromTimeInput = readInputValue(event);
+                            }}
+                        />
+                    {/if}
                     <DatePicker>
                         <DatePickerInput
                             id="result-grid-to-date"
@@ -297,6 +302,17 @@
                             }}
                         />
                     </DatePicker>
+                    {#if enableTimeInput}
+                        <TimePicker
+                            size="sm"
+                            labelText="To time"
+                            placeholder="HH:MM"
+                            bind:value={toTimeInput}
+                            on:input={(event) => {
+                                toTimeInput = readInputValue(event);
+                            }}
+                        />
+                    {/if}
                 </div>
                 <div class="result-grid__filters-actions">
                     {#if loading && hasLoaded}
@@ -308,36 +324,19 @@
                     <Button kind="secondary" size="small" type="reset">Clear</Button>
                 </div>
             </div>
-            {#if enableTimeInput}
-                <div class="result-grid__filters-row">
-                    <TimePicker
-                        size="sm"
-                        labelText="From time"
-                        placeholder="HH:MM"
-                        bind:value={fromTimeInput}
-                        on:input={(event) => {
-                            fromTimeInput = readInputValue(event);
-                        }}
-                    />
-                    <TimePicker
-                        size="sm"
-                        labelText="To time"
-                        placeholder="HH:MM"
-                        bind:value={toTimeInput}
-                        on:input={(event) => {
-                            toTimeInput = readInputValue(event);
-                        }}
-                    />
-                </div>
-            {/if}
         </form>
 
-        {#if rows.length}
+        {#if errorMessage}
+            <InlineNotification
+                class="result-grid__error"
+                kind="error"
+                title={`Unable to load ${title.toLowerCase()}`}
+                subtitle={errorMessage}
+            />
+        {:else}
             <WillowDark>
                 <Grid data={rows} {columns} />
             </WillowDark>
-        {:else}
-            <p>No data available.</p>
         {/if}
     {/if}
 </section>
