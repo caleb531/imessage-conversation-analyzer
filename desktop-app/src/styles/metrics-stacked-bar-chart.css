@@ -1,0 +1,61 @@
+.metrics-stacked-bar-chart__container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.metrics-stacked-bar-chart__scroll {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 0.5rem;
+    align-self: stretch;
+}
+
+.metrics-stacked-bar-chart {
+    height: 360px;
+    min-width: 100%;
+}
+
+.metrics-stacked-bar-chart__legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem 1.25rem;
+    margin: 0.25rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.metrics-stacked-bar-chart__legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.85rem;
+    color: #e0e0e0;
+}
+
+.metrics-stacked-bar-chart__legend-swatch {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 0.2rem;
+    background: var(--legend-color, #9aa0a6);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18);
+}
+
+/* Force Apple Color Emoji to ensure emojis are rendered as graphics, not text */
+.emoji-tick-label {
+    font-family:
+        'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', 'Segoe UI Symbol', sans-serif;
+    letter-spacing: normal;
+    word-spacing: normal;
+}
+
+.text-tick-label {
+    font-family:
+        -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif,
+        'Segoe UI Symbol';
+    letter-spacing: normal;
+    word-spacing: normal;
+}

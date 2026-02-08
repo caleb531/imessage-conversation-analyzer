@@ -22,9 +22,10 @@
         command: string[];
         charts?: Snippet<[Array<Record<string, unknown>>, GridColumn[]]>;
         children?: Snippet;
+        chartsClass?: string;
     }
 
-    let { title, description, command, charts, children }: Props = $props();
+    let { title, description, command, charts, children, chartsClass }: Props = $props();
 
     let isReloadingData = $state(true);
     let hasInitiallyLoaded = $state(false);
@@ -263,7 +264,11 @@
         </form>
 
         {#if charts && rows.length && !errorMessage}
-            <div class="result-grid-charts" aria-label="Chart area" role="img">
+            <div
+                class={`result-grid-charts${chartsClass ? ` ${chartsClass}` : ''}`}
+                aria-label="Chart area"
+                role="img"
+            >
                 {@render charts(rows, columns)}
             </div>
         {/if}
