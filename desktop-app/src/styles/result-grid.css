@@ -30,18 +30,18 @@
 }
 
 .result-grid__filters-row--main {
-    display: grid;
-    grid-template-columns: 1fr auto;
+    display: flex;
+    justify-content: center;
     align-items: end;
-    column-gap: 1.5rem;
+    width: auto;
 }
 
 .result-grid__filters-fields {
     display: grid;
     grid-template-columns: repeat(2, minmax(9rem, 1fr));
     gap: 1rem 0.5rem;
-    width: 100%;
-    max-width: 24rem;
+    width: auto;
+    max-width: none;
     align-items: end;
 }
 
