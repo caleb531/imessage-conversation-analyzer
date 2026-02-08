@@ -12,3 +12,4 @@ src-tauri/bin/
 src-tauri/_internal/
 src-tauri/ica-sidecar
 src-tauri/ica-sidecar-*/
+.vite
