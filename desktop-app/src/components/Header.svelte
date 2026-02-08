@@ -22,7 +22,8 @@
 
 <Header platformName="ICA">
     <HeaderNav>
-        <HeaderNavItem href="/message-totals">Overall Totals</HeaderNavItem>
+        <HeaderNavItem href="/message-totals">Message Totals</HeaderNavItem>
+        <HeaderNavItem href="/attachment-totals">Attachment Totals</HeaderNavItem>
         <HeaderNavItem href="/most-frequent-emojis">Emojis</HeaderNavItem>
         <HeaderNavItem href="/totals-by-day">Totals by Day</HeaderNavItem>
     </HeaderNav>

@@ -7,5 +7,16 @@
 
 /* Force Apple Color Emoji to ensure emojis are rendered as graphics, not text */
 .emoji-tick-label {
-    font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
+    font-family:
+        'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', 'Segoe UI Symbol', sans-serif;
+    letter-spacing: normal;
+    word-spacing: normal;
+}
+
+.text-tick-label {
+    font-family:
+        -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif,
+        'Segoe UI Symbol';
+    letter-spacing: normal;
+    word-spacing: normal;
 }

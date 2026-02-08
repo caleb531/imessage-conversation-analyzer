@@ -12,8 +12,8 @@
     }): DataPoint[] {
         if (!columns.length || !rows.length) return [];
 
-        // Emojis result usually matches "Emoji" and "Count"
-        let keyCol = columns.find((c) => /Emoji/i.test(c.header));
+        // Result usually matches "Type" and "Total"
+        let keyCol = columns.find((c) => /Type/i.test(c.header));
         let valueCol = columns.find((c) => /Count|Total/i.test(c.header));
 
         // Fallback: Use first and second columns if named columns not found
@@ -34,11 +34,11 @@
 </script>
 
 <ResultGrid
-    title="Most Frequent Emojis"
-    description="See which emojis are used most frequently in your conversation."
-    command={['most_frequent_emojis']}
+    title="Attachment Totals"
+    description="Review aggregated totals for each type of attachment in your conversation."
+    command={['attachment_totals']}
 >
     {#snippet charts(rows, columns)}
-        <MetricBarChart data={getChartData({ rows, columns })} labelType="emoji" />
+        <MetricBarChart data={getChartData({ rows, columns })} orientation="horizontal" />
     {/snippet}
 </ResultGrid>
