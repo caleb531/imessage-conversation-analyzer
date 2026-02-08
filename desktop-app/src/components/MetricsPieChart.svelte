@@ -14,34 +14,47 @@
 
 {#if data.length > 0}
     <article class="metrics-pie-chart">
-        <PieChart
-            {data}
-            key="key"
-            value="value"
-            cRange={colors}
-            {innerRadius}
-            {outerRadius}
-            {cornerRadius}
-            {padAngle}
-            props={{
-                tooltip: {
-                    root: {
-                        classes: { root: 'layerchart-tooltip' }
+        <div class="metrics-pie-chart__chart">
+            <PieChart
+                {data}
+                key="key"
+                value="value"
+                cRange={colors}
+                {innerRadius}
+                {outerRadius}
+                {cornerRadius}
+                {padAngle}
+                props={{
+                    tooltip: {
+                        root: {
+                            classes: { root: 'layerchart-tooltip' }
+                        }
                     }
-                }
-            }}
-        >
-            <svelte:fragment slot="aboveMarks" let:width let:height>
-                <text
-                    x={0}
-                    y={0}
-                    text-anchor="middle"
-                    dominant-baseline="middle"
-                    class="metrics-pie-chart__label"
-                >
-                    {label}
-                </text>
-            </svelte:fragment>
-        </PieChart>
+                }}
+            >
+                <svelte:fragment slot="aboveMarks" let:width let:height>
+                    <text
+                        x={0}
+                        y={0}
+                        text-anchor="middle"
+                        dominant-baseline="middle"
+                        class="metrics-pie-chart__label"
+                    >
+                        {label}
+                    </text>
+                </svelte:fragment>
+            </PieChart>
+        </div>
+        <ul class="metrics-pie-chart__legend" aria-label={`${label} legend`}>
+            {#each data as point, index}
+                <li class="metrics-pie-chart__legend-item">
+                    <span
+                        class="metrics-pie-chart__legend-swatch"
+                        style={`--legend-color: ${colors[index % colors.length]}`}
+                    ></span>
+                    <span class="metrics-pie-chart__legend-label">{point.key}</span>
+                </li>
+            {/each}
+        </ul>
     </article>
 {/if}
