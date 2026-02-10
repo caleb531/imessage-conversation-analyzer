@@ -91,11 +91,6 @@
         return String(value).padStart(2, '0');
     }
 
-    function readInputValue(event: Event): string {
-        const target = event.target as HTMLInputElement | null;
-        return target?.value ?? '';
-    }
-
     function normalizeDateInput(value: string): string | null {
         const trimmed = value.trim();
         if (!trimmed) return null;
@@ -203,16 +198,16 @@
             <div class="result-grid__filters-row result-grid__filters-row--main">
                 {#key datePickerResetKey}
                     <div class="result-grid__filters-fields">
-                        <DatePicker>
+                        <DatePicker
+                            datePickerType="single"
+                            dateFormat="m/d/Y"
+                            bind:value={fromDateInput}
+                        >
                             <DatePickerInput
                                 id="result-grid-from-date"
                                 size="sm"
                                 labelText="From date"
                                 placeholder="mm/dd/yyyy"
-                                bind:value={fromDateInput}
-                                on:input={(event) => {
-                                    fromDateInput = readInputValue(event);
-                                }}
                             >
                                 <span slot="labelText" class="result-grid__date-label">
                                     <span>From date</span>
@@ -224,16 +219,16 @@
                                 </span>
                             </DatePickerInput>
                         </DatePicker>
-                        <DatePicker>
+                        <DatePicker
+                            datePickerType="single"
+                            dateFormat="m/d/Y"
+                            bind:value={toDateInput}
+                        >
                             <DatePickerInput
                                 id="result-grid-to-date"
                                 size="sm"
                                 labelText="To date"
                                 placeholder="mm/dd/yyyy"
-                                bind:value={toDateInput}
-                                on:input={(event) => {
-                                    toDateInput = readInputValue(event);
-                                }}
                             >
                                 <span slot="labelText" class="result-grid__date-label">
                                     <span>To date</span>
