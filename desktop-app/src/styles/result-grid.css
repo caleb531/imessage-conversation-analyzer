@@ -59,6 +59,9 @@
     align-items: center;
     gap: 0.25rem;
 }
+.bx--date-picker.bx--date-picker--single .bx--date-picker__input {
+    width: 9rem;
+}
 
 .result-grid__soft-loading {
     display: flex;
