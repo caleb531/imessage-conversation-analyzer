@@ -43,6 +43,7 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-svelte": "^3.13.1",
     "execa": "^9.6.1",
+    "globals": "^17.3.0",
     "prettier": "^3.7.4",
     "prettier-plugin-svelte": "^3.4.0",
     "sass-embedded": "^1.93.3",
