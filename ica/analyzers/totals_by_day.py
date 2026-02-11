@@ -36,18 +36,20 @@ def main() -> None:
 
     # Rename columns
     daily_counts = daily_counts.rename(
-        columns=lambda col: "#_sent_by_me" if col == "Me" else f"#_sent_by_{col}"
+        columns=lambda col: "total_sent_by_me"
+        if col == "Me"
+        else f"total_sent_by_{col}"
     )
 
     # Calculate total sent
-    daily_counts["#_sent"] = daily_counts.sum(axis=1)
+    daily_counts["total_sent"] = daily_counts.sum(axis=1)
 
     # Filter days with > 0 messages
-    daily_counts = daily_counts[daily_counts["#_sent"] > 0]
+    daily_counts = daily_counts[daily_counts["total_sent"] > 0]
 
     # Reorder columns
-    cols = ["#_sent", "#_sent_by_me"] + [
-        f"#_sent_by_{name}" for name in all_participants
+    cols = ["total_sent", "total_sent_by_me"] + [
+        f"total_sent_by_{name}" for name in all_participants
     ]
     daily_counts = daily_counts[cols]
 
@@ -56,7 +58,7 @@ def main() -> None:
         format=cli_args.format,
         output=cli_args.output,
         prettified_label_overrides={
-            f"#_sent_by_{display_name}": f"# Sent By {display_name}"
+            f"total_sent_by_{display_name}": f"Total Sent By {display_name}"
             for display_name in all_participants
         },
     )

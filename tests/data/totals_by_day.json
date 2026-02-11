@@ -1,37 +1,37 @@
 {
   "2024-01-08T00:00:00.000": {
-    "#_sent": 3,
-    "#_sent_by_me": 1,
-    "#_sent_by_Jane": 2
+    "total_sent": 3,
+    "total_sent_by_me": 1,
+    "total_sent_by_Jane": 2
   },
   "2024-01-09T00:00:00.000": {
-    "#_sent": 2,
-    "#_sent_by_me": 1,
-    "#_sent_by_Jane": 1
+    "total_sent": 2,
+    "total_sent_by_me": 1,
+    "total_sent_by_Jane": 1
   },
   "2024-01-11T00:00:00.000": {
-    "#_sent": 2,
-    "#_sent_by_me": 1,
-    "#_sent_by_Jane": 1
+    "total_sent": 2,
+    "total_sent_by_me": 1,
+    "total_sent_by_Jane": 1
   },
   "2024-01-14T00:00:00.000": {
-    "#_sent": 1,
-    "#_sent_by_me": 0,
-    "#_sent_by_Jane": 1
+    "total_sent": 1,
+    "total_sent_by_me": 0,
+    "total_sent_by_Jane": 1
   },
   "2024-01-16T00:00:00.000": {
-    "#_sent": 1,
-    "#_sent_by_me": 1,
-    "#_sent_by_Jane": 0
+    "total_sent": 1,
+    "total_sent_by_me": 1,
+    "total_sent_by_Jane": 0
   },
   "2024-01-17T00:00:00.000": {
-    "#_sent": 1,
-    "#_sent_by_me": 0,
-    "#_sent_by_Jane": 1
+    "total_sent": 1,
+    "total_sent_by_me": 0,
+    "total_sent_by_Jane": 1
   },
   "2024-01-19T00:00:00.000": {
-    "#_sent": 1,
-    "#_sent_by_me": 1,
-    "#_sent_by_Jane": 0
+    "total_sent": 1,
+    "total_sent_by_me": 1,
+    "total_sent_by_Jane": 0
   }
 }
