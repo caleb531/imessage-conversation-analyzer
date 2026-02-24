@@ -71,12 +71,15 @@ def create_mock_db(
         for table_name, records in merged_data.items():
             if not len(records):
                 continue
+            all_keys = list(dict.fromkeys(key for record in records for key in record))
+            normalized_records = [
+                {key: record.get(key) for key in all_keys} for record in records
+            ]
             with closing(con.cursor()) as cur:
-                cur.execute(
-                    f"CREATE TABLE {table_name}({', '.join(records[0].keys())})"
-                )
-                key_placeholders = ", ".join(f":{key}" for key in records[0].keys())
+                cur.execute(f"CREATE TABLE {table_name}({', '.join(all_keys)})")
+                key_placeholders = ", ".join(f":{key}" for key in all_keys)
                 cur.executemany(
-                    f"INSERT INTO {table_name} VALUES({key_placeholders})", records
+                    f"INSERT INTO {table_name} VALUES({key_placeholders})",
+                    normalized_records,
                 )
             con.commit()

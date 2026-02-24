@@ -110,6 +110,21 @@ def test_find_group_conversation() -> None:
     assert "Hello everyone!" in dfs.messages["text"].values
 
 
+def test_messages_include_expressive_send_style_id() -> None:
+    """
+    Should include the raw expressive send style ID from the chat DB.
+    """
+    dfs = ica.get_dataframes(contacts=["Daniel Brightingale"])
+    assert "expressive_send_style_id" in dfs.messages.columns
+    assert (
+        dfs.messages.loc[
+            dfs.messages["ROWID"] == "67d1d980-4db8-4005-b644-cd269402dd29",
+            "expressive_send_style_id",
+        ].iloc[0]
+        == "com.apple.messages.effect.CKEchoEffect"
+    )
+
+
 def test_contact_record_merging() -> None:
     """
     Should merge contact records if two records share the same name and share at

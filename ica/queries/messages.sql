@@ -4,6 +4,7 @@ SELECT
     "handle_id",
     "handle"."id" AS "sender_handle",
     "attributedBody",
+    "message"."expressive_send_style_id",
     datetime("message"."date" / 1000000000 + strftime("%s", "2001-01-01") ,"unixepoch") as "datetime",
     "is_from_me"
 FROM "message"
