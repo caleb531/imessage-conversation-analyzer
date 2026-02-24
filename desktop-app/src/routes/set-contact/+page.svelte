@@ -1,8 +1,9 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
-    import { Button, InlineNotification } from 'carbon-components-svelte';
+    import { Button } from 'carbon-components-svelte';
     import { onMount } from 'svelte';
     import ContactPicker from '../../components/ContactPicker.svelte';
+    import InlineNotification from '../../components/InlineNotification.svelte';
     import {
         ensureSelectedContactLoaded,
         selectedContact,

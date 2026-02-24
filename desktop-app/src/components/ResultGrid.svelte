@@ -5,7 +5,6 @@
         Button,
         DatePicker,
         DatePickerInput,
-        InlineNotification,
         Loading,
         TooltipIcon
     } from 'carbon-components-svelte';
@@ -14,6 +13,7 @@
     import '../styles/result-grid.css';
     import type { GridColumn } from '../types';
     import DateCell from './DateCell.svelte';
+    import InlineNotification from './InlineNotification.svelte';
     import NumberCell from './NumberCell.svelte';
 
     interface Props {

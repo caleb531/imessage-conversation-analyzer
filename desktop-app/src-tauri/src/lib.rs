@@ -13,6 +13,8 @@ use {
     },
 };
 
+use std::path::{Path, PathBuf};
+
 #[cfg(target_os = "macos")]
 const CN_ENTITY_TYPE_CONTACTS: i64 = 0;
 #[cfg(target_os = "macos")]
@@ -260,13 +262,59 @@ unsafe fn ns_error_to_string(error: *mut Object) -> String {
     }
 }
 
+#[tauri::command]
+fn resolve_download_output_path(base_name: String) -> Result<String, String> {
+    if base_name.trim().is_empty() {
+        return Err("Output filename cannot be empty.".into());
+    }
+
+    let base_path = Path::new(&base_name);
+    if base_path.is_absolute() || base_path.components().count() > 1 {
+        return Err("Output filename must not include directory segments.".into());
+    }
+
+    let home_dir = std::env::var("HOME")
+        .map(PathBuf::from)
+        .map_err(|_| "Could not resolve HOME directory.".to_string())?;
+    let downloads_dir = home_dir.join("Downloads");
+
+    let stem = base_path
+        .file_stem()
+        .and_then(|value| value.to_str())
+        .filter(|value| !value.trim().is_empty())
+        .ok_or_else(|| "Output filename is invalid.".to_string())?;
+
+    let extension = base_path
+        .extension()
+        .and_then(|value| value.to_str())
+        .filter(|value| !value.trim().is_empty())
+        .unwrap_or("csv");
+
+    let mut index: usize = 0;
+    loop {
+        let candidate_name = if index == 0 {
+            format!("{stem}.{extension}")
+        } else {
+            format!("{stem}-{index}.{extension}")
+        };
+        let candidate_path = downloads_dir.join(candidate_name);
+        if !candidate_path.exists() {
+            return Ok(candidate_path.to_string_lossy().into_owned());
+        }
+        index += 1;
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_shell::init())
-        .invoke_handler(tauri::generate_handler![get_contact_names])
+        .invoke_handler(tauri::generate_handler![
+            get_contact_names,
+            resolve_download_output_path
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

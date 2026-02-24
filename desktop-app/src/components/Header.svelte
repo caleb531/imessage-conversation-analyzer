@@ -26,6 +26,7 @@
         <HeaderNavItem href="/attachment-totals">Attachment Totals</HeaderNavItem>
         <HeaderNavItem href="/most-frequent-emojis">Emojis</HeaderNavItem>
         <HeaderNavItem href="/totals-by-day">Totals by Day</HeaderNavItem>
+        <HeaderNavItem href="/transcript">Transcript</HeaderNavItem>
     </HeaderNav>
     <HeaderUtilities>
         <div class="app-header__contact">

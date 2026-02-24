@@ -4,9 +4,10 @@ import { getSelectedContact } from './contacts.svelte';
 import { runIcaSidecar, type SidecarResult } from './sidecar';
 
 const FORMAT_FLAGS = new Set(['--format', '-f']);
+const OUTPUT_FLAGS = new Set(['--output', '-o']);
 const CONTACT_FLAGS = new Set(['--contact', '-c']);
-const COMBINED_SHORT_FLAGS = new Set(['-c', '-f']);
-const COMBINED_LONG_FLAGS = new Set(['--contact', '--format']);
+const COMBINED_SHORT_FLAGS = new Set(['-c', '-f', '-o']);
+const COMBINED_LONG_FLAGS = new Set(['--contact', '--format', '--output']);
 
 export class MissingContactError extends Error {
     constructor(message = 'No contact selected. Choose a contact before running the analyzer.') {
@@ -27,6 +28,14 @@ export interface IcaCsvResult {
     headers: IcaCsvHeader[];
     stderr: string;
     rawCsv: string;
+    args: string[];
+}
+
+export interface IcaCommandResult {
+    code: SidecarResult['code'];
+    signal: SidecarResult['signal'];
+    stderr: string;
+    stdout: string;
     args: string[];
 }
 
@@ -118,6 +127,11 @@ async function addContactArgument(args: string[]): Promise<string[]> {
 function ensureCsvFormat(args: string[]): string[] {
     const withoutFormat = removeOption(args, FORMAT_FLAGS);
     return [...withoutFormat, '--format', 'csv'];
+}
+
+function ensureOutputPath(args: string[], outputPath: string): string[] {
+    const withoutOutput = removeOption(args, OUTPUT_FLAGS);
+    return [...withoutOutput, '--output', outputPath];
 }
 
 function parseCsvOutput(
@@ -241,6 +255,33 @@ export async function invokeIcaCsv(args: string | string[]): Promise<IcaCsvResul
         headers: parsedCsv.headers,
         stderr: result.stderr.trim(),
         rawCsv,
+        args: finalArgs
+    };
+}
+
+export async function invokeIcaCsvToFile(
+    args: string | string[],
+    outputPath: string
+): Promise<IcaCommandResult> {
+    const parsedArgs = parseArgInput(args);
+    const expandedArgs = expandKnownCombinedArgs(parsedArgs);
+    const argsWithContact = await addContactArgument(expandedArgs);
+    const csvArgs = ensureCsvFormat(argsWithContact);
+    const finalArgs = ensureOutputPath(csvArgs, outputPath);
+
+    const result = await runIcaSidecar(finalArgs);
+    const stderr = result.stderr.trim();
+    const stdout = result.stdout.trim();
+
+    if (result.code !== 0) {
+        throw new Error(stderr || stdout || `ICA exited with code ${result.code ?? 'unknown'}.`);
+    }
+
+    return {
+        code: result.code,
+        signal: result.signal,
+        stderr,
+        stdout,
         args: finalArgs
     };
 }

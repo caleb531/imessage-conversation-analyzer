@@ -1,5 +1,6 @@
 <script lang="ts">
-    import { Button, CodeSnippet, InlineNotification, TextInput } from 'carbon-components-svelte';
+    import { Button, CodeSnippet, TextInput } from 'carbon-components-svelte';
+    import InlineNotification from '../../components/InlineNotification.svelte';
     import { invokeIcaCsv, MissingContactError, type IcaCsvHeader } from '../../lib/cli';
 
     let icaArgs = $state('message_totals');
