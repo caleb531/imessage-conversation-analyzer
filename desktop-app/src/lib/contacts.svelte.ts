@@ -1,9 +1,9 @@
 import { invoke } from '@tauri-apps/api/core';
 import { load } from '@tauri-apps/plugin-store';
 
-export type ContactValue = string | null;
+export type ContactValues = string[];
 
-export const selectedContact = $state<{ value: ContactValue }>({ value: null });
+export const selectedContacts = $state<{ value: ContactValues }>({ value: [] });
 
 let storePromise: Promise<Awaited<ReturnType<typeof load>>> | undefined;
 let initPromise: Promise<void> | null = null;
@@ -16,19 +16,38 @@ async function getStore() {
     return storePromise;
 }
 
-async function initialiseSelectedContact() {
+function normalizeContacts(contacts: ContactValues | null | undefined): ContactValues {
+    if (!Array.isArray(contacts)) {
+        return [];
+    }
+    return Array.from(
+        new Set(
+            contacts
+                .map((contact) => contact.trim())
+                .filter((contact) => contact.length > 0)
+        )
+    );
+}
+
+async function initialiseSelectedContacts() {
     const store = await getStore();
-    const stored = await store.get<string>('selectedContact');
-    selectedContact.value = stored ?? null;
+    const stored = await store.get<ContactValues>('selectedContacts');
+
+    if (Array.isArray(stored)) {
+        selectedContacts.value = normalizeContacts(stored);
+    } else {
+        const legacyStored = await store.get<string>('selectedContact');
+        selectedContacts.value = legacyStored ? [legacyStored] : [];
+    }
     hasLoaded = true;
 }
 
-export async function ensureSelectedContactLoaded() {
+export async function ensureSelectedContactsLoaded() {
     if (hasLoaded) {
         return;
     }
     if (!initPromise) {
-        initPromise = initialiseSelectedContact().catch((error) => {
+        initPromise = initialiseSelectedContacts().catch((error) => {
             initPromise = null;
             throw error;
         });
@@ -36,32 +55,35 @@ export async function ensureSelectedContactLoaded() {
     await initPromise;
 }
 
-export async function getSelectedContact() {
-    await ensureSelectedContactLoaded();
-    return selectedContact.value;
+export async function getSelectedContacts() {
+    await ensureSelectedContactsLoaded();
+    return selectedContacts.value;
 }
 
-export async function setSelectedContact(contact: ContactValue | undefined) {
+export async function setSelectedContacts(contacts: ContactValues | null | undefined) {
     const store = await getStore();
-    if (contact) {
-        await store.set('selectedContact', contact);
+    const normalizedContacts = normalizeContacts(contacts);
+    if (normalizedContacts.length > 0) {
+        await store.set('selectedContacts', normalizedContacts);
+        await store.delete('selectedContact');
     } else {
+        await store.delete('selectedContacts');
         await store.delete('selectedContact');
     }
     await store.save();
-    selectedContact.value = contact ?? null;
+    selectedContacts.value = normalizedContacts;
     hasLoaded = true;
 }
 
-export async function clearSelectedContact() {
-    await setSelectedContact(null);
+export async function clearSelectedContacts() {
+    await setSelectedContacts(null);
 }
 
-export async function refreshSelectedContact() {
+export async function refreshSelectedContacts() {
     hasLoaded = false;
     initPromise = null;
-    await ensureSelectedContactLoaded();
-    return selectedContact.value;
+    await ensureSelectedContactsLoaded();
+    return selectedContacts.value;
 }
 
 export async function fetchContactNames(): Promise<string[]> {

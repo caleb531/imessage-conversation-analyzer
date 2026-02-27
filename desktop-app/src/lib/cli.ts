@@ -1,6 +1,6 @@
 import Papa from 'papaparse';
 import { parseArgsStringToArgv } from 'string-argv';
-import { getSelectedContact } from './contacts.svelte';
+import { getSelectedContacts } from './contacts.svelte';
 import { runIcaSidecar, type SidecarResult } from './sidecar';
 
 const FORMAT_FLAGS = new Set(['--format', '-f']);
@@ -10,7 +10,7 @@ const COMBINED_SHORT_FLAGS = new Set(['-c', '-f', '-o']);
 const COMBINED_LONG_FLAGS = new Set(['--contact', '--format', '--output']);
 
 export class MissingContactError extends Error {
-    constructor(message = 'No contact selected. Choose a contact before running the analyzer.') {
+    constructor(message = 'No contacts selected. Choose at least one contact before running the analyzer.') {
         super(message);
         this.name = 'MissingContactError';
     }
@@ -117,11 +117,11 @@ async function addContactArgument(args: string[]): Promise<string[]> {
     if (hasFlag(args, CONTACT_FLAGS)) {
         return args;
     }
-    const contact = await getSelectedContact();
-    if (!contact) {
+    const contacts = await getSelectedContacts();
+    if (contacts.length === 0) {
         throw new MissingContactError();
     }
-    return [...args, '--contact', contact];
+    return [...args, ...contacts.flatMap((contact) => ['--contact', contact])];
 }
 
 function ensureCsvFormat(args: string[]): string[] {

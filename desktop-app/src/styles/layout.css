@@ -14,6 +14,8 @@ body {
     font-family:
         -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif,
         'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+    user-select: none;
+    -webkit-user-select: none;
     color: #fff;
 }
 
@@ -60,8 +62,20 @@ h1,
 h2 {
     text-align: center;
 }
+h3 {
+    --cds-productive-heading-04-font-size: 1.5rem;
+}
 
 .bx--btn {
     margin: 0;
     padding: 12px 20px;
+    user-select: none;
+}
+
+a {
+    user-select: none;
+    cursor: default;
+}
+a:hover {
+    text-decoration: none !important;
 }

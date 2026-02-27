@@ -1,5 +1,40 @@
+.contact-picker {
+    width: 100%;
+}
+
 .contact-picker__container {
     text-align: left;
+    width: 100%;
+}
+
+.contact-picker__container :global(.bx--list-box__wrapper),
+.contact-picker__container :global(.bx--combo-box),
+.contact-picker__container :global(.bx--list-box) {
+    width: 100%;
+    min-width: 0;
+}
+
+.contact-picker__selected-heading {
+    margin-top: 18px;
+    margin-bottom: 6px;
+    line-height: 1.2;
+}
+
+.contact-picker__selected-list {
+    margin: 0;
+    padding-left: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    row-gap: 0;
+}
+
+.contact-picker__selected-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    margin: 0;
 }
 
 .contact-picker-status {

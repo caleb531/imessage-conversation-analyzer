@@ -5,40 +5,40 @@
     import ContactPicker from '../../components/ContactPicker.svelte';
     import InlineNotification from '../../components/InlineNotification.svelte';
     import {
-        ensureSelectedContactLoaded,
-        selectedContact,
-        setSelectedContact
+        ensureSelectedContactsLoaded,
+        selectedContacts,
+        setSelectedContacts
     } from '../../lib/contacts.svelte';
 
-    let contactSelection = $state<string | undefined>(undefined);
+    let contactSelection = $state<string[]>([]);
     let buttonDisabled = $state(false);
-    let buttonLabel = $state('Save contact');
+    let buttonLabel = $state('Save contacts');
     let saveError = $state('');
     // Duration to show success message (in milliseconds) before navigating away
     let successMessageDelay = 750;
 
     onMount(async () => {
-        await ensureSelectedContactLoaded();
-        contactSelection = selectedContact.value ?? undefined;
+        await ensureSelectedContactsLoaded();
+        contactSelection = [...selectedContacts.value];
     });
 
     async function handleSubmit(event: Event) {
         event.preventDefault();
         saveError = '';
-        if (!contactSelection) {
-            saveError = 'You must select a contact before continuing.';
+        if (contactSelection.length === 0) {
+            saveError = 'You must select at least one contact before continuing.';
             return;
         }
         buttonDisabled = true;
         buttonLabel = 'Saving…';
         try {
-            await setSelectedContact(contactSelection);
-            buttonLabel = 'Saved contact!';
+            await setSelectedContacts(contactSelection);
+            buttonLabel = 'Saved contacts!';
             await new Promise((resolve) => setTimeout(resolve, successMessageDelay));
             await goto('/message-totals');
         } catch (error) {
             saveError = error instanceof Error ? error.message : String(error);
-            buttonLabel = 'Save contact';
+            buttonLabel = 'Save contacts';
             buttonDisabled = false;
         }
     }
@@ -46,8 +46,8 @@
 
 <section class="set-contact">
     <form class="set-contact__form" onsubmit={handleSubmit}>
-        <h2>Choose a contact</h2>
-        <ContactPicker bind:selectedContact={contactSelection} />
+        <h2>Choose contacts</h2>
+        <ContactPicker bind:selectedContacts={contactSelection} />
         {#if saveError}
             <InlineNotification kind="error" title="Error" subtitle={saveError} />
         {/if}

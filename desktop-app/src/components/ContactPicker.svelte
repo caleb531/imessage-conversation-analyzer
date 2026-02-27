@@ -9,11 +9,12 @@
         text: string;
     };
 
-    let { selectedContact = $bindable<string | undefined>() } = $props();
+    let { selectedContacts = $bindable<string[]>([]) } = $props();
     let contactsLoading = $state(true);
     let contactsError = $state('');
     let comboboxItems = $state<ContactItem[]>([]);
     let searchValue = $state('');
+    let selectedId = $state<string | undefined>(undefined);
 
     const trimmedSearch = $derived(searchValue.trim());
     const filteredCount = $derived(
@@ -42,9 +43,27 @@
 
     function updateComboboxItems(names: string[]) {
         comboboxItems = names.map((name) => ({ id: name, text: name }));
-        if (!comboboxItems.some((item) => item.id === selectedContact)) {
-            selectedContact = undefined;
+        selectedContacts = selectedContacts.filter((contact) =>
+            comboboxItems.some((item) => item.id === contact)
+        );
+        if (selectedId && !comboboxItems.some((item) => item.id === selectedId)) {
+            selectedId = undefined;
         }
+    }
+
+    function addContact() {
+        if (!selectedId) {
+            return;
+        }
+        if (!selectedContacts.includes(selectedId)) {
+            selectedContacts = [...selectedContacts, selectedId];
+        }
+        selectedId = undefined;
+        searchValue = '';
+    }
+
+    function removeContact(contact: string) {
+        selectedContacts = selectedContacts.filter((entry) => entry !== contact);
     }
 
     function shouldFilterItem(item: ContactItem, value: string) {
@@ -53,6 +72,12 @@
         }
         return item.text.toLowerCase().includes(value.toLowerCase());
     }
+
+    $effect(() => {
+        if (selectedId) {
+            addContact();
+        }
+    });
 </script>
 
 <article class="contact-picker">
@@ -69,7 +94,7 @@
             <ComboBox
                 id="contact-picker__combobox"
                 placeholder="Search contacts…"
-                bind:selectedId={selectedContact}
+                bind:selectedId
                 bind:value={searchValue}
                 items={comboboxItems}
                 {shouldFilterItem}
@@ -85,13 +110,27 @@
                 No contacts match "{trimmedSearch}".
             </p>
         {/if}
-        {#if selectedContact}
-            <p class="contact-picker-status contact-picker-status--selection">
-                Selected contact: {selectedContact}
-            </p>
+        {#if selectedContacts.length > 0}
+            <h3 class="contact-picker__selected-heading">Selected Contacts</h3>
+            <ul class="contact-picker__selected-list">
+                {#each selectedContacts as contact}
+                    <li class="contact-picker__selected-item">
+                        <span>{contact}</span>
+                        <Button
+                            kind="ghost"
+                            size="small"
+                            type="button"
+                            class="contact-picker-remove"
+                            on:click={() => removeContact(contact)}
+                        >
+                            Remove
+                        </Button>
+                    </li>
+                {/each}
+            </ul>
         {:else}
             <p class="contact-picker-status contact-picker-status--selection">
-                No contact selected.
+                No contacts selected.
             </p>
         {/if}
     {/if}
