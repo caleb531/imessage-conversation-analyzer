@@ -96,7 +96,7 @@
     fill: none;
 }
 .result-grid-charts text {
-    fill: #fff;
+    fill: var(--color-text-primary);
 }
 
 .result-grid-charts--wide {

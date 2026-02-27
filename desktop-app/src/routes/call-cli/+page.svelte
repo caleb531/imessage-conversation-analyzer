@@ -87,7 +87,7 @@
 
     .call-cli__error-log {
         padding: 1rem;
-        background-color: rgba(255, 255, 255, 0.04);
+        background-color: var(--color-surface-elevated-subtle);
         border-radius: 0.25rem;
         font-family: 'IBM Plex Mono', monospace;
         font-size: 0.875rem;

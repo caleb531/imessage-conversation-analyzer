@@ -16,7 +16,7 @@ body {
         'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
     user-select: none;
     -webkit-user-select: none;
-    color: #fff;
+    color: var(--color-text-primary);
 }
 
 main {

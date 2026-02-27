@@ -4,13 +4,13 @@
     import type { GridColumn } from '../../types';
 
     const seriesColors = [
-        '#0f62fe',
-        '#24a148',
-        '#8a3ffc',
-        '#ff832b',
-        '#007d79',
-        '#fa4d56',
-        '#a56eff'
+        'var(--color-chart-series-1)',
+        'var(--color-chart-series-2)',
+        'var(--color-chart-series-3)',
+        'var(--color-chart-series-4)',
+        'var(--color-chart-series-5)',
+        'var(--color-chart-series-6)',
+        'var(--color-chart-series-7)'
     ];
 
     function getStackedChartProps({

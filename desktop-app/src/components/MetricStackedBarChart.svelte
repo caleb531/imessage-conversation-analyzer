@@ -55,6 +55,29 @@
         }
     }));
 
+    function resolveColor(color: string): string {
+        if (typeof window === 'undefined') {
+            return color;
+        }
+
+        const match = color.match(/^var\((--[^),\s]+)(?:,\s*[^)]+)?\)$/);
+        if (!match) {
+            return color;
+        }
+
+        const resolved = getComputedStyle(document.documentElement)
+            .getPropertyValue(match[1])
+            .trim();
+        return resolved || color;
+    }
+
+    const chartSeries = $derived.by(() =>
+        series.map((item) => ({
+            ...item,
+            color: resolveColor(item.color ?? 'var(--color-chart-legend-fallback)')
+        }))
+    );
+
     const maxStackValue = $derived.by(() => {
         if (data.length === 0 || series.length === 0) {
             return 0;
@@ -86,7 +109,7 @@
             <article class="metric-stacked-bar-chart" style={`width: ${chartWidth}px;`}>
                 <BarChart
                     {data}
-                    {series}
+                    series={chartSeries}
                     {bandPadding}
                     {x}
                     seriesLayout="stack"
@@ -107,11 +130,12 @@
         </div>
         {#if showLegend}
             <ul class="metric-stacked-bar-chart__legend" aria-label="Chart legend">
+                <!-- eslint-disable-next-line svelte/require-each-key -->
                 {#each series as item}
                     <li class="metric-stacked-bar-chart__legend-item">
                         <span
                             class="metric-stacked-bar-chart__legend-swatch"
-                            style={`--legend-color: ${item.color ?? '#9aa0a6'}`}
+                            style={`--legend-color: ${item.color ?? 'var(--color-chart-legend-fallback)'}`}
                         ></span>
                         <span class="metric-stacked-bar-chart__legend-label">{item.label}</span>
                     </li>

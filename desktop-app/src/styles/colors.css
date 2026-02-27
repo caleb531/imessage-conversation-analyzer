@@ -1,4 +1,66 @@
 :root {
-    /* Define colors as lists of HSL components */
-    --color-primary: 219 99% 53%;
+    /* Base color palette (raw values) */
+    --palette-blue-60: #0f62fe;
+    --palette-purple-60: #8a3ffc;
+    --palette-green-60: #24a148;
+    --palette-orange-50: #ff832b;
+    --palette-teal-60: #007d79;
+    --palette-red-50: #fa4d56;
+    --palette-violet-60: #a56eff;
+    --palette-cyan-50: #00cfda;
+    --palette-magenta-60: #ff0055;
+    --palette-yellow-30: #f1c21b;
+    --palette-green-40: #6fdc8c;
+
+    --palette-white: #ffffff;
+    --palette-gray-100: #f4f4f4;
+    --palette-gray-200: #e0e0e0;
+    --palette-gray-500: #525252;
+    --palette-gray-400: #9aa0a6;
+
+    --palette-white-hsl: 0 0% 100%;
+    --palette-gray-100-hsl: 0 0% 96%;
+    --palette-overlay-900-hsl: 0 0% 13%;
+    --palette-overlay-800-hsl: 0 0% 19%;
+    --palette-black-hsl: 0 0% 0%;
+}
+
+:root {
+    /* Semantic color palette */
+    --color-primary: var(--palette-blue-60);
+    --color-loading: var(--color-primary);
+    --cds-interactive-04: var(--color-loading) !important;
+
+    --color-text-primary: var(--palette-white);
+    --color-text-secondary: var(--palette-gray-100);
+    --color-text-tertiary: var(--palette-gray-200);
+    --color-text-muted: hsl(var(--palette-gray-100-hsl) / 0.75);
+    --color-text-subtle: hsl(var(--palette-white-hsl) / 0.5);
+
+    --color-border-subtle: var(--palette-gray-500);
+    --color-border-contrast-soft: hsl(var(--palette-white-hsl) / 0.18);
+
+    --color-surface-overlay-strong: hsl(var(--palette-overlay-900-hsl) / 0.9);
+    --color-surface-overlay: hsl(var(--palette-overlay-800-hsl) / 0.9);
+    --color-surface-elevated-subtle: hsl(var(--palette-white-hsl) / 0.04);
+
+    --color-shadow-elevation-1: hsl(var(--palette-black-hsl) / 0.4);
+
+    --color-chart-series-1: var(--palette-blue-60);
+    --color-chart-series-2: var(--palette-purple-60);
+    --color-chart-series-3: var(--palette-green-60);
+    --color-chart-series-4: var(--palette-orange-50);
+    --color-chart-series-5: var(--palette-teal-60);
+    --color-chart-series-6: var(--palette-red-50);
+    --color-chart-series-7: var(--palette-violet-60);
+
+    --color-chart-categorical-1: var(--palette-blue-60);
+    --color-chart-categorical-2: var(--palette-purple-60);
+    --color-chart-categorical-3: var(--palette-green-60);
+    --color-chart-categorical-4: var(--palette-cyan-50);
+    --color-chart-categorical-5: var(--palette-magenta-60);
+    --color-chart-categorical-6: var(--palette-yellow-30);
+    --color-chart-categorical-7: var(--palette-green-40);
+
+    --color-chart-legend-fallback: var(--palette-gray-400);
 }

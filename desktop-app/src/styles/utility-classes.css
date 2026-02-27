@@ -45,7 +45,7 @@
     border-style: solid;
 }
 .elevation-1 {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 8px var(--color-shadow-elevation-1);
 }
 .transition-opacity {
     transition: opacity 150ms ease;
@@ -60,28 +60,28 @@
     backdrop-filter: blur(2px);
 }
 .bg-surface-100\/90 {
-    background-color: rgba(34, 34, 34, 0.9);
+    background-color: var(--color-surface-overlay-strong);
 }
 .bg-surface-300\/90 {
-    background-color: rgba(48, 48, 48, 0.9);
+    background-color: var(--color-surface-overlay);
 }
 .text-surface-content {
-    color: #f4f4f4;
+    color: var(--color-text-secondary);
 }
 .text-surface-content\/75 {
-    color: rgba(244, 244, 244, 0.75);
+    color: var(--color-text-muted);
 }
 .text-surface-100 {
-    color: #ffffff;
+    color: var(--color-text-primary);
 }
 .text-surface-100\/50 {
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--color-text-subtle);
 }
 .border-surface-content {
-    border-color: #525252;
+    border-color: var(--color-border-subtle);
 }
 .dark\:bg-surface-300\/90 {
-    background-color: rgba(48, 48, 48, 0.9);
+    background-color: var(--color-surface-overlay);
 }
 .fill-transparent {
     fill: transparent;

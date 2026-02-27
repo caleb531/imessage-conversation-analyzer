@@ -21,6 +21,7 @@
     const chartX = $derived(orientation === 'horizontal' ? y : x);
     const chartY = $derived(orientation === 'horizontal' ? x : y);
     const labelClass = $derived(labelType === 'emoji' ? 'emoji-tick-label' : 'text-tick-label');
+    let barColor = $state('var(--color-chart-series-1)');
 
     const axisProps = $derived(
         orientation === 'horizontal'
@@ -57,7 +58,8 @@
             bandPadding={0.3}
             props={{
                 bars: {
-                    radius: 4
+                    radius: 4,
+                    fill: barColor
                 },
                 ...axisProps,
                 tooltip: {

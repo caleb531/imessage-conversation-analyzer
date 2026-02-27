@@ -243,7 +243,7 @@ export async function invokeIcaCsv(args: string | string[]): Promise<IcaCsvResul
     const rawCsv = result.stdout.trim();
 
     if (!rawCsv) {
-        throw new Error('ICA returned no CSV output.');
+        throw new Error('No data returned.');
     }
 
     const parsedCsv = parseCsvOutput(rawCsv, finalArgs);

@@ -272,7 +272,7 @@
             <InlineNotification
                 class="result-grid__error"
                 kind="error"
-                title={`Unable to load ${title.toLowerCase()}`}
+                title="Error"
                 subtitle={errorMessage}
             />
         {:else}

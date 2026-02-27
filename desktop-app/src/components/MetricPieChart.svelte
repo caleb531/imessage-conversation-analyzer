@@ -5,7 +5,14 @@
 
     export let data: DataPoint[];
     export let label = '';
-    export let colors = ['#0f62fe', '#8a3ffc', '#00cfda', '#ff0055', '#f1c21b', '#6fdc8c'];
+    export let colors = [
+        'var(--color-chart-categorical-1)',
+        'var(--color-chart-categorical-2)',
+        'var(--color-chart-categorical-3)',
+        'var(--color-chart-categorical-4)',
+        'var(--color-chart-categorical-5)',
+        'var(--color-chart-categorical-6)'
+    ];
     export let innerRadius = -15;
     export let outerRadius = 70;
     export let cornerRadius = 4;
@@ -46,7 +53,7 @@
             </PieChart>
         </div>
         <ul class="metric-pie-chart__legend" aria-label={`${label} legend`}>
-            {#each data as point, index}
+            {#each data as point, index (point.key)}
                 <li class="metric-pie-chart__legend-item">
                     <span
                         class="metric-pie-chart__legend-swatch"

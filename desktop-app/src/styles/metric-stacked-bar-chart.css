@@ -33,15 +33,15 @@
     align-items: center;
     gap: 0.45rem;
     font-size: 0.85rem;
-    color: #e0e0e0;
+    color: var(--color-text-tertiary);
 }
 
 .metric-stacked-bar-chart__legend-swatch {
     width: 0.75rem;
     height: 0.75rem;
     border-radius: 0.2rem;
-    background: var(--legend-color, #9aa0a6);
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18);
+    background: var(--legend-color, var(--color-chart-legend-fallback));
+    box-shadow: 0 0 0 1px var(--color-border-contrast-soft);
 }
 
 /* Force Apple Color Emoji to ensure emojis are rendered as graphics, not text */
