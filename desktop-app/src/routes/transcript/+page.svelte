@@ -56,8 +56,8 @@
         <header>
             <h2>Transcript</h2>
             <p class="transcript-export__description">
-                Export your full conversation transcript in your selected format to Downloads. The
-                filename will be incremented when needed (for example, transcript-1.csv).
+                Export your full conversation transcript. The exported file will be saved to your
+                Downloads folder.
             </p>
         </header>
 
