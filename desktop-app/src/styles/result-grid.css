@@ -102,3 +102,7 @@
 .result-grid-charts--wide {
     width: min(100%, 90vw);
 }
+
+.result-grid-charts--attachment {
+    width: min(100%, 75vw);
+}
