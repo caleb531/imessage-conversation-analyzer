@@ -73,10 +73,18 @@ h3 {
     cursor: default;
 }
 
-a {
+a,
+a:visited,
+.bx--link,
+.bx--link:visited {
     user-select: none;
     cursor: default;
+    color: var(--color-text-link);
 }
-a:hover {
+a:hover,
+a:visited:hover,
+.bx--link:hover,
+.bx--link:visited:hover {
     text-decoration: none !important;
+    color: var(--color-text-link-hover);
 }

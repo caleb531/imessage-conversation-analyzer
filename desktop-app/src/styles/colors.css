@@ -1,6 +1,8 @@
 :root {
     /* Base color palette (raw values) */
     --palette-blue-60: #0f62fe;
+    --palette-blue-90: #3687d8;
+    --palette-blue-120: #369dd8;
     --palette-purple-60: #8a3ffc;
     --palette-green-60: #24a148;
     --palette-orange-50: #ff832b;
@@ -15,8 +17,8 @@
     --palette-white: #ffffff;
     --palette-gray-100: #f4f4f4;
     --palette-gray-200: #e0e0e0;
-    --palette-gray-500: #525252;
     --palette-gray-400: #9aa0a6;
+    --palette-gray-500: #525252;
 
     --palette-white-hsl: 0 0% 100%;
     --palette-gray-100-hsl: 0 0% 96%;
@@ -34,6 +36,8 @@
     --color-text-primary: var(--palette-white);
     --color-text-secondary: var(--palette-gray-100);
     --color-text-tertiary: var(--palette-gray-200);
+    --color-text-link: var(--palette-blue-90);
+    --color-text-link-hover: var(--palette-blue-120);
     --color-text-muted: hsl(var(--palette-gray-100-hsl) / 0.75);
     --color-text-subtle: hsl(var(--palette-white-hsl) / 0.5);
 
