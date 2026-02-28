@@ -13,9 +13,30 @@
     align-self: stretch;
 }
 
+.metric-stacked-bar-chart__inner {
+    min-width: 100%;
+}
+
 .metric-stacked-bar-chart {
     height: 360px;
-    min-width: 100%;
+    width: 100%;
+}
+
+.metric-stacked-bar-chart__subaxis {
+    position: relative;
+    height: 1rem;
+    margin-top: -0.15rem;
+    pointer-events: none;
+}
+
+.metric-stacked-bar-chart__subaxis-label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 0.72rem;
+    line-height: 1;
+    color: var(--color-text-quaternary);
+    white-space: nowrap;
 }
 
 .metric-stacked-bar-chart__legend {

@@ -4,6 +4,8 @@
 
     type StackedDatum = Record<string, string | number>;
     type StackedSeries = { key: string; label: string; color?: string };
+    type GroupLabel = { label: string; startIndex: number };
+    type TickFormatter = (value: string | number) => string;
 
     let {
         data,
@@ -13,7 +15,9 @@
         labelType = 'string',
         minLabelWidth = 90,
         barWidth = 6,
-        showLegend = true
+        showLegend = true,
+        xGroupLabels = [],
+        xTickFormat
     }: {
         data: StackedDatum[];
         series: StackedSeries[];
@@ -23,6 +27,8 @@
         minLabelWidth?: number;
         barWidth?: number;
         showLegend?: boolean;
+        xGroupLabels?: GroupLabel[];
+        xTickFormat?: TickFormatter;
     } = $props();
 
     let containerWidth = $state(0);
@@ -46,6 +52,7 @@
     const axisProps = $derived.by(() => ({
         xAxis: {
             ticks: tickCount,
+            ...(xTickFormat ? { format: xTickFormat } : {}),
             tickLabelProps: {
                 class: labelClass
             }
@@ -101,32 +108,95 @@
             left: estimatedLabelWidth
         };
     });
+
+    function estimateTickLabelWidth(label: string): number {
+        const compactLabel = label.trim();
+        if (!compactLabel) {
+            return 0;
+        }
+
+        if (typeof document === 'undefined') {
+            return compactLabel.length * 8;
+        }
+
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        if (!context) {
+            return compactLabel.length * 8;
+        }
+
+        context.font = '16px -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif';
+        return context.measureText(compactLabel).width;
+    }
+
+    const groupLabelPositions = $derived.by(() => {
+        if (xGroupLabels.length === 0 || data.length === 0) {
+            return [];
+        }
+
+        const chartAreaWidth = Math.max(0, chartWidth - chartPadding.left - chartPadding.right);
+        if (chartAreaWidth === 0) {
+            return [];
+        }
+
+        const innerPadding = Math.max(0, Math.min(0.95, bandPadding));
+        const outerPadding = innerPadding;
+        const step = chartAreaWidth / Math.max(1, data.length - innerPadding + outerPadding * 2);
+        const bandwidth = step * (1 - innerPadding);
+
+        return xGroupLabels
+            .filter((group) => group.startIndex >= 0 && group.startIndex < data.length)
+            .map((group) => ({
+                ...group,
+                left: (() => {
+                    const datum = data[group.startIndex];
+                    const xValue = datum?.[x] ?? '';
+                    const tickLabel = xTickFormat ? xTickFormat(xValue) : String(xValue ?? '');
+                    const tickLabelWidth = estimateTickLabelWidth(tickLabel);
+                    const tickCenter =
+                        chartPadding.left + outerPadding * step + group.startIndex * step + bandwidth / 2;
+                    return tickCenter - tickLabelWidth / 2;
+                })()
+            }));
+    });
 </script>
 
 {#if data.length > 0 && series.length > 0}
     <div class="metric-stacked-bar-chart__container">
         <div class="metric-stacked-bar-chart__scroll" bind:clientWidth={containerWidth}>
-            <article class="metric-stacked-bar-chart" style={`width: ${chartWidth}px;`}>
-                <BarChart
-                    {data}
-                    series={chartSeries}
-                    {bandPadding}
-                    {x}
-                    seriesLayout="stack"
-                    padding={chartPadding}
-                    props={{
-                        bars: {
-                            radius: 0
-                        },
-                        ...axisProps,
-                        tooltip: {
-                            root: {
-                                classes: { root: 'layerchart-tooltip' }
+            <div class="metric-stacked-bar-chart__inner" style={`width: ${chartWidth}px;`}>
+                <article class="metric-stacked-bar-chart">
+                    <BarChart
+                        {data}
+                        series={chartSeries}
+                        {bandPadding}
+                        {x}
+                        seriesLayout="stack"
+                        padding={chartPadding}
+                        props={{
+                            bars: {
+                                radius: 0
+                            },
+                            ...axisProps,
+                            tooltip: {
+                                root: {
+                                    classes: { root: 'layerchart-tooltip' }
+                                }
                             }
-                        }
-                    }}
-                />
-            </article>
+                        }}
+                    />
+                </article>
+                {#if groupLabelPositions.length > 0}
+                    <div class="metric-stacked-bar-chart__subaxis" aria-hidden="true">
+                        {#each groupLabelPositions as group (`${group.label}-${group.startIndex}`)}
+                            <span
+                                class="metric-stacked-bar-chart__subaxis-label"
+                                style={`left: ${group.left}px;`}>{group.label}</span
+                            >
+                        {/each}
+                    </div>
+                {/if}
+            </div>
         </div>
         {#if showLegend}
             <ul class="metric-stacked-bar-chart__legend" aria-label="Chart legend">

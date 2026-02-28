@@ -36,6 +36,7 @@
     --color-text-primary: var(--palette-white);
     --color-text-secondary: var(--palette-gray-100);
     --color-text-tertiary: var(--palette-gray-200);
+    --color-text-quaternary: var(--palette-gray-400);
     --color-text-link: var(--palette-blue-90);
     --color-text-link-hover: var(--palette-blue-120);
     --color-text-muted: hsl(var(--palette-gray-100-hsl) / 0.75);
