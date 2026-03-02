@@ -83,22 +83,7 @@
                   return !/total|#\s*sent$/i.test(column.header);
               });
 
-        const seriesColumns =
-            candidateSeriesColumns.length <= 2
-                ? candidateSeriesColumns
-                : [...candidateSeriesColumns]
-                      .sort((left, right) => {
-                          const leftTotal = rows.reduce(
-                              (sum, row) => sum + Number(row[left.id] ?? 0),
-                              0
-                          );
-                          const rightTotal = rows.reduce(
-                              (sum, row) => sum + Number(row[right.id] ?? 0),
-                              0
-                          );
-                          return rightTotal - leftTotal;
-                      })
-                      .slice(0, 2);
+        const seriesColumns = candidateSeriesColumns;
 
         if (!seriesColumns.length) {
             return { data: [], series: [], xGroupLabels: [] };
