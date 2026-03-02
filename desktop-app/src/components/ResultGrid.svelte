@@ -313,9 +313,11 @@
                 subtitle={errorMessage}
             />
         {:else}
-            <WillowDark>
-                <Grid data={rows} {columns} />
-            </WillowDark>
+            <article class="result-grid__grid-container">
+                <WillowDark>
+                    <Grid data={rows} {columns} />
+                </WillowDark>
+            </article>
         {/if}
     {/if}
 </section>
