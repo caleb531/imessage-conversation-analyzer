@@ -10,6 +10,7 @@
     } from 'carbon-components-svelte';
     import Information from 'carbon-icons-svelte/lib/Information.svelte';
     import { onMount, type Snippet } from 'svelte';
+    import { SvelteMap } from 'svelte/reactivity';
     import '../styles/result-grid.css';
     import type { GridColumn } from '../types';
     import DateCell from './DateCell.svelte';
@@ -46,6 +47,25 @@
         toDate: ''
     });
 
+    const TIME_UNIT_PAD_LENGTH = 2;
+    const FALLBACK_PIXELS_PER_CHAR = 10;
+    const FALLBACK_FONT_WEIGHT = '400';
+    const FALLBACK_FONT_SIZE = '16px';
+    const FALLBACK_FONT_FAMILY = 'system-ui';
+    const COLUMN_HORIZONTAL_PADDING_PX = 48;
+    const MIN_COLUMN_WIDTH_PX = 120;
+    const NUMBER_WIDTH_FORMATTER = new Intl.NumberFormat();
+    const DATE_WIDTH_FORMATTER = new Intl.DateTimeFormat('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+
+    let textMeasureContext: CanvasRenderingContext2D | null = null;
+    let textMeasureFont = '';
+    const textWidthCache = new SvelteMap<string, number>();
+
     const cellFormatters = [
         {
             pattern: /^\d+$/,
@@ -66,6 +86,97 @@
         return null;
     }
 
+    function formatCellValueForWidth(value: unknown): string {
+        // Mirror display formatting so measured width matches what users actually see.
+        if (value === null || value === undefined) {
+            return '';
+        }
+
+        const stringValue = String(value);
+        if (/^\d+$/.test(stringValue)) {
+            return NUMBER_WIDTH_FORMATTER.format(Number(stringValue));
+        }
+        if (/^\d{4}-\d{2}-\d{2}$/.test(stringValue)) {
+            return DATE_WIDTH_FORMATTER.format(new Date(stringValue));
+        }
+        return stringValue;
+    }
+
+    function getMeasurementContext(): CanvasRenderingContext2D | null {
+        if (textMeasureContext) {
+            return textMeasureContext;
+        }
+
+        if (typeof window === 'undefined' || typeof document === 'undefined') {
+            return null;
+        }
+
+        const canvas = document.createElement('canvas');
+        textMeasureContext = canvas.getContext('2d');
+        return textMeasureContext;
+    }
+
+    function getMeasurementFont(): string {
+        if (typeof window === 'undefined' || typeof document === 'undefined') {
+            return `${FALLBACK_FONT_WEIGHT} ${FALLBACK_FONT_SIZE} ${FALLBACK_FONT_FAMILY}`;
+        }
+
+        const bodyStyles = getComputedStyle(document.body);
+        const fontWeight = bodyStyles.fontWeight || FALLBACK_FONT_WEIGHT;
+        const fontSize = bodyStyles.fontSize || FALLBACK_FONT_SIZE;
+        const fontFamily = bodyStyles.fontFamily || FALLBACK_FONT_FAMILY;
+        return `${fontWeight} ${fontSize} ${fontFamily}`;
+    }
+
+    function measureTextWidthPx(text: string): number {
+        // Measure in pixels using current document font; fallback keeps SSR/edge cases safe.
+        if (typeof window === 'undefined' || typeof document === 'undefined') {
+            // Server-side/no-DOM fallback: approximate width from character count.
+            return text.length * FALLBACK_PIXELS_PER_CHAR;
+        }
+
+        const context = getMeasurementContext();
+        if (!context) {
+            // If canvas context is unavailable, keep the same deterministic fallback.
+            return text.length * FALLBACK_PIXELS_PER_CHAR;
+        }
+
+        const font = getMeasurementFont();
+        if (textMeasureFont !== font) {
+            // Font changes affect text metrics, so resync context and invalidate cached widths.
+            textMeasureFont = font;
+            context.font = font;
+            textWidthCache.clear();
+        }
+
+        const cached = textWidthCache.get(text);
+        if (cached !== undefined) {
+            // Hot path: repeated values (common in tables) skip re-measurement.
+            return cached;
+        }
+
+        const measuredWidth = Math.ceil(context.measureText(text).width);
+        textWidthCache.set(text, measuredWidth);
+
+        return measuredWidth;
+    }
+
+    function computeColumnWidth(
+        header: IcaCsvHeader,
+        dataRows: Array<Record<string, unknown>>
+    ): number {
+        // Ensure each column can fit both header and widest formatted cell value.
+        let widest = measureTextWidthPx(header.original);
+
+        for (const row of dataRows) {
+            const text = formatCellValueForWidth(row[header.id]);
+            widest = Math.max(widest, measureTextWidthPx(text));
+        }
+
+        // Include cell padding/sort affordance breathing room to avoid clipped text.
+        return Math.max(MIN_COLUMN_WIDTH_PX, widest + COLUMN_HORIZONTAL_PADDING_PX);
+    }
+
     function createColumns(
         headers: IcaCsvHeader[],
         dataRows: Array<Record<string, unknown>>
@@ -74,21 +185,20 @@
             return [];
         }
         const sample = dataRows[0] ?? {};
-        return headers.map((header, index) => {
+        return headers.map((header) => {
             const value = sample[header.id];
             const ValueFormatter = getValueFormatter(value as string | number);
             return {
                 id: header.id,
                 header: header.original,
-                flexgrow: 1,
-                width: 120,
+                width: computeColumnWidth(header, dataRows),
                 ...(ValueFormatter ? { cell: ValueFormatter } : {})
             } satisfies GridColumn;
         });
     }
 
     function padTimeUnit(value: number): string {
-        return String(value).padStart(2, '0');
+        return String(value).padStart(TIME_UNIT_PAD_LENGTH, '0');
     }
 
     function normalizeDateInput(value: string): string | null {

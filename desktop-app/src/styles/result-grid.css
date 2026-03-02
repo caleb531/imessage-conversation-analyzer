@@ -76,11 +76,25 @@
     max-width: 48rem;
 }
 
+.result-grid .wx-willow-dark-theme {
+    width: fit-content;
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.result-grid .wx-willow-dark-theme .wx-grid {
+    display: inline-block;
+    min-width: max-content;
+}
+
 .wx-willow-dark-theme {
     background: none !important;
 }
 .wx-table-box {
     border-bottom-width: 0 !important;
+}
+.result-grid .wx-willow-dark-theme .wx-table-box {
+    width: max-content;
 }
 .wx-data {
     border-bottom: var(--wx-table-border);
