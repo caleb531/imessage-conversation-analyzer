@@ -1,22 +1,18 @@
 <script lang="ts">
     import { invokeIcaCsv, MissingContactError, type IcaCsvHeader } from '$lib/cli';
+    import { buildDateFilterArgs, type DateFilterState } from '$lib/dateFilters';
     import { Grid, WillowDark } from '@svar-ui/svelte-grid';
-    import {
-        Button,
-        DatePicker,
-        DatePickerInput,
-        Loading,
-        TooltipIcon
-    } from 'carbon-components-svelte';
-    import Information from 'carbon-icons-svelte/lib/Information.svelte';
+    import { Button, Loading } from 'carbon-components-svelte';
     import { onMount, type Snippet } from 'svelte';
     import { SvelteMap } from 'svelte/reactivity';
     import '../styles/result-grid.css';
     import type { GridColumn } from '../types';
     import DateCell from './DateCell.svelte';
+    import DateRangeFields from './DateRangeFields.svelte';
     import InlineNotification from './InlineNotification.svelte';
     import NumberCell from './NumberCell.svelte';
 
+    // Props used by ResultGrid across all metric routes.
     interface Props {
         title: string;
         description: string;
@@ -28,26 +24,23 @@
 
     let { title, description, command, charts, children, chartsClass }: Props = $props();
 
+    // UI and data state for asynchronous loading lifecycle.
     let isReloadingData = $state(true);
     let hasInitiallyLoaded = $state(false);
     let errorMessage = $state('');
     let rows = $state<Array<Record<string, unknown>>>([]);
     let columns = $state<GridColumn[]>([]);
 
-    type DateFilterState = {
-        fromDate: string;
-        toDate: string;
-    };
-
+    // Controlled date picker values and currently applied filter snapshot.
     let fromDateInput = $state('');
     let toDateInput = $state('');
+    // Forces date picker subtree recreation when clearing values.
     let datePickerResetKey = $state(0);
     let appliedFilters = $state<DateFilterState>({
         fromDate: '',
         toDate: ''
     });
 
-    const TIME_UNIT_PAD_LENGTH = 2;
     const FALLBACK_PIXELS_PER_CHAR = 10;
     const FALLBACK_FONT_WEIGHT = '400';
     const FALLBACK_FONT_SIZE = '16px';
@@ -197,46 +190,12 @@
         });
     }
 
-    function padTimeUnit(value: number): string {
-        return String(value).padStart(TIME_UNIT_PAD_LENGTH, '0');
-    }
-
-    function normalizeDateInput(value: string): string | null {
-        const trimmed = value.trim();
-        if (!trimmed) return null;
-        const isoMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(trimmed);
-        if (isoMatch) return trimmed;
-        const slashMatch = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(trimmed);
-        if (slashMatch) {
-            const month = padTimeUnit(Number(slashMatch[1]));
-            const day = padTimeUnit(Number(slashMatch[2]));
-            return `${slashMatch[3]}-${month}-${day}`;
-        }
-        return null;
-    }
-
-    function buildDateValue(dateValue: string): string | null {
-        return normalizeDateInput(dateValue);
-    }
-
-    function buildFilterArgs(filters: DateFilterState): string[] {
-        const args: string[] = [];
-        const fromValue = buildDateValue(filters.fromDate);
-        const toValue = buildDateValue(filters.toDate);
-        if (fromValue) {
-            args.push('--from-date', fromValue);
-        }
-        if (toValue) {
-            args.push('--to-date', toValue);
-        }
-        return args;
-    }
-
+    // Loads grid data from ICA using any currently applied date filters.
     async function loadData(filters: DateFilterState = appliedFilters) {
         isReloadingData = true;
         errorMessage = '';
         try {
-            const filterArgs = buildFilterArgs(filters);
+            const filterArgs = buildDateFilterArgs(filters);
             const result = await invokeIcaCsv([...command, ...filterArgs]);
             rows = result.rows;
             columns = createColumns(result.headers, result.rows);
@@ -252,6 +211,7 @@
         }
     }
 
+    // Applies in-progress date input values as the next active filter set.
     function applyFilters() {
         const nextFilters: DateFilterState = {
             fromDate: fromDateInput,
@@ -261,16 +221,19 @@
         void loadData(nextFilters);
     }
 
+    // Handles form submit so Apply triggers filtered data reload.
     function submitFilters(event: Event) {
         event.preventDefault();
         applyFilters();
     }
 
+    // Handles form reset so Clear runs custom reset behavior.
     function resetFilters(event: Event) {
         event.preventDefault();
         clearFilters();
     }
 
+    // Resets date filters to empty and reloads unfiltered results.
     function clearFilters() {
         fromDateInput = '';
         toDateInput = '';
@@ -283,6 +246,7 @@
         void loadData(cleared);
     }
 
+    // Initial data fetch when the grid first mounts.
     onMount(() => {
         void loadData();
     });
@@ -307,54 +271,13 @@
         >
             <div class="result-grid__filters-row result-grid__filters-row--main">
                 {#key datePickerResetKey}
-                    <div class="result-grid__filters-fields">
-                        <DatePicker
-                            datePickerType="single"
-                            dateFormat="m/d/Y"
-                            bind:value={fromDateInput}
-                        >
-                            <DatePickerInput
-                                id="result-grid-from-date"
-                                size="sm"
-                                labelText="From date"
-                                placeholder="mm/dd/yyyy"
-                            >
-                                {#snippet labelChildren()}
-                                    <span class="result-grid__date-label">
-                                        <span>From date</span>
-                                        <TooltipIcon
-                                            tooltipText="Starting from midnight on the specified start date"
-                                        >
-                                            <Information />
-                                        </TooltipIcon>
-                                    </span>
-                                {/snippet}
-                            </DatePickerInput>
-                        </DatePicker>
-                        <DatePicker
-                            datePickerType="single"
-                            dateFormat="m/d/Y"
-                            bind:value={toDateInput}
-                        >
-                            <DatePickerInput
-                                id="result-grid-to-date"
-                                size="sm"
-                                labelText="To date"
-                                placeholder="mm/dd/yyyy"
-                            >
-                                {#snippet labelChildren()}
-                                    <span class="result-grid__date-label">
-                                        <span>To date</span>
-                                        <TooltipIcon
-                                            tooltipText="Up to (but not including) the specified end date"
-                                        >
-                                            <Information />
-                                        </TooltipIcon>
-                                    </span>
-                                {/snippet}
-                            </DatePickerInput>
-                        </DatePicker>
-                    </div>
+                    <DateRangeFields
+                        fromDateInputId="result-grid-from-date"
+                        toDateInputId="result-grid-to-date"
+                        bind:fromDate={fromDateInput}
+                        bind:toDate={toDateInput}
+                        disabled={isReloadingData}
+                    />
                 {/key}
                 <div class="result-grid__filters-actions">
                     {#if isReloadingData && hasInitiallyLoaded}
