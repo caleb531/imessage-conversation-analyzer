@@ -209,14 +209,16 @@
                                 labelText="From date"
                                 placeholder="mm/dd/yyyy"
                             >
-                                <span slot="labelText" class="result-grid__date-label">
-                                    <span>From date</span>
-                                    <TooltipIcon
-                                        tooltipText="Starting from midnight on the specified start date"
-                                    >
-                                        <Information />
-                                    </TooltipIcon>
-                                </span>
+                                {#snippet labelChildren()}
+                                    <span class="result-grid__date-label">
+                                        <span>From date</span>
+                                        <TooltipIcon
+                                            tooltipText="Starting from midnight on the specified start date"
+                                        >
+                                            <Information />
+                                        </TooltipIcon>
+                                    </span>
+                                {/snippet}
                             </DatePickerInput>
                         </DatePicker>
                         <DatePicker
@@ -230,14 +232,16 @@
                                 labelText="To date"
                                 placeholder="mm/dd/yyyy"
                             >
-                                <span slot="labelText" class="result-grid__date-label">
-                                    <span>To date</span>
-                                    <TooltipIcon
-                                        tooltipText="Up to (but not including) the specified end date"
-                                    >
-                                        <Information />
-                                    </TooltipIcon>
-                                </span>
+                                {#snippet labelChildren()}
+                                    <span class="result-grid__date-label">
+                                        <span>To date</span>
+                                        <TooltipIcon
+                                            tooltipText="Up to (but not including) the specified end date"
+                                        >
+                                            <Information />
+                                        </TooltipIcon>
+                                    </span>
+                                {/snippet}
                             </DatePickerInput>
                         </DatePicker>
                     </div>
