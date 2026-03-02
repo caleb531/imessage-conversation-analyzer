@@ -12,7 +12,7 @@ export default [
     prettier,
     ...svelte.configs['flat/prettier'],
     {
-        files: ['**/*.svelte'],
+        files: ['**/*.svelte', '**/*.svelte.ts'],
         languageOptions: {
             parserOptions: {
                 parser: ts.parser
@@ -36,6 +36,7 @@ export default [
             '.DS_Store',
             'node_modules',
             'build',
+            'src-tauri',
             '.svelte-kit',
             '.vercel',
             'package',
