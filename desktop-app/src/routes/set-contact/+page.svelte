@@ -13,7 +13,7 @@
 
     let contactSelection = $state<string[]>([]);
     let buttonDisabled = $state(false);
-    let buttonLabel = $state('Save contacts');
+    let buttonLabel = $state('Set contacts');
     let saveError = $state('');
     // Duration to show success message (in milliseconds) before navigating away
     let successMessageDelay = 750;
@@ -34,12 +34,12 @@
         buttonLabel = 'Saving…';
         try {
             await setSelectedContacts(contactSelection);
-            buttonLabel = 'Saved contacts!';
+            buttonLabel = 'Done!';
             await new Promise((resolve) => setTimeout(resolve, successMessageDelay));
             await goto(resolve('/message-totals'));
         } catch (error) {
             saveError = error instanceof Error ? error.message : String(error);
-            buttonLabel = 'Save contacts';
+            buttonLabel = 'Set contacts';
             buttonDisabled = false;
         }
     }
