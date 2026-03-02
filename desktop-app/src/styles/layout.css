@@ -66,9 +66,21 @@ h3 {
     --cds-productive-heading-04-font-size: 1.5rem;
 }
 
+.bx--select-input,
+.bx--date-picker__input,
+.bx--text-input,
+.bx--list-box {
+    border-radius: 5px;
+    border-bottom-width: 0;
+}
+.flatpickr-calendar {
+    border-radius: 10px;
+}
+
 .bx--btn {
     margin: 0;
     padding: 12px 20px;
+    border-radius: 5px;
     user-select: none;
     cursor: default;
 }

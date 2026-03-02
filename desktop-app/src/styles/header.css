@@ -6,6 +6,9 @@ header.bx--header {
 nav.bx--header__nav {
     display: block;
 }
+[role='menuitem'] {
+    border-radius: 6px;
+}
 
 .app-header__contact {
     display: flex;
