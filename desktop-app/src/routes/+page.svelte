@@ -9,7 +9,7 @@
         if (contacts.length > 0) {
             await goto(resolve('/message-totals'));
         } else {
-            await goto(resolve('/set-contact'));
+            await goto(resolve('/set-contacts'));
         }
     });
 </script>

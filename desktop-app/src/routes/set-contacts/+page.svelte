@@ -43,8 +43,8 @@
     }
 </script>
 
-<section class="set-contact">
-    <form class="set-contact__form" onsubmit={handleSubmit}>
+<section class="set-contacts">
+    <form class="set-contacts__form" onsubmit={handleSubmit}>
         <h2>Choose contacts</h2>
         <ContactPicker bind:selectedContacts={contactSelection} />
         {#if saveError}

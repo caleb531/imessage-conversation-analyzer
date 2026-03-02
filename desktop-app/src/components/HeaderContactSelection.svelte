@@ -131,7 +131,7 @@
 
 <div class="app-header__contact-selection">
     <span class="app-header__contact-selection-names">{contactLabel}</span>
-    <Link class="app-header__contact-selection-link" href="/set-contact">
+    <Link class="app-header__contact-selection-link" href="/set-contacts">
         {actionLabel}
     </Link>
 </div>
