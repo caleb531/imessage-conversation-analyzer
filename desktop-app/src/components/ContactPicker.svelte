@@ -16,14 +16,26 @@
     let searchValue = $state('');
     let selectedId = $state<string | undefined>(undefined);
 
+    const availableComboboxItems = $derived(
+        comboboxItems.filter((item) => !selectedContacts.includes(item.id))
+    );
     const trimmedSearch = $derived(searchValue.trim());
     const filteredCount = $derived(
+        availableComboboxItems.reduce(
+            (count, item) => count + (shouldFilterItem(item, trimmedSearch) ? 1 : 0),
+            0
+        )
+    );
+    const totalFilteredCount = $derived(
         comboboxItems.reduce(
             (count, item) => count + (shouldFilterItem(item, trimmedSearch) ? 1 : 0),
             0
         )
     );
     const noMatches = $derived(Boolean(trimmedSearch) && filteredCount === 0);
+    const matchesAlreadySelected = $derived(
+        Boolean(trimmedSearch) && totalFilteredCount > 0 && noMatches
+    );
 
     onMount(loadContacts);
 
@@ -96,24 +108,32 @@
                 placeholder="Search contacts…"
                 bind:selectedId
                 bind:value={searchValue}
-                items={comboboxItems}
+                items={availableComboboxItems}
                 {shouldFilterItem}
-                disabled={!comboboxItems.length}
+                disabled={!availableComboboxItems.length}
             />
         </div>
-        {#if !comboboxItems.length}
+        {#if !availableComboboxItems.length}
             <p class="contact-picker-status contact-picker-status--empty">
-                No contacts are available.
+                {#if !comboboxItems.length}
+                    No contacts available.
+                {:else}
+                    All contacts selected.
+                {/if}
             </p>
         {:else if noMatches}
             <p class="contact-picker-status contact-picker-status--empty">
-                No contacts match "{trimmedSearch}".
+                {#if matchesAlreadySelected}
+                    All matching contacts already selected.
+                {:else}
+                    No matching contacts.
+                {/if}
             </p>
         {/if}
         {#if selectedContacts.length > 0}
             <h3 class="contact-picker__selected-heading">Selected Contacts</h3>
             <ul class="contact-picker__selected-list">
-                {#each selectedContacts as contact}
+                {#each selectedContacts as contact (contact)}
                     <li class="contact-picker__selected-item">
                         <span>{contact}</span>
                         <Button
@@ -128,7 +148,7 @@
                     </li>
                 {/each}
             </ul>
-        {:else}
+        {:else if !comboboxItems.length}
             <p class="contact-picker-status contact-picker-status--selection">
                 No contacts selected.
             </p>
