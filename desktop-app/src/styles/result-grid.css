@@ -106,7 +106,7 @@
 .result-grid-charts {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     width: 50%;
     margin: 0 auto;
     margin-top: -0.5em;
