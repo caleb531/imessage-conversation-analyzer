@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "imessage-conversation-analyzer",
+  "productName": "iMessage Conversation Analyzer",
   "version": "0.1.0",
   "identifier": "com.calebevans.imessage-conversation-analyzer",
   "build": {
