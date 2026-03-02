@@ -1,3 +1,5 @@
+All variables, functions, and other definitions should be accompanied by thoughtful code comments.
+
 You are able to use the Svelte MCP server, where you have access to comprehensive Svelte 5 and SvelteKit documentation. Here's how to use the available tools effectively:
 
 ## Available MCP Tools:
