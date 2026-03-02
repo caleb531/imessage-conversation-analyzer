@@ -1,5 +1,6 @@
 <script lang="ts">
     import { BarChart } from 'layerchart';
+    import { chartColors } from '../colors';
     import '../styles/metric-bar-chart.css';
     import type { DataPoint } from '../types';
 
@@ -21,7 +22,7 @@
     const chartX = $derived(orientation === 'horizontal' ? y : x);
     const chartY = $derived(orientation === 'horizontal' ? x : y);
     const labelClass = $derived(labelType === 'emoji' ? 'emoji-tick-label' : 'text-tick-label');
-    let barColor = $state('var(--color-chart-series-1)');
+    let barColor = $state(chartColors[0] ?? 'var(--color-chart-1)');
 
     const axisProps = $derived(
         orientation === 'horizontal'

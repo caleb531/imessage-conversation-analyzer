@@ -1,17 +1,8 @@
 <script lang="ts">
+    import { chartColors } from '../../colors';
     import MetricStackedBarChart from '../../components/MetricStackedBarChart.svelte';
     import ResultGrid from '../../components/ResultGrid.svelte';
     import type { GridColumn } from '../../types';
-
-    const seriesColors = [
-        'var(--color-chart-series-1)',
-        'var(--color-chart-series-2)',
-        'var(--color-chart-series-3)',
-        'var(--color-chart-series-4)',
-        'var(--color-chart-series-5)',
-        'var(--color-chart-series-6)',
-        'var(--color-chart-series-7)'
-    ];
 
     const dateLabelFormatter = new Intl.DateTimeFormat('en-US', {
         month: 'numeric',
@@ -136,7 +127,7 @@
         const series = seriesColumns.map((column, index) => ({
             key: column.id,
             label: column.header,
-            color: seriesColors[index % seriesColors.length]
+            color: chartColors[index % chartColors.length]
         }));
 
         return { data, series, xGroupLabels };

@@ -1,18 +1,11 @@
 <script lang="ts">
     import { PieChart } from 'layerchart';
+    import { chartColors } from '../colors';
     import '../styles/metric-pie-chart.css';
     import type { DataPoint } from '../types';
 
     export let data: DataPoint[];
     export let label = '';
-    export let colors = [
-        'var(--color-chart-categorical-1)',
-        'var(--color-chart-categorical-2)',
-        'var(--color-chart-categorical-3)',
-        'var(--color-chart-categorical-4)',
-        'var(--color-chart-categorical-5)',
-        'var(--color-chart-categorical-6)'
-    ];
     export let innerRadius = -15;
     export let outerRadius = 70;
     export let cornerRadius = 4;
@@ -26,7 +19,7 @@
                 {data}
                 key="key"
                 value="value"
-                cRange={colors}
+                cRange={chartColors}
                 {innerRadius}
                 {outerRadius}
                 {cornerRadius}
@@ -57,7 +50,7 @@
                 <li class="metric-pie-chart__legend-item">
                     <span
                         class="metric-pie-chart__legend-swatch"
-                        style={`--legend-color: ${colors[index % colors.length]}`}
+                        style={`--legend-color: ${chartColors[index % chartColors.length]}`}
                     ></span>
                     <span class="metric-pie-chart__legend-label">{point.key}</span>
                 </li>
