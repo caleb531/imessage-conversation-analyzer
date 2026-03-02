@@ -1,6 +1,4 @@
 <script lang="ts">
-    import { goto } from '$app/navigation';
-    import { resolve } from '$app/paths';
     import { Button } from 'carbon-components-svelte';
     import { onMount } from 'svelte';
     import ContactPicker from '../../components/ContactPicker.svelte';
@@ -36,9 +34,9 @@
             await setSelectedContacts(contactSelection);
             buttonLabel = 'Done!';
             await new Promise((resolve) => setTimeout(resolve, successMessageDelay));
-            await goto(resolve('/message-totals'));
         } catch (error) {
             saveError = error instanceof Error ? error.message : String(error);
+        } finally {
             buttonLabel = 'Set contacts';
             buttonDisabled = false;
         }
