@@ -10,19 +10,19 @@ nav.bx--header__nav {
     border-radius: 6px;
 }
 
-.app-header__contact {
+.app-header__contact-selection {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     gap: 0.25rem;
 }
 
-.app-header__contact-name {
+.app-header__contact-selection-names {
     font-size: 0.875rem;
     line-height: 1.25rem;
 }
 
-.app-header__contact-link {
+.app-header__contact-selection-link {
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.08em;
