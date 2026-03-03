@@ -10,18 +10,18 @@
     import type { Contact } from '../../types';
 
     // Tracks the contacts selected in the picker prior to persistence.
-    let contactSelection = $state<Contact[]>([]);
+    let pickerSelectedContacts = $state<Contact[]>([]);
     // Tracks the latest persistence failure message for inline display.
     let saveError = $state('');
     // Indicates that initial contact state has been loaded from persisted storage.
-    let hasInitialisedSelection = $state(false);
+    let hasInitializedSelection = $state(false);
     // Tracks the most recent save request number to ignore stale async completion.
     let saveRequestVersion = 0;
 
     onMount(async () => {
         await ensureSelectedContactsLoaded();
-        contactSelection = [...selectedContacts.value];
-        hasInitialisedSelection = true;
+        pickerSelectedContacts = [...selectedContacts.value];
+        hasInitializedSelection = true;
     });
 
     // Persists the latest contact selection and only applies results from the newest request.
@@ -43,18 +43,18 @@
 
     // Automatically persists contacts whenever picker selection changes after initial load.
     $effect(() => {
-        if (!hasInitialisedSelection) {
+        if (!hasInitializedSelection) {
             return;
         }
 
-        void persistSelection([...contactSelection]);
+        void persistSelection([...pickerSelectedContacts]);
     });
 </script>
 
 <section class="set-contacts">
-    <form class="set-contacts__form" onsubmit={(e) => e.preventDefault()}>
+    <form class="set-contacts__form" onsubmit={(event) => event.preventDefault()}>
         <h2>Choose contacts</h2>
-        <ContactPicker bind:selectedContacts={contactSelection} />
+        <ContactPicker bind:selectedContacts={pickerSelectedContacts} />
         <p class="set-contacts__note">Changes are automatically saved</p>
         {#if saveError}
             <InlineNotification kind="error" title="Error" subtitle={saveError} />

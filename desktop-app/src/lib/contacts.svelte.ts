@@ -61,7 +61,7 @@ function normalizeOptionalString(value: unknown): string | undefined {
     return trimmedValue.length > 0 ? trimmedValue : undefined;
 }
 
-async function initialiseSelectedContacts() {
+async function initializeSelectedContacts() {
     const store = await getStore();
     const stored = await store.get<ContactValues>('selectedContacts');
     selectedContacts.value = normalizeContacts(stored);
@@ -73,7 +73,7 @@ export async function ensureSelectedContactsLoaded() {
         return;
     }
     if (!initPromise) {
-        initPromise = initialiseSelectedContacts().catch((error) => {
+        initPromise = initializeSelectedContacts().catch((error) => {
             initPromise = null;
             throw error;
         });
