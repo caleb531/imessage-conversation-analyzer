@@ -32,7 +32,7 @@
         >
             {#snippet labelChildren()}
                 <span class="date-range-fields__label">
-                    <span>From date</span>
+                    <span class="date-range-fields__label-text">From date</span>
                     <TooltipIcon tooltipText="Starting from midnight on the specified start date">
                         <Information />
                     </TooltipIcon>
@@ -51,7 +51,7 @@
         >
             {#snippet labelChildren()}
                 <span class="date-range-fields__label">
-                    <span>To date</span>
+                    <span class="date-range-fields__label-text">To date</span>
                     <TooltipIcon tooltipText="Up to (but not including) the specified end date">
                         <Information />
                     </TooltipIcon>

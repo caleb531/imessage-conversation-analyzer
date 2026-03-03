@@ -176,7 +176,9 @@
             <ul class="contact-picker__selected-list">
                 {#each selectedContacts as contact (contact.id)}
                     <li class="contact-picker__selected-item">
-                        <span>{getSelectedContactLabel(contact)}</span>
+                        <span class="contact-picker__selected-item-label"
+                            >{getSelectedContactLabel(contact)}</span
+                        >
                         <Button
                             kind="ghost"
                             size="small"
