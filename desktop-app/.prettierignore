@@ -3,7 +3,7 @@ node_modules
 /build
 /.svelte-kit
 /.vercel
-/src-tauri
+/src-tauri/*/
 /src/lib
 /package
 .env

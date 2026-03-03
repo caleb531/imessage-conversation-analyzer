@@ -32,9 +32,7 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "externalBin": [
-      "bin/ica-sidecar"
-    ],
+    "externalBin": ["bin/ica-sidecar"],
     "resources": ["_internal"]
   }
 }
