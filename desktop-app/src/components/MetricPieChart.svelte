@@ -4,12 +4,25 @@
     import '../styles/metric-pie-chart.css';
     import type { DataPoint } from '../types';
 
-    export let data: DataPoint[];
-    export let label = '';
-    export let innerRadius = -15;
-    export let outerRadius = 70;
-    export let cornerRadius = 4;
-    export let padAngle = 0.02;
+    // Public props accepted by the pie chart wrapper component.
+    interface Props {
+        data: DataPoint[];
+        label?: string;
+        innerRadius?: number;
+        outerRadius?: number;
+        cornerRadius?: number;
+        padAngle?: number;
+    }
+
+    // Component props with defaults for chart sizing and arc styling.
+    let {
+        data,
+        label = '',
+        innerRadius = -15,
+        outerRadius = 70,
+        cornerRadius = 4,
+        padAngle = 0.02
+    }: Props = $props();
 </script>
 
 {#if data.length > 0}
@@ -32,7 +45,7 @@
                     }
                 }}
             >
-                <svelte:fragment slot="aboveMarks" let:width let:height>
+                <svelte:fragment slot="aboveMarks">
                     <text
                         x={0}
                         y={0}

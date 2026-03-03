@@ -1,7 +1,8 @@
-import { defineConfig } from 'vite';
 import { sveltekit } from '@sveltejs/kit/vite';
+import { defineConfig } from 'vite';
 import sidecarBuildPlugin from './plugins/sidecar-build.js';
 
+// Host override used by `tauri dev` when HMR should bind to a specific interface.
 const host = process.env.TAURI_DEV_HOST;
 
 // https://vite.dev/config/

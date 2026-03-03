@@ -4,6 +4,7 @@
     import ResultGrid from '../../components/ResultGrid.svelte';
     import type { GridColumn } from '../../types';
 
+    // Builds stacked-bar chart props for emoji frequency and per-contact counts.
     function getStackedChartProps({
         rows,
         columns

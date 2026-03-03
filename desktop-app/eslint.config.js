@@ -5,6 +5,7 @@ import globals from 'globals';
 import ts from 'typescript-eslint';
 
 /** @type {import('eslint').Linter.Config[]} */
+// Flat ESLint configuration for TypeScript, Svelte, and formatting compatibility.
 export default [
     js.configs.recommended,
     ...ts.configs.recommended,
@@ -12,6 +13,7 @@ export default [
     prettier,
     ...svelte.configs['flat/prettier'],
     {
+        // Svelte files use the TypeScript parser for script blocks.
         files: ['**/*.svelte', '**/*.svelte.ts'],
         languageOptions: {
             parserOptions: {
@@ -20,6 +22,7 @@ export default [
         }
     },
     {
+        // Shared browser/node globals and baseline lint rules.
         languageOptions: {
             globals: {
                 ...globals.browser,
@@ -27,11 +30,19 @@ export default [
             }
         },
         rules: {
-            'no-unused-vars': 'off',
-            '@typescript-eslint/no-unused-vars': 'off'
+            'no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+            '@typescript-eslint/no-unused-vars': [
+                'warn',
+                {
+                    argsIgnorePattern: '^_',
+                    varsIgnorePattern: '^_',
+                    caughtErrorsIgnorePattern: '^_'
+                }
+            ]
         }
     },
     {
+        // Ignore generated assets and dependency lock files.
         ignores: [
             '.DS_Store',
             'node_modules',

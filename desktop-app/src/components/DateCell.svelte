@@ -1,5 +1,15 @@
 <script lang="ts">
-    const { row, column } = $props<{ value: number }>();
+    // Props consumed by a grid cell renderer for date values.
+    interface Props {
+        row: Record<string, unknown>;
+        column: { id: string };
+    }
+
+    // Current row payload and target column metadata from the grid.
+    const { row, column }: Props = $props();
+
+    // Cell value normalized to a string for safe Date construction.
+    const dateValue = $derived(String(row[column.id] ?? ''));
 </script>
 
 <span class="date-cell"
@@ -8,5 +18,5 @@
         year: 'numeric',
         month: 'short',
         day: 'numeric'
-    }).format(new Date(row[column.id]))}</span
+    }).format(new Date(dateValue))}</span
 >

@@ -4,12 +4,18 @@ import { getContactCliSelector } from '../types';
 import { getSelectedContacts } from './contacts.svelte';
 import { runIcaSidecar, type SidecarResult } from './sidecar';
 
+// Flags accepted for explicit output format control.
 const FORMAT_FLAGS = new Set(['--format', '-f']);
+// Flags accepted for explicit output path control.
 const OUTPUT_FLAGS = new Set(['--output', '-o']);
+// Flags accepted for explicit contact selector control.
 const CONTACT_FLAGS = new Set(['--contact', '-c']);
+// Combined short flags that can include their value in the same token.
 const COMBINED_SHORT_FLAGS = new Set(['-c', '-f', '-o']);
+// Combined long flags that can include their value in the same token.
 const COMBINED_LONG_FLAGS = new Set(['--contact', '--format', '--output']);
 
+// Domain error used when the user has not selected contacts before running ICA.
 export class MissingContactError extends Error {
     constructor(message = 'No contacts selected. Choose at least one contact before running the analyzer.') {
         super(message);
@@ -17,11 +23,13 @@ export class MissingContactError extends Error {
     }
 }
 
+// Header metadata returned after CSV parsing and header normalization.
 export interface IcaCsvHeader {
     original: string;
     id: string;
 }
 
+// Rich result payload returned for CSV-returning ICA invocations.
 export interface IcaCsvResult {
     code: SidecarResult['code'];
     signal: SidecarResult['signal'];
@@ -32,6 +40,7 @@ export interface IcaCsvResult {
     args: string[];
 }
 
+// Result payload returned when ICA writes output directly to a file.
 export interface IcaCommandResult {
     code: SidecarResult['code'];
     signal: SidecarResult['signal'];
@@ -40,6 +49,7 @@ export interface IcaCommandResult {
     args: string[];
 }
 
+// Converts arbitrary CSV headers to stable camelCase object keys.
 function toCamelCase(header: string, headerIndex: number): string {
     const cleaned = header.replace(/[^0-9A-Za-z]+/g, ' ').trim();
     if (!cleaned) {
@@ -57,6 +67,7 @@ function toCamelCase(header: string, headerIndex: number): string {
         .join('');
 }
 
+// Expands combined `--flag=value` and `-fvalue` argument forms for known options.
 function expandKnownCombinedArgs(args: string[]): string[] {
     const expanded: string[] = [];
     for (const arg of args) {
@@ -86,6 +97,7 @@ function expandKnownCombinedArgs(args: string[]): string[] {
     return expanded;
 }
 
+// Removes an option and its trailing value for all matching flag aliases.
 function removeOption(args: string[], flags: Set<string>): string[] {
     const result: string[] = [];
     for (let index = 0; index < args.length; index += 1) {
@@ -99,10 +111,12 @@ function removeOption(args: string[], flags: Set<string>): string[] {
     return result;
 }
 
+// Returns whether any of the provided flags already exists in the argument list.
 function hasFlag(args: string[], flags: Set<string>): boolean {
     return args.some((arg) => flags.has(arg));
 }
 
+// Parses either shell-style argument text or a pre-tokenized argument array.
 function parseArgInput(args: string | string[]): string[] {
     if (Array.isArray(args)) {
         return [...args];
@@ -114,6 +128,7 @@ function parseArgInput(args: string | string[]): string[] {
     return parseArgsStringToArgv(trimmed);
 }
 
+// Adds resolved `--contact` selectors from saved contacts when missing from args.
 async function addContactArgument(args: string[]): Promise<string[]> {
     if (hasFlag(args, CONTACT_FLAGS)) {
         return args;
@@ -135,16 +150,19 @@ async function addContactArgument(args: string[]): Promise<string[]> {
     return [...args, ...contactSelectors.flatMap((selector) => ['--contact', selector])];
 }
 
+// Forces CSV output format by replacing any existing format flag pair.
 function ensureCsvFormat(args: string[]): string[] {
     const withoutFormat = removeOption(args, FORMAT_FLAGS);
     return [...withoutFormat, '--format', 'csv'];
 }
 
+// Forces output path by replacing any existing output flag pair.
 function ensureOutputPath(args: string[], outputPath: string): string[] {
     const withoutOutput = removeOption(args, OUTPUT_FLAGS);
     return [...withoutOutput, '--output', outputPath];
 }
 
+// Parses ICA CSV stdout into normalized headers and row objects.
 function parseCsvOutput(
     rawCsv: string,
     finalArgs: string[]
@@ -153,6 +171,7 @@ function parseCsvOutput(
     const headersByIndex = new Map<number, IcaCsvHeader>();
     const usedIds = new Set<string>();
 
+    // Guarantees unique header IDs when the CLI emits repeated header names.
     function ensureUniqueId(baseId: string): string {
         let candidate = baseId;
         let suffix = 1;
@@ -244,6 +263,7 @@ function parseCsvOutput(
     return { headers: filteredHeaders, rows: parseResult.data };
 }
 
+// Runs ICA and returns parsed CSV rows for table/chart rendering routes.
 export async function invokeIcaCsv(args: string | string[]): Promise<IcaCsvResult> {
     const parsedArgs = parseArgInput(args);
     const expandedArgs = expandKnownCombinedArgs(parsedArgs);
@@ -251,10 +271,17 @@ export async function invokeIcaCsv(args: string | string[]): Promise<IcaCsvResul
     const finalArgs = ensureCsvFormat(argsWithContact);
 
     const result = await runIcaSidecar(finalArgs);
+    if (result.code !== 0) {
+        const stderr = result.stderr.trim();
+        const stdout = result.stdout.trim();
+        throw new Error(
+            `ICA failed (code ${result.code ?? 'unknown'}) for args: ${finalArgs.join(' ')}. ${stderr || stdout}`
+        );
+    }
     const rawCsv = result.stdout.trim();
 
     if (!rawCsv) {
-        throw new Error('No data returned.');
+        throw new Error(`ICA produced no CSV output for args: ${finalArgs.join(' ')}`);
     }
 
     const parsedCsv = parseCsvOutput(rawCsv, finalArgs);
@@ -270,6 +297,7 @@ export async function invokeIcaCsv(args: string | string[]): Promise<IcaCsvResul
     };
 }
 
+// Runs ICA and writes CSV output to disk using an explicit output path.
 export async function invokeIcaCsvToFile(
     args: string | string[],
     outputPath: string
@@ -295,8 +323,4 @@ export async function invokeIcaCsvToFile(
         stdout,
         args: finalArgs
     };
-}
-
-export async function runMessageTotals(): Promise<IcaCsvResult> {
-    return invokeIcaCsv(['message_totals']);
 }

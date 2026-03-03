@@ -2,14 +2,20 @@ import { invoke } from '@tauri-apps/api/core';
 import { load } from '@tauri-apps/plugin-store';
 import type { Contact } from '../types';
 
+// Alias for selected-contact arrays used across store helpers.
 export type ContactValues = Contact[];
 
+// Reactive in-memory selected contacts mirrored from persisted store data.
 export const selectedContacts = $state<{ value: ContactValues }>({ value: [] });
 
+// Lazy-initialized promise for the plugin-store instance.
 let storePromise: Promise<Awaited<ReturnType<typeof load>>> | undefined;
+// In-flight initialization promise used to coalesce concurrent bootstrap calls.
 let initPromise: Promise<void> | null = null;
+// Guard that prevents reloading from disk on every caller request.
 let hasLoaded = false;
 
+// Returns the persisted store instance, creating it on first use.
 async function getStore() {
     if (!storePromise) {
         storePromise = load('store.json');
@@ -17,6 +23,7 @@ async function getStore() {
     return storePromise;
 }
 
+// Normalizes persisted contacts and removes invalid or duplicate entries by contact ID.
 function normalizeContacts(contacts: ContactValues | null | undefined): ContactValues {
     if (!Array.isArray(contacts)) {
         return [];
@@ -61,6 +68,7 @@ function normalizeOptionalString(value: unknown): string | undefined {
     return trimmedValue.length > 0 ? trimmedValue : undefined;
 }
 
+// Loads selected contacts from persistence into reactive in-memory state.
 async function initializeSelectedContacts() {
     const store = await getStore();
     const stored = await store.get<ContactValues>('selectedContacts');
@@ -68,6 +76,7 @@ async function initializeSelectedContacts() {
     hasLoaded = true;
 }
 
+// Ensures selected contacts have been loaded from persistence once per app session.
 export async function ensureSelectedContactsLoaded() {
     if (hasLoaded) {
         return;
@@ -81,11 +90,13 @@ export async function ensureSelectedContactsLoaded() {
     await initPromise;
 }
 
+// Returns selected contacts after ensuring initial persistence load has completed.
 export async function getSelectedContacts() {
     await ensureSelectedContactsLoaded();
     return selectedContacts.value;
 }
 
+// Persists and updates the in-memory selected contacts list.
 export async function setSelectedContacts(contacts: ContactValues | null | undefined) {
     const store = await getStore();
     const normalizedContacts = normalizeContacts(contacts);
@@ -99,10 +110,12 @@ export async function setSelectedContacts(contacts: ContactValues | null | undef
     hasLoaded = true;
 }
 
+// Clears all selected contacts from persistence and memory.
 export async function clearSelectedContacts() {
     await setSelectedContacts(null);
 }
 
+// Forces a fresh reload of selected contacts from persistence.
 export async function refreshSelectedContacts() {
     hasLoaded = false;
     initPromise = null;
@@ -110,6 +123,13 @@ export async function refreshSelectedContacts() {
     return selectedContacts.value;
 }
 
+// Fetches all contacts from the native backend command.
 export async function fetchContacts(): Promise<Contact[]> {
-    return invoke<Contact[]>('get_contacts');
+    try {
+        return await invoke<Contact[]>('get_contacts');
+    } catch (error) {
+        throw new Error(`Failed to fetch contacts via get_contacts: ${String(error)}`, {
+            cause: error
+        });
+    }
 }

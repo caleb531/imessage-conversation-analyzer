@@ -5,44 +5,58 @@
     import '../styles/contact-picker.css';
     import { getContactBaseName, getContactDisplayLabel, type Contact } from '../types';
 
+    // Internal ComboBox item shape that preserves the original contact payload.
     type ContactItem = {
         id: string;
         text: string;
         contact: Contact;
     };
 
+    // Two-way bound selection list controlled by parent route components.
     let { selectedContacts = $bindable<Contact[]>([]) } = $props();
+    // Loading flag for the initial contacts fetch.
     let contactsLoading = $state(true);
+    // Inline error text for fetch failures.
     let contactsError = $state('');
+    // Full list of selectable combobox options.
     let comboboxItems = $state<ContactItem[]>([]);
+    // Current search text used by the combobox filter.
     let searchValue = $state('');
+    // Currently highlighted/selected combobox item ID.
     let selectedId = $state<string | undefined>(undefined);
 
+    // Items that are not yet present in the selected list.
     const availableComboboxItems = $derived(
         comboboxItems.filter(
             (item) => !selectedContacts.some((selectedContact) => selectedContact.id === item.id)
         )
     );
+    // Search query with whitespace trimmed for matching and state derivation.
     const trimmedSearch = $derived(searchValue.trim());
+    // Number of matches among currently available items.
     const filteredCount = $derived(
         availableComboboxItems.reduce(
             (count, item) => count + (shouldFilterItem(item, trimmedSearch) ? 1 : 0),
             0
         )
     );
+    // Number of matches across the full item set including already selected entries.
     const totalFilteredCount = $derived(
         comboboxItems.reduce(
             (count, item) => count + (shouldFilterItem(item, trimmedSearch) ? 1 : 0),
             0
         )
     );
+    // Indicates no available items match the current search query.
     const noMatches = $derived(Boolean(trimmedSearch) && filteredCount === 0);
+    // Indicates matches exist but every match is already selected.
     const matchesAlreadySelected = $derived(
         Boolean(trimmedSearch) && totalFilteredCount > 0 && noMatches
     );
 
     onMount(loadContacts);
 
+    // Loads contacts from the backend and maps them into ComboBox options.
     async function loadContacts() {
         contactsLoading = true;
         contactsError = '';
@@ -87,6 +101,7 @@
         }
     }
 
+    // Adds the currently selected combobox item to the selected contacts list.
     function addContact() {
         if (!selectedId) {
             return;
@@ -107,10 +122,12 @@
         searchValue = '';
     }
 
+    // Removes one selected contact by ID.
     function removeContact(contactId: string) {
         selectedContacts = selectedContacts.filter((entry) => entry.id !== contactId);
     }
 
+    // Case-insensitive text predicate used by Carbon ComboBox filtering.
     function shouldFilterItem(item: ContactItem, value: string) {
         if (!value) {
             return true;

@@ -4,11 +4,13 @@
     import ResultGrid from '../../components/ResultGrid.svelte';
     import type { GridColumn } from '../../types';
 
+    // Formatter used for compact month/day x-axis labels.
     const dateLabelFormatter = new Intl.DateTimeFormat('en-US', {
         month: 'numeric',
         day: 'numeric'
     });
 
+    // Formats axis tick values into short date labels.
     function formatDateTick(value: string | number): string {
         const parsedDate = parseDateValue(value);
         if (!parsedDate) {
@@ -17,6 +19,7 @@
         return dateLabelFormatter.format(parsedDate);
     }
 
+    // Parses mixed date inputs into valid Date objects when possible.
     function parseDateValue(value: unknown): Date | null {
         const input = String(value ?? '').trim();
         if (!input) {
@@ -44,6 +47,7 @@
         return Number.isNaN(parsed.getTime()) ? null : parsed;
     }
 
+    // Builds chart series, data points, and year boundary labels from grid data.
     function getStackedChartProps({
         rows,
         columns

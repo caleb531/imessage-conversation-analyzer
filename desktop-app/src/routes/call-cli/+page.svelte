@@ -3,18 +3,27 @@
     import InlineNotification from '../../components/InlineNotification.svelte';
     import { invokeIcaCsv, MissingContactError, type IcaCsvHeader } from '../../lib/cli';
 
+    // Raw CLI argument text entered by the user.
     let icaArgs = $state('message_totals');
+    // Parsed CSV rows returned from ICA.
     let icaRows = $state<Array<Record<string, unknown>>>([]);
+    // Normalized CSV header metadata returned from ICA.
     let icaHeaders = $state<IcaCsvHeader[]>([]);
+    // stderr output captured from sidecar execution.
     let icaStderr = $state('');
+    // User-facing error message for failed executions.
     let icaError = $state('');
+    // Running flag used to disable duplicate submissions.
     let icaRunning = $state(false);
+    // Final argument list after parser and contact injection normalization.
     let resolvedArgs = $state<string[]>([]);
 
+    // Pretty-prints rows for the debug code snippet panel.
     function formatRows(rows: Array<Record<string, unknown>>) {
         return JSON.stringify(rows, null, 2);
     }
 
+    // Runs ICA with the current argument input and updates the debug panels.
     async function runSidecar(event: Event) {
         event.preventDefault();
         icaRunning = true;

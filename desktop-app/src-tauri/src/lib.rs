@@ -17,10 +17,13 @@ use serde::Serialize;
 use std::path::{Path, PathBuf};
 
 #[cfg(target_os = "macos")]
+/// Contacts framework entity type constant for contacts.
 const CN_ENTITY_TYPE_CONTACTS: i64 = 0;
 #[cfg(target_os = "macos")]
+/// Authorization status value meaning user has not been prompted yet.
 const CN_AUTH_STATUS_NOT_DETERMINED: i64 = 0;
 #[cfg(target_os = "macos")]
+/// Authorization status value meaning access has been granted.
 const CN_AUTH_STATUS_AUTHORIZED: i64 = 3;
 
 #[cfg(target_os = "macos")]
@@ -32,9 +35,11 @@ extern "C" {}
 extern "C" {}
 
 #[cfg(target_os = "macos")]
+/// Small RAII wrapper that releases retained Objective-C objects on drop.
 struct ObjcOwned(*mut Object);
 
 #[derive(Clone, Serialize)]
+/// Serializable contact payload returned to the frontend.
 struct Contact {
     id: String,
     #[serde(rename = "firstName", skip_serializing_if = "Option::is_none")]
@@ -52,6 +57,7 @@ struct Contact {
 #[cfg(target_os = "macos")]
 impl ObjcOwned {
     #[inline]
+    /// Returns the raw Objective-C pointer owned by this wrapper.
     fn as_ptr(&self) -> *mut Object {
         self.0
     }
@@ -59,6 +65,7 @@ impl ObjcOwned {
 
 #[cfg(target_os = "macos")]
 impl Drop for ObjcOwned {
+    /// Releases the retained Objective-C object if one is present.
     fn drop(&mut self) {
         unsafe {
             if !self.0.is_null() {
@@ -69,6 +76,7 @@ impl Drop for ObjcOwned {
 }
 
 #[tauri::command]
+/// Tauri command that fetches contacts from the native macOS contacts database.
 async fn get_contacts() -> Result<Vec<Contact>, String> {
     #[cfg(target_os = "macos")]
     {
@@ -84,6 +92,7 @@ async fn get_contacts() -> Result<Vec<Contact>, String> {
 }
 
 #[cfg(target_os = "macos")]
+/// Fetches contacts through `CNContactStore` and maps them into frontend DTOs.
 fn fetch_contacts() -> Result<Vec<Contact>, String> {
     unsafe {
         let store_ptr: *mut Object = msg_send![class!(CNContactStore), new];
@@ -103,7 +112,8 @@ fn fetch_contacts() -> Result<Vec<Contact>, String> {
             "phoneNumbers",
             "emailAddresses",
         ];
-        let mut c_strings = Vec::with_capacity(key_strings.len());
+        // Keep C strings alive while creating NSString keys from UTF-8 pointers.
+        let mut key_cstrings = Vec::with_capacity(key_strings.len());
         let mut ns_keys = Vec::with_capacity(key_strings.len());
         for key in key_strings {
             let c_string = CString::new(key).map_err(|_| format!("Invalid key: {key}"))?;
@@ -112,7 +122,7 @@ fn fetch_contacts() -> Result<Vec<Contact>, String> {
             if ns_key.is_null() {
                 return Err(format!("Failed to create NSString for {key}."));
             }
-            c_strings.push(c_string);
+            key_cstrings.push(c_string);
             ns_keys.push(ns_key);
         }
 
@@ -173,6 +183,7 @@ fn fetch_contacts() -> Result<Vec<Contact>, String> {
 }
 
 #[cfg(target_os = "macos")]
+/// Ensures the app has contacts permission, requesting it when needed.
 fn ensure_contacts_access(store: *mut Object) -> Result<(), String> {
     unsafe {
         let status: i64 = msg_send![class!(CNContactStore), authorizationStatusForEntityType: CN_ENTITY_TYPE_CONTACTS];
@@ -194,10 +205,10 @@ fn ensure_contacts_access(store: *mut Object) -> Result<(), String> {
                 Some(ns_error_to_string(error))
             };
 
-            let mut guard = state_clone
-                .0
-                .lock()
-                .expect("poisoned contacts access mutex");
+            let mut guard = match state_clone.0.lock() {
+                Ok(guard) => guard,
+                Err(poisoned) => poisoned.into_inner(),
+            };
             *guard = Some((granted == YES, error_message));
             state_clone.1.notify_one();
         });
@@ -229,6 +240,7 @@ fn ensure_contacts_access(store: *mut Object) -> Result<(), String> {
 }
 
 #[cfg(target_os = "macos")]
+/// Builds a stable, case-insensitive sort key for contact ordering.
 fn contact_sort_key(contact: &Contact) -> String {
     let first_name = contact.first_name.clone().unwrap_or_default();
     let last_name = contact.last_name.clone().unwrap_or_default();
@@ -243,6 +255,9 @@ fn contact_sort_key(contact: &Contact) -> String {
 }
 
 #[cfg(target_os = "macos")]
+/// # Safety
+///
+/// `contact` must be either null or a valid `CNContact` Objective-C instance.
 unsafe fn contact_from_objc(contact: *mut Object) -> Option<Contact> {
     if contact.is_null() {
         return None;
@@ -273,6 +288,9 @@ unsafe fn contact_from_objc(contact: *mut Object) -> Option<Contact> {
 }
 
 #[cfg(target_os = "macos")]
+/// # Safety
+///
+/// `phone_numbers` must be either null or a valid Objective-C collection of labeled phone values.
 unsafe fn first_phone_value(phone_numbers: *mut Object) -> Option<String> {
     if phone_numbers.is_null() {
         return None;
@@ -298,6 +316,9 @@ unsafe fn first_phone_value(phone_numbers: *mut Object) -> Option<String> {
 }
 
 #[cfg(target_os = "macos")]
+/// # Safety
+///
+/// `email_addresses` must be either null or a valid Objective-C collection of labeled email values.
 unsafe fn first_email_value(email_addresses: *mut Object) -> Option<String> {
     if email_addresses.is_null() {
         return None;
@@ -319,6 +340,9 @@ unsafe fn first_email_value(email_addresses: *mut Object) -> Option<String> {
 }
 
 #[cfg(target_os = "macos")]
+/// # Safety
+///
+/// `ns_string` must be either null or a valid Objective-C `NSString` pointer.
 unsafe fn nsstring_to_optional_string(ns_string: *mut Object) -> Option<String> {
     let value = nsstring_to_string(ns_string);
     let trimmed = value.trim();
@@ -330,6 +354,9 @@ unsafe fn nsstring_to_optional_string(ns_string: *mut Object) -> Option<String> 
 }
 
 #[cfg(target_os = "macos")]
+/// # Safety
+///
+/// `ns_string` must be either null or a valid Objective-C `NSString` pointer.
 unsafe fn nsstring_to_string(ns_string: *mut Object) -> String {
     if ns_string.is_null() {
         return String::new();
@@ -343,6 +370,9 @@ unsafe fn nsstring_to_string(ns_string: *mut Object) -> String {
 }
 
 #[cfg(target_os = "macos")]
+/// # Safety
+///
+/// `error` must be either null or a valid Objective-C `NSError` pointer.
 unsafe fn ns_error_to_string(error: *mut Object) -> String {
     if error.is_null() {
         return "Unknown contacts error.".into();
@@ -357,6 +387,7 @@ unsafe fn ns_error_to_string(error: *mut Object) -> String {
 }
 
 #[tauri::command]
+/// Tauri command that resolves a collision-free output filename inside `~/Downloads`.
 fn resolve_download_output_path(base_name: String) -> Result<String, String> {
     if base_name.trim().is_empty() {
         return Err("Output filename cannot be empty.".into());
@@ -400,6 +431,7 @@ fn resolve_download_output_path(base_name: String) -> Result<String, String> {
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
+/// Initializes the Tauri app and registers plugins and invoke commands.
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_store::Builder::new().build())

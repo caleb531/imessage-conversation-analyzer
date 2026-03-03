@@ -18,10 +18,16 @@
     // Tracks the most recent save request number to ignore stale async completion.
     let saveRequestVersion = 0;
 
+    // Loads persisted contacts before enabling auto-save side effects.
     onMount(async () => {
-        await ensureSelectedContactsLoaded();
-        pickerSelectedContacts = [...selectedContacts.value];
-        hasInitializedSelection = true;
+        try {
+            await ensureSelectedContactsLoaded();
+            pickerSelectedContacts = [...selectedContacts.value];
+        } catch (error) {
+            saveError = error instanceof Error ? error.message : String(error);
+        } finally {
+            hasInitializedSelection = true;
+        }
     });
 
     // Persists the latest contact selection and only applies results from the newest request.

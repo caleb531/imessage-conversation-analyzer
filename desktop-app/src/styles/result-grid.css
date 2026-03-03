@@ -36,15 +36,6 @@
     width: auto;
 }
 
-.result-grid__filters-fields {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(9rem, 1fr));
-    gap: 1rem 0.5rem;
-    width: auto;
-    max-width: none;
-    align-items: end;
-}
-
 .result-grid__filters-actions {
     display: flex;
     gap: 0.75rem;
@@ -52,15 +43,6 @@
     align-items: center;
     margin-left: 0;
     align-self: end;
-}
-
-.result-grid__date-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-}
-.bx--date-picker.bx--date-picker--single .bx--date-picker__input {
-    width: 9rem;
 }
 
 .result-grid__soft-loading {
@@ -91,14 +73,14 @@
     display: inline-block;
     min-width: max-content;
 }
+
+/* Third-party grid override:
+   keep intrinsic table width and remove extra whitespace below the final row. */
 .result-grid .wx-willow-dark-theme .wx-table-box {
     width: max-content;
     height: auto !important; /* Eliminate spacing below last row */
     --border-radius: 10px;
-    border-top-left-radius: var(--border-radius);
-    border-top-right-radius: var(--border-radius);
-    border-bottom-left-radius: var(--border-radius);
-    border-bottom-right-radius: var(--border-radius);
+    border-radius: var(--border-radius);
 }
 
 .result-grid-charts {

@@ -1,3 +1,4 @@
+// Grid column metadata consumed by the Svar grid component.
 export interface GridColumn {
     id: string;
     header: string;
@@ -5,6 +6,7 @@ export interface GridColumn {
     flexgrow?: number;
 }
 
+// Generic key/value pair used by chart components.
 export interface DataPoint {
     key: string;
     value: number;

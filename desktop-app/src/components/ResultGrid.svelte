@@ -18,11 +18,10 @@
         description: string;
         command: string[];
         charts?: Snippet<[Array<Record<string, unknown>>, GridColumn[]]>;
-        children?: Snippet;
         chartsClass?: string;
     }
 
-    let { title, description, command, charts, children, chartsClass }: Props = $props();
+    let { title, description, command, charts, chartsClass }: Props = $props();
 
     // UI and data state for asynchronous loading lifecycle.
     let isReloadingData = $state(true);

@@ -21,12 +21,14 @@ body {
 
 main {
     margin: 0;
-    padding-top: 10vh;
     padding: 20px;
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
+
+/* Keep Carbon content and Willow grid wrappers in one shared flex column;
+   `height: 1px` prevents nested overflow sizing issues while children own scrolling. */
 body,
 .bx--header ~ .bx--content,
 section,

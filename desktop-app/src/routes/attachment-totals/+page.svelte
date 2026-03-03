@@ -4,6 +4,7 @@
     import ResultGrid from '../../components/ResultGrid.svelte';
     import type { GridColumn } from '../../types';
 
+    // Builds horizontal stacked-bar chart props from grid rows/columns.
     function getStackedChartProps({
         rows,
         columns

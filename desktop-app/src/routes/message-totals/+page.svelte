@@ -3,6 +3,7 @@
     import ResultGrid from '../../components/ResultGrid.svelte';
     import type { DataPoint, GridColumn } from '../../types';
 
+    // Extracts sorted pie-chart datapoints from metric/total table rows.
     function getChartDataFromMetrics({
         rows,
         columns,
@@ -12,7 +13,7 @@
         rows: Array<Record<string, unknown>>;
         columns: GridColumn[];
         columnNamePattern: RegExp;
-        columnNameFormatter: (s: string) => string;
+        columnNameFormatter: (_input: string) => string;
     }): DataPoint[] {
         const metricCol = columns.find((column) => column.header === 'Metric');
         const totalCol = columns.find((column) => column.header === 'Total');

@@ -5,6 +5,7 @@
     import '../styles/colors.css';
     import '../styles/layout.css';
     import '../styles/utility-classes.css';
+    // Routed child content rendered inside the layout shell.
     const { children } = $props();
 </script>
 
@@ -12,9 +13,7 @@
     <Header />
     <Content>
         <section>
-            {#if children}
-                {@render children()}
-            {/if}
+            {@render children?.()}
         </section>
     </Content>
 </Theme>
