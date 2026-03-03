@@ -1,5 +1,6 @@
 import Papa from 'papaparse';
 import { parseArgsStringToArgv } from 'string-argv';
+import { getContactCliSelector } from '../types';
 import { getSelectedContacts } from './contacts.svelte';
 import { runIcaSidecar, type SidecarResult } from './sidecar';
 
@@ -121,7 +122,17 @@ async function addContactArgument(args: string[]): Promise<string[]> {
     if (contacts.length === 0) {
         throw new MissingContactError();
     }
-    return [...args, ...contacts.flatMap((contact) => ['--contact', contact])];
+
+    // Uses phone, then email, then contact name so the CLI can disambiguate duplicates.
+    const contactSelectors = contacts
+        .map((contact) => getContactCliSelector(contact))
+        .filter((selector) => selector.length > 0);
+
+    if (contactSelectors.length === 0) {
+        throw new MissingContactError('Selected contacts do not include any valid CLI selectors.');
+    }
+
+    return [...args, ...contactSelectors.flatMap((selector) => ['--contact', selector])];
 }
 
 function ensureCsvFormat(args: string[]): string[] {

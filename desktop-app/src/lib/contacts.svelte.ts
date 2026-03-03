@@ -1,7 +1,8 @@
 import { invoke } from '@tauri-apps/api/core';
 import { load } from '@tauri-apps/plugin-store';
+import type { Contact } from '../types';
 
-export type ContactValues = string[];
+export type ContactValues = Contact[];
 
 export const selectedContacts = $state<{ value: ContactValues }>({ value: [] });
 
@@ -20,25 +21,50 @@ function normalizeContacts(contacts: ContactValues | null | undefined): ContactV
     if (!Array.isArray(contacts)) {
         return [];
     }
-    return Array.from(
-        new Set(
-            contacts
-                .map((contact) => contact.trim())
-                .filter((contact) => contact.length > 0)
-        )
-    );
+
+    // Deduplicates persisted contacts by ID while normalizing all optional text fields.
+    const uniqueContacts: Contact[] = [];
+    for (const contact of contacts) {
+        if (!contact || typeof contact !== 'object') {
+            continue;
+        }
+        const normalizedId = String(contact.id ?? '').trim();
+        if (!normalizedId) {
+            continue;
+        }
+        const normalizedContact: Contact = {
+            id: normalizedId,
+            firstName: normalizeOptionalString(contact.firstName),
+            lastName: normalizeOptionalString(contact.lastName),
+            companyName: normalizeOptionalString(contact.companyName),
+            phone: normalizeOptionalString(contact.phone),
+            email: normalizeOptionalString(contact.email)
+        };
+
+        const existingIndex = uniqueContacts.findIndex((entry) => entry.id === normalizedId);
+        if (existingIndex >= 0) {
+            uniqueContacts[existingIndex] = normalizedContact;
+        } else {
+            uniqueContacts.push(normalizedContact);
+        }
+    }
+
+    return uniqueContacts;
+}
+
+// Normalizes optional text values by trimming and dropping blank strings.
+function normalizeOptionalString(value: unknown): string | undefined {
+    if (typeof value !== 'string') {
+        return undefined;
+    }
+    const trimmedValue = value.trim();
+    return trimmedValue.length > 0 ? trimmedValue : undefined;
 }
 
 async function initialiseSelectedContacts() {
     const store = await getStore();
     const stored = await store.get<ContactValues>('selectedContacts');
-
-    if (Array.isArray(stored)) {
-        selectedContacts.value = normalizeContacts(stored);
-    } else {
-        const legacyStored = await store.get<string>('selectedContact');
-        selectedContacts.value = legacyStored ? [legacyStored] : [];
-    }
+    selectedContacts.value = normalizeContacts(stored);
     hasLoaded = true;
 }
 
@@ -65,10 +91,8 @@ export async function setSelectedContacts(contacts: ContactValues | null | undef
     const normalizedContacts = normalizeContacts(contacts);
     if (normalizedContacts.length > 0) {
         await store.set('selectedContacts', normalizedContacts);
-        await store.delete('selectedContact');
     } else {
         await store.delete('selectedContacts');
-        await store.delete('selectedContact');
     }
     await store.save();
     selectedContacts.value = normalizedContacts;
@@ -86,6 +110,6 @@ export async function refreshSelectedContacts() {
     return selectedContacts.value;
 }
 
-export async function fetchContactNames(): Promise<string[]> {
-    return invoke<string[]>('get_contact_names');
+export async function fetchContacts(): Promise<Contact[]> {
+    return invoke<Contact[]>('get_contacts');
 }

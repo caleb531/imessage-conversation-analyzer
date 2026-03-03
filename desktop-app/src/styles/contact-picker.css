@@ -41,3 +41,8 @@
     margin-top: 10px;
     text-align: center;
 }
+
+.contact-picker-status--loading {
+    display: flex;
+    justify-content: center;
+}

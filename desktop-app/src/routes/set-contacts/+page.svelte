@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { Button } from 'carbon-components-svelte';
     import { onMount } from 'svelte';
     import ContactPicker from '../../components/ContactPicker.svelte';
     import InlineNotification from '../../components/InlineNotification.svelte';
@@ -8,50 +7,66 @@
         selectedContacts,
         setSelectedContacts
     } from '../../lib/contacts.svelte';
+    import type { Contact } from '../../types';
 
-    let contactSelection = $state<string[]>([]);
-    let buttonDisabled = $state(false);
-    let buttonLabel = $state('Set contacts');
+    // Tracks the contacts selected in the picker prior to persistence.
+    let contactSelection = $state<Contact[]>([]);
+    // Tracks the latest persistence failure message for inline display.
     let saveError = $state('');
-    // Duration to show success message (in milliseconds) before navigating away
-    let successMessageDelay = 750;
+    // Indicates that initial contact state has been loaded from persisted storage.
+    let hasInitialisedSelection = $state(false);
+    // Tracks the most recent save request number to ignore stale async completion.
+    let saveRequestVersion = 0;
 
     onMount(async () => {
         await ensureSelectedContactsLoaded();
         contactSelection = [...selectedContacts.value];
+        hasInitialisedSelection = true;
     });
 
-    async function handleSubmit(event: Event) {
-        event.preventDefault();
+    // Persists the latest contact selection and only applies results from the newest request.
+    async function persistSelection(contacts: Contact[]) {
+        // Capture the current value of the request version before awaiting
+        // so we can ignore stale failures from older saves that finish after newer ones.
+        const requestVersion = saveRequestVersion + 1;
+        saveRequestVersion = requestVersion;
         saveError = '';
-        if (contactSelection.length === 0) {
-            saveError = 'You must select at least one contact before continuing.';
-            return;
-        }
-        buttonDisabled = true;
-        buttonLabel = 'Saving…';
+
         try {
-            await setSelectedContacts(contactSelection);
-            buttonLabel = 'Done!';
-            await new Promise((resolve) => setTimeout(resolve, successMessageDelay));
+            await setSelectedContacts(contacts);
         } catch (error) {
-            saveError = error instanceof Error ? error.message : String(error);
-        } finally {
-            buttonLabel = 'Set contacts';
-            buttonDisabled = false;
+            if (requestVersion === saveRequestVersion) {
+                saveError = error instanceof Error ? error.message : String(error);
+            }
         }
     }
+
+    // Automatically persists contacts whenever picker selection changes after initial load.
+    $effect(() => {
+        if (!hasInitialisedSelection) {
+            return;
+        }
+
+        void persistSelection([...contactSelection]);
+    });
 </script>
 
 <section class="set-contacts">
-    <form class="set-contacts__form" onsubmit={handleSubmit}>
+    <form class="set-contacts__form" onsubmit={(e) => e.preventDefault()}>
         <h2>Choose contacts</h2>
         <ContactPicker bind:selectedContacts={contactSelection} />
+        <p class="set-contacts__note">Changes are automatically saved</p>
         {#if saveError}
             <InlineNotification kind="error" title="Error" subtitle={saveError} />
         {/if}
-        <Button type="submit" disabled={buttonDisabled}>
-            {buttonLabel}
-        </Button>
     </form>
 </section>
+
+<style>
+    .set-contacts__note {
+        font-style: italic;
+        color: var(--color-text-subtle);
+        margin: 0;
+        font-size: 0.875rem;
+    }
+</style>

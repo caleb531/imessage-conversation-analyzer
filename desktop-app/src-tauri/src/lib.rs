@@ -13,6 +13,7 @@ use {
     },
 };
 
+use serde::Serialize;
 use std::path::{Path, PathBuf};
 
 #[cfg(target_os = "macos")]
@@ -32,6 +33,21 @@ extern "C" {}
 
 #[cfg(target_os = "macos")]
 struct ObjcOwned(*mut Object);
+
+#[derive(Clone, Serialize)]
+struct Contact {
+    id: String,
+    #[serde(rename = "firstName", skip_serializing_if = "Option::is_none")]
+    first_name: Option<String>,
+    #[serde(rename = "lastName", skip_serializing_if = "Option::is_none")]
+    last_name: Option<String>,
+    #[serde(rename = "companyName", skip_serializing_if = "Option::is_none")]
+    company_name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    phone: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    email: Option<String>,
+}
 
 #[cfg(target_os = "macos")]
 impl ObjcOwned {
@@ -53,10 +69,10 @@ impl Drop for ObjcOwned {
 }
 
 #[tauri::command]
-async fn get_contact_names() -> Result<Vec<String>, String> {
+async fn get_contacts() -> Result<Vec<Contact>, String> {
     #[cfg(target_os = "macos")]
     {
-        tauri::async_runtime::spawn_blocking(move || fetch_contact_names())
+        tauri::async_runtime::spawn_blocking(move || fetch_contacts())
             .await
             .map_err(|err| err.to_string())?
     }
@@ -68,7 +84,7 @@ async fn get_contact_names() -> Result<Vec<String>, String> {
 }
 
 #[cfg(target_os = "macos")]
-fn fetch_contact_names() -> Result<Vec<String>, String> {
+fn fetch_contacts() -> Result<Vec<Contact>, String> {
     unsafe {
         let store_ptr: *mut Object = msg_send![class!(CNContactStore), new];
         if store_ptr.is_null() {
@@ -79,7 +95,14 @@ fn fetch_contact_names() -> Result<Vec<String>, String> {
 
         ensure_contacts_access(store_raw)?;
 
-        let key_strings = ["givenName", "familyName", "organizationName"];
+        let key_strings = [
+            "identifier",
+            "givenName",
+            "familyName",
+            "organizationName",
+            "phoneNumbers",
+            "emailAddresses",
+        ];
         let mut c_strings = Vec::with_capacity(key_strings.len());
         let mut ns_keys = Vec::with_capacity(key_strings.len());
         for key in key_strings {
@@ -111,14 +134,14 @@ fn fetch_contact_names() -> Result<Vec<String>, String> {
         let request = ObjcOwned(request_ptr);
         let request_raw = request.as_ptr();
 
-        let contacts = Arc::new(Mutex::new(Vec::<String>::new()));
+        let contacts = Arc::new(Mutex::new(Vec::<Contact>::new()));
         let contacts_clone = Arc::clone(&contacts);
 
         let block = ConcreteBlock::new(move |contact: *mut Object, _stop: *mut BOOL| {
-            if let Some(name) = contact_display_name(contact) {
+            if let Some(contact_entry) = contact_from_objc(contact) {
                 if let Ok(mut list) = contacts_clone.lock() {
-                    if !list.contains(&name) {
-                        list.push(name);
+                    if !list.iter().any(|existing| existing.id == contact_entry.id) {
+                        list.push(contact_entry);
                     }
                 }
             }
@@ -144,8 +167,7 @@ fn fetch_contact_names() -> Result<Vec<String>, String> {
             .lock()
             .map_err(|_| "Failed to read contacts list.".to_string())?
             .clone();
-        result.sort();
-        result.dedup();
+        result.sort_by_key(contact_sort_key);
         Ok(result)
     }
 }
@@ -207,31 +229,103 @@ fn ensure_contacts_access(store: *mut Object) -> Result<(), String> {
 }
 
 #[cfg(target_os = "macos")]
-unsafe fn contact_display_name(contact: *mut Object) -> Option<String> {
+fn contact_sort_key(contact: &Contact) -> String {
+    let first_name = contact.first_name.clone().unwrap_or_default();
+    let last_name = contact.last_name.clone().unwrap_or_default();
+    let company_name = contact.company_name.clone().unwrap_or_default();
+    format!(
+        "{}|{}|{}|{}",
+        first_name.to_lowercase(),
+        last_name.to_lowercase(),
+        company_name.to_lowercase(),
+        contact.id.to_lowercase()
+    )
+}
+
+#[cfg(target_os = "macos")]
+unsafe fn contact_from_objc(contact: *mut Object) -> Option<Contact> {
     if contact.is_null() {
         return None;
     }
 
+    let identifier_ptr: *mut Object = msg_send![contact, identifier];
     let given_ptr: *mut Object = msg_send![contact, givenName];
     let family_ptr: *mut Object = msg_send![contact, familyName];
     let organization_ptr: *mut Object = msg_send![contact, organizationName];
+    let phone_numbers_ptr: *mut Object = msg_send![contact, phoneNumbers];
+    let email_addresses_ptr: *mut Object = msg_send![contact, emailAddresses];
 
-    let given = nsstring_to_string(given_ptr).trim().to_string();
-    let family = nsstring_to_string(family_ptr).trim().to_string();
-    let organization = nsstring_to_string(organization_ptr).trim().to_string();
+    let identifier = nsstring_to_optional_string(identifier_ptr)?;
+    let first_name = nsstring_to_optional_string(given_ptr);
+    let last_name = nsstring_to_optional_string(family_ptr);
+    let company_name = nsstring_to_optional_string(organization_ptr);
+    let phone = first_phone_value(phone_numbers_ptr);
+    let email = first_email_value(email_addresses_ptr);
 
-    let full_name = match (given.is_empty(), family.is_empty()) {
-        (false, false) => format!("{} {}", given, family),
-        (false, true) => given,
-        (true, false) => family,
-        (true, true) => organization,
-    };
+    Some(Contact {
+        id: identifier,
+        first_name,
+        last_name,
+        company_name,
+        phone,
+        email,
+    })
+}
 
-    let trimmed = full_name.trim().to_string();
+#[cfg(target_os = "macos")]
+unsafe fn first_phone_value(phone_numbers: *mut Object) -> Option<String> {
+    if phone_numbers.is_null() {
+        return None;
+    }
+
+    let count: usize = msg_send![phone_numbers, count];
+    for index in 0..count {
+        let labeled_value: *mut Object = msg_send![phone_numbers, objectAtIndex: index];
+        if labeled_value.is_null() {
+            continue;
+        }
+        let phone_number: *mut Object = msg_send![labeled_value, value];
+        if phone_number.is_null() {
+            continue;
+        }
+        let phone_string: *mut Object = msg_send![phone_number, stringValue];
+        if let Some(value) = nsstring_to_optional_string(phone_string) {
+            return Some(value);
+        }
+    }
+
+    None
+}
+
+#[cfg(target_os = "macos")]
+unsafe fn first_email_value(email_addresses: *mut Object) -> Option<String> {
+    if email_addresses.is_null() {
+        return None;
+    }
+
+    let count: usize = msg_send![email_addresses, count];
+    for index in 0..count {
+        let labeled_value: *mut Object = msg_send![email_addresses, objectAtIndex: index];
+        if labeled_value.is_null() {
+            continue;
+        }
+        let email_value: *mut Object = msg_send![labeled_value, value];
+        if let Some(value) = nsstring_to_optional_string(email_value) {
+            return Some(value);
+        }
+    }
+
+    None
+}
+
+#[cfg(target_os = "macos")]
+unsafe fn nsstring_to_optional_string(ns_string: *mut Object) -> Option<String> {
+    let value = nsstring_to_string(ns_string);
+    let trimmed = value.trim();
     if trimmed.is_empty() {
         None
     } else {
-        Some(trimmed)
+        Some(trimmed.to_string())
     }
 }
 
@@ -312,7 +406,7 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
-            get_contact_names,
+            get_contacts,
             resolve_download_output_path
         ])
         .run(tauri::generate_context!())
