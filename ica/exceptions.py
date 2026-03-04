@@ -48,3 +48,14 @@ class FormatNotSupportedError(BaseAnalyzerException):
     """
 
     pass
+
+
+class MessagesDatabaseAccessError(BaseAnalyzerException):
+    """
+    Raised when the Messages SQLite database cannot be opened.
+
+    This commonly occurs when the running process lacks macOS Full Disk Access
+    permission for `~/Library/Messages/chat.db`.
+    """
+
+    pass

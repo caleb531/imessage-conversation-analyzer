@@ -9,7 +9,7 @@
     "build:sidecar": "./scripts/build-sidecar.sh",
     "clean": "pnpm clean:sidecar && rm -rf build .svelte-kit package",
     "clean:sidecar": "rm -rf src-tauri/_internal src-tauri/ica-sidecar src-tauri/ica-sidecar-* src-tauri/target",
-    "preview": "vite preview",
+    "preview": "open 'src-tauri/target/release/bundle/macos/iMessage Conversation Analyzer.app'",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "tauri": "tauri",

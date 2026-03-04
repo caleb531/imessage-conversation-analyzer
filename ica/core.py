@@ -28,6 +28,7 @@ from ica.exceptions import (
     ConversationNotFoundError,
     DateRangeInvalidError,
     FormatNotSupportedError,
+    MessagesDatabaseAccessError,
 )
 
 # In order to interpolate the user-specified list of chat identifiers into the
@@ -454,7 +455,19 @@ def get_dataframes(
 
     contact_records = get_contact_records(contacts)
 
-    with closing(sqlite3.connect(f"file:{DB_PATH}?mode=ro", uri=True)) as con:
+    # Open the Messages database in read-only mode. On macOS, this may fail if
+    # the running app has not been granted Full Disk Access.
+    try:
+        con = sqlite3.connect(f"file:{DB_PATH}?mode=ro", uri=True)
+    except sqlite3.OperationalError as error:
+        raise MessagesDatabaseAccessError(
+            "Unable to open the Messages database at "
+            f"'{DB_PATH}'. On macOS, grant Full Disk Access to this app in "
+            "System Settings → Privacy & Security → Full Disk Access, then restart the app. "  # noqa: E501
+            f"Original error: {error}"
+        ) from error
+
+    with closing(con) as con:
         chat_ids = get_chat_ids_for_contacts(con, contact_records)
         if not chat_ids:
             raise ConversationNotFoundError(

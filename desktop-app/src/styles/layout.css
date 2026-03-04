@@ -19,6 +19,10 @@ body {
     color: var(--color-text-primary);
 }
 
+.app-shell {
+    display: contents;
+}
+
 main {
     margin: 0;
     padding: 20px;

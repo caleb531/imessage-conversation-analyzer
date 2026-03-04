@@ -15,6 +15,7 @@ use {
 
 use serde::Serialize;
 use std::path::{Path, PathBuf};
+use std::process::Command;
 
 #[cfg(target_os = "macos")]
 /// Contacts framework entity type constant for contacts.
@@ -23,8 +24,35 @@ const CN_ENTITY_TYPE_CONTACTS: i64 = 0;
 /// Authorization status value meaning user has not been prompted yet.
 const CN_AUTH_STATUS_NOT_DETERMINED: i64 = 0;
 #[cfg(target_os = "macos")]
+/// Authorization status value meaning access is restricted by system policy.
+const CN_AUTH_STATUS_RESTRICTED: i64 = 1;
+#[cfg(target_os = "macos")]
+/// Authorization status value meaning access has been explicitly denied.
+const CN_AUTH_STATUS_DENIED: i64 = 2;
+#[cfg(target_os = "macos")]
 /// Authorization status value meaning access has been granted.
 const CN_AUTH_STATUS_AUTHORIZED: i64 = 3;
+
+/// Serializable permission state returned to the frontend for a single permission.
+#[derive(Clone, Serialize)]
+struct PermissionState {
+    granted: bool,
+    #[serde(rename = "canRequest")]
+    can_request: bool,
+    status: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    detail: Option<String>,
+}
+
+/// Serializable permissions snapshot returned to the frontend permission gate.
+#[derive(Clone, Serialize)]
+struct PermissionStatus {
+    contacts: PermissionState,
+    #[serde(rename = "fullDiskAccess")]
+    full_disk_access: PermissionState,
+    #[serde(rename = "allGranted")]
+    all_granted: bool,
+}
 
 #[cfg(target_os = "macos")]
 #[link(name = "Contacts", kind = "framework")]
@@ -240,6 +268,185 @@ fn ensure_contacts_access(store: *mut Object) -> Result<(), String> {
 }
 
 #[cfg(target_os = "macos")]
+/// Returns current contacts permission status without triggering a prompt.
+fn get_contacts_permission_state(detail: Option<String>) -> PermissionState {
+    unsafe {
+        let status: i64 = msg_send![class!(CNContactStore), authorizationStatusForEntityType: CN_ENTITY_TYPE_CONTACTS];
+
+        match status {
+            CN_AUTH_STATUS_AUTHORIZED => PermissionState {
+                granted: true,
+                can_request: false,
+                status: "granted".into(),
+                detail,
+            },
+            CN_AUTH_STATUS_NOT_DETERMINED => PermissionState {
+                granted: false,
+                can_request: true,
+                status: "not_determined".into(),
+                detail,
+            },
+            CN_AUTH_STATUS_DENIED => PermissionState {
+                granted: false,
+                can_request: false,
+                status: "denied".into(),
+                detail,
+            },
+            CN_AUTH_STATUS_RESTRICTED => PermissionState {
+                granted: false,
+                can_request: false,
+                status: "restricted".into(),
+                detail,
+            },
+            _ => PermissionState {
+                granted: false,
+                can_request: false,
+                status: "unknown".into(),
+                detail,
+            },
+        }
+    }
+}
+
+#[cfg(target_os = "macos")]
+/// Returns current Full Disk Access status by attempting to open Messages DB.
+fn get_full_disk_access_permission_state() -> PermissionState {
+    let messages_db_path = Path::new(&std::env::var("HOME").unwrap_or_default())
+        .join("Library")
+        .join("Messages")
+        .join("chat.db");
+
+    match std::fs::File::open(&messages_db_path) {
+        Ok(_) => PermissionState {
+            granted: true,
+            can_request: false,
+            status: "granted".into(),
+            detail: None,
+        },
+        Err(error) if error.kind() == std::io::ErrorKind::PermissionDenied => PermissionState {
+            granted: false,
+            can_request: false,
+            status: "denied".into(),
+            detail: Some(format!(
+                "macOS denied access to {}. Grant Full Disk Access in System Settings.",
+                messages_db_path.to_string_lossy()
+            )),
+        },
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => PermissionState {
+            granted: false,
+            can_request: false,
+            status: "not_found".into(),
+            detail: Some(format!(
+                "Could not find Messages database at {}.",
+                messages_db_path.to_string_lossy()
+            )),
+        },
+        Err(error) => PermissionState {
+            granted: false,
+            can_request: false,
+            status: "error".into(),
+            detail: Some(format!(
+                "Could not validate Messages database access at {}: {}",
+                messages_db_path.to_string_lossy(),
+                error
+            )),
+        },
+    }
+}
+
+#[tauri::command]
+/// Returns required desktop permission states for Contacts and Messages DB access.
+fn get_permissions_status() -> Result<PermissionStatus, String> {
+    #[cfg(target_os = "macos")]
+    {
+        let contacts = get_contacts_permission_state(None);
+        let full_disk_access = get_full_disk_access_permission_state();
+        let all_granted = contacts.granted && full_disk_access.granted;
+        return Ok(PermissionStatus {
+            contacts,
+            full_disk_access,
+            all_granted,
+        });
+    }
+
+    #[cfg(not(target_os = "macos"))]
+    {
+        Err("Permission checks are only implemented on macOS.".into())
+    }
+}
+
+#[tauri::command]
+/// Requests Contacts access if possible and then returns the updated permission status.
+fn request_contacts_permission() -> Result<PermissionStatus, String> {
+    #[cfg(target_os = "macos")]
+    {
+        let contact_request_error = unsafe {
+            let store_ptr: *mut Object = msg_send![class!(CNContactStore), new];
+            if store_ptr.is_null() {
+                Some("Failed to create CNContactStore for contacts permission request.".to_string())
+            } else {
+                let store = ObjcOwned(store_ptr);
+                ensure_contacts_access(store.as_ptr()).err()
+            }
+        };
+
+        let contacts = get_contacts_permission_state(contact_request_error);
+        let full_disk_access = get_full_disk_access_permission_state();
+        let all_granted = contacts.granted && full_disk_access.granted;
+        return Ok(PermissionStatus {
+            contacts,
+            full_disk_access,
+            all_granted,
+        });
+    }
+
+    #[cfg(not(target_os = "macos"))]
+    {
+        Err("Contacts permission requests are only implemented on macOS.".into())
+    }
+}
+
+#[tauri::command]
+/// Opens macOS System Settings at the requested privacy permission panel.
+fn open_permissions_settings(permission: String) -> Result<(), String> {
+    #[cfg(target_os = "macos")]
+    {
+        let settings_url = match permission.as_str() {
+            "contacts" => {
+                "x-apple.systempreferences:com.apple.preference.security?Privacy_Contacts"
+            }
+            "full-disk-access" => {
+                "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles"
+            }
+            _ => {
+                return Err(format!(
+                    "Unsupported permission settings target: {permission}"
+                ))
+            }
+        };
+
+        let status = Command::new("open")
+            .arg(settings_url)
+            .status()
+            .map_err(|error| format!("Failed to open macOS settings: {error}"))?;
+
+        if status.success() {
+            Ok(())
+        } else {
+            Err(format!(
+                "macOS settings command exited with status {:?}.",
+                status.code()
+            ))
+        }
+    }
+
+    #[cfg(not(target_os = "macos"))]
+    {
+        Err("Opening permission settings is only implemented on macOS.".into())
+    }
+}
+
+#[cfg(target_os = "macos")]
 /// Builds a stable, case-insensitive sort key for contact ordering.
 fn contact_sort_key(contact: &Contact) -> String {
     let first_name = contact.first_name.clone().unwrap_or_default();
@@ -439,7 +646,10 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
             get_contacts,
-            resolve_download_output_path
+            resolve_download_output_path,
+            get_permissions_status,
+            request_contacts_permission,
+            open_permissions_settings
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
