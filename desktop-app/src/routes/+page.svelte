@@ -141,8 +141,8 @@
                     <div class="permissions-splash__info">
                         <h2>Contacts</h2>
                         <p>
-                            Needed to search and display contacts in the contact picker and to map
-                            selected people to conversation handles.
+                            Needed to let you select the contacts belonging to the conversationso
+                            you wish to analyze.
                         </p>
                         <p class="permissions-splash__status">
                             Status: <strong>{contactsStatusLabel}</strong>
@@ -174,9 +174,8 @@
                     <div class="permissions-splash__info">
                         <h2>Full Disk Access</h2>
                         <p>
-                            Needed so the bundled analyzer can read <code
-                                >~/Library/Messages/chat.db</code
-                            >.
+                            Needed so the can read the iMessage database and analyze your
+                            conversations.
                         </p>
                         <p class="permissions-splash__status">
                             Status: <strong>{fullDiskStatusLabel}</strong>
@@ -232,14 +231,6 @@
 {/if}
 
 <style>
-    .permissions-splash {
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 2rem;
-    }
-
     .permissions-splash__panel {
         width: 100%;
         max-width: 72rem;
