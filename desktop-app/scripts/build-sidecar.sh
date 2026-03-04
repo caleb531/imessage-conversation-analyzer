@@ -12,7 +12,8 @@ SIDE_CAR_TARGET_DIR="$OUTPUT_DIR/ica-sidecar-$TARGET_TRIPLE"
 SIDE_CAR_EXTERNAL_EXE="$DESKTOP_APP_DIR/src-tauri/ica-sidecar"
 SIDE_CAR_RUNTIME_DIR="$DESKTOP_APP_DIR/src-tauri/_internal"
 SIDE_CAR_ENTRY="ica-sidecar"
-SIDE_CAR_SUFFIXED_DIR="$DESKTOP_APP_DIR/src-tauri/${SIDE_CAR_ENTRY}-${TARGET_TRIPLE}"
+# PyInstaller's --onedir output is created under distpath/name.
+SIDE_CAR_RUNTIME_ENTRY_DIR="$SIDE_CAR_RUNTIME_DIR/$SIDE_CAR_ENTRY"
 TAURI_TARGET_DEBUG_RUNTIME="$DESKTOP_APP_DIR/src-tauri/target/debug/_internal"
 TAURI_TARGET_RELEASE_RUNTIME="$DESKTOP_APP_DIR/src-tauri/target/release/_internal"
 
@@ -21,7 +22,7 @@ mkdir -p "$BUILD_DIR"
 
 needs_rebuild=false
 
-if [[ ! -f "$SIDE_CAR_EXTERNAL_EXE" || ! -d "$SIDE_CAR_RUNTIME_DIR" || ! -d "$SIDE_CAR_TARGET_DIR" || ! -d "$SIDE_CAR_SUFFIXED_DIR" ]]; then
+if [[ ! -f "$SIDE_CAR_EXTERNAL_EXE" || ! -d "$SIDE_CAR_RUNTIME_ENTRY_DIR" || ! -f "$SIDE_CAR_TARGET_DIR" ]]; then
   needs_rebuild=true
 else
   if [[ "$PROJECT_ROOT/pyproject.toml" -nt "$SIDE_CAR_EXTERNAL_EXE" || "$PROJECT_ROOT/uv.lock" -nt "$SIDE_CAR_EXTERNAL_EXE" ]]; then
@@ -38,7 +39,7 @@ if [[ $needs_rebuild == false ]]; then
   exit 0
 fi
 
-rm -rf "$SIDE_CAR_RUNTIME_DIR" "$SIDE_CAR_TARGET_DIR" "$SIDE_CAR_EXTERNAL_EXE" "$SIDE_CAR_SUFFIXED_DIR" "$OUTPUT_DIR/_internal" "$TAURI_TARGET_DEBUG_RUNTIME" "$TAURI_TARGET_RELEASE_RUNTIME"
+rm -rf "$SIDE_CAR_RUNTIME_DIR" "$SIDE_CAR_TARGET_DIR" "$SIDE_CAR_EXTERNAL_EXE" "$OUTPUT_DIR/_internal" "$TAURI_TARGET_DEBUG_RUNTIME" "$TAURI_TARGET_RELEASE_RUNTIME"
 
 cd "$PROJECT_ROOT"
 

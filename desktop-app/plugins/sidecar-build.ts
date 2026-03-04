@@ -36,14 +36,24 @@ function createSidecarBuildRunner() {
 export function sidecarBuildPlugin(): Plugin {
     // Shared build runner reused by both configureServer and buildStart hooks.
     const runBuild = createSidecarBuildRunner();
+    // Captures whether Vite is currently running in `serve` or `build` mode.
+    let viteCommand: 'serve' | 'build' | undefined;
     // Tracks whether serve mode has already performed its initial build.
     let builtForServe = false;
+    // Tracks whether build mode has already performed its sidecar build.
+    let builtForBuild = false;
 
     return {
         name: 'ica-sidecar-build',
         enforce: 'pre',
+        configResolved(config) {
+            // Persist Vite's top-level command so each hook can decide whether
+            // it should trigger the sidecar build.
+            viteCommand = config.command;
+        },
         async configureServer() {
-            if (builtForServe) {
+            // Only run in actual dev server mode and only once per process.
+            if (viteCommand !== 'serve' || builtForServe) {
                 return;
             }
             await runBuild();
@@ -52,10 +62,20 @@ export function sidecarBuildPlugin(): Plugin {
         async buildStart(options) {
             // Rollup passes normalized input options; `watch` indicates watch mode.
             const isWatchMode = Boolean((options as { watch?: unknown }).watch);
-            if (isWatchMode && builtForServe) {
+            // Skip buildStart-triggered rebuilds during dev/watch mode because
+            // configureServer already handles the serve startup build.
+            if (viteCommand === 'serve' || isWatchMode) {
                 return;
             }
+
+            // In production builds, run once per process even if buildStart
+            // is triggered more than once by the toolchain.
+            if (builtForBuild) {
+                return;
+            }
+
             await runBuild();
+            builtForBuild = true;
         }
     };
 }
