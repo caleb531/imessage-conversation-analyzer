@@ -40,7 +40,6 @@ section,
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    height: 1px;
 }
 .bx--header ~ .bx--content {
     margin: 0;
