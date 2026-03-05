@@ -3,6 +3,7 @@
     --palette-blue-60: #0f62fe;
     --palette-blue-90: #4d8bfe;
     --palette-blue-120: #669cff;
+    --palette-purple-40: #6027b4;
     --palette-purple-60: #8a3ffc;
     --palette-green-40: #6fdc8c;
     --palette-green-60: #66cc33;
@@ -42,6 +43,7 @@
     --color-text-link-hover: var(--palette-blue-120);
     --color-text-muted: hsl(var(--palette-gray-100-hsl) / 0.75);
     --color-text-subtle: hsl(var(--palette-white-hsl) / 0.5);
+    --color-note: var(--palette-purple-40);
 
     --color-border-subtle: var(--palette-gray-500);
     --color-border-contrast-soft: hsl(var(--palette-white-hsl) / 0.18);

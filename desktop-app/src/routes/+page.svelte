@@ -129,10 +129,19 @@
     <section class="permissions-splash">
         <div class="permissions-splash__panel">
             <header class="permissions-splash__header">
-                <h1>iMessage Conversation Analyzer</h1>
+                <h1>
+                    <img class="permissions-splash__logo" src="logo-128x128@2x.png" alt="" /> iMessage
+                    Conversation Analyzer
+                </h1>
                 <p>
-                    Grant the permissions below so the app can read your Messages database and
-                    resolve selected contacts correctly.
+                    Please grant the following permissions so the application can properly analyze
+                    your message history.
+                </p>
+                <p class="permissions-splash__disclaimer">
+                    <strong>
+                        All processing is done locally on your machine, and no data is collected or
+                        transmitted.
+                    </strong>
                 </p>
             </header>
 
@@ -140,10 +149,7 @@
                 <div class="permissions-splash__row">
                     <div class="permissions-splash__info">
                         <h2>Contacts</h2>
-                        <p>
-                            Needed to let you select the contacts belonging to the conversationso
-                            you wish to analyze.
-                        </p>
+                        <p>Needed to display the names of people in your conversations.</p>
                         <p class="permissions-splash__status">
                             Status: <strong>{contactsStatusLabel}</strong>
                         </p>
@@ -174,8 +180,8 @@
                     <div class="permissions-splash__info">
                         <h2>Full Disk Access</h2>
                         <p>
-                            Needed so the can read the iMessage database and analyze your
-                            conversations.
+                            Needed to read the iMessage database located at
+                            <code>~/Library/Messages/chat.db</code>.
                         </p>
                         <p class="permissions-splash__status">
                             Status: <strong>{fullDiskStatusLabel}</strong>
@@ -233,13 +239,15 @@
 <style>
     .permissions-splash__panel {
         width: 100%;
-        max-width: 72rem;
+        max-width: 50rem;
+        margin: 0 auto;
         background: var(--color-surface-secondary);
         border: 1px solid var(--color-border-secondary);
         border-radius: 0.75rem;
         padding: 2rem;
         display: flex;
         flex-direction: column;
+        align-items: center;
         gap: 1.5rem;
     }
 
@@ -248,11 +256,23 @@
     }
 
     .permissions-splash__header h1 {
-        margin: 0 0 0.75rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.75rem;
+        margin: 0;
+        margin-bottom: 1rem;
     }
 
-    .permissions-splash__header p {
-        margin: 0;
+    .permissions-splash__logo {
+        height: 3rem;
+    }
+
+    .permissions-splash__disclaimer {
+        margin-top: 1rem;
+        border-radius: 10px;
+        padding: 10px 15px;
+        background-color: var(--color-note);
     }
 
     .permissions-splash__rows {
@@ -274,7 +294,6 @@
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
-        max-width: 50rem;
     }
 
     .permissions-splash__info h2 {
@@ -299,7 +318,6 @@
         display: flex;
         align-items: center;
         justify-content: flex-end;
-        min-width: 18rem;
     }
 
     .permissions-splash__footer {
