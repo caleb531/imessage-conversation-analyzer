@@ -20,3 +20,9 @@ nosetests.xml
 # Required packages
 .venv
 .virtualenv
+
+# Desktop app
+src-tauri/bin/
+src-tauri/_internal/
+src-tauri/ica-sidecar
+src-tauri/ica-sidecar-*/
