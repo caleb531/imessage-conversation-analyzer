@@ -68,21 +68,21 @@
     padding-bottom: 16px;
 }
 
-.result-grid .wx-willow-dark-theme {
+.result-grid__grid-container > div {
     width: fit-content;
     max-width: 100%;
     margin: 0 auto;
     background: none !important;
 }
 
-.result-grid .wx-willow-dark-theme .wx-grid {
+.result-grid .wx-grid {
     display: inline-block;
     min-width: max-content;
 }
 
 /* Third-party grid override:
    keep intrinsic table width and remove extra whitespace below the final row. */
-.result-grid .wx-willow-dark-theme .wx-table-box {
+.result-grid .wx-table-box {
     width: max-content;
     height: auto !important; /* Eliminate spacing below last row */
     --border-radius: 10px;
