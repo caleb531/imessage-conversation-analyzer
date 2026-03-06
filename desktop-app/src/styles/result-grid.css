@@ -88,6 +88,11 @@
     --border-radius: 10px;
     border-radius: var(--border-radius);
 }
+/* Make table data text-selectable */
+.result-grid .wx-data {
+    -webkit-user-select: auto;
+    user-select: auto;
+}
 
 .result-grid-charts {
     display: flex;
