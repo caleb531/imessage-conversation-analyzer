@@ -19,12 +19,27 @@
         command: string[];
         charts?: Snippet<[Array<Record<string, unknown>>, GridColumn[]]>;
         chartsClass?: string;
+        // Optional analyzer-specific controls rendered above date filters.
+        parameters?: Snippet<[boolean]>;
+        // Gates analysis execution until required analyzer inputs are present.
+        isReady?: boolean;
+        // User-facing explanation shown while analysis is gated by missing inputs.
+        notReadyMessage?: string;
     }
 
-    let { title, description, command, charts, chartsClass }: Props = $props();
+    let {
+        title,
+        description,
+        command,
+        charts,
+        chartsClass,
+        parameters,
+        isReady = true,
+        notReadyMessage = ''
+    }: Props = $props();
 
     // UI and data state for asynchronous loading lifecycle.
-    let isReloadingData = $state(true);
+    let isReloadingData = $state(false);
     let hasInitiallyLoaded = $state(false);
     let errorMessage = $state('');
     let rows = $state<Array<Record<string, unknown>>>([]);
@@ -191,6 +206,9 @@
 
     // Loads grid data from ICA using any currently applied date filters.
     async function loadData(filters: DateFilterState = appliedFilters) {
+        if (!isReady) {
+            return;
+        }
         isReloadingData = true;
         errorMessage = '';
         try {
@@ -212,6 +230,9 @@
 
     // Applies in-progress date input values as the next active filter set.
     function applyFilters() {
+        if (!isReady) {
+            return;
+        }
         const nextFilters: DateFilterState = {
             fromDate: fromDateInput,
             toDate: toDateInput
@@ -242,12 +263,19 @@
             toDate: ''
         };
         appliedFilters = cleared;
-        void loadData(cleared);
+        if (isReady) {
+            void loadData(cleared);
+        }
     }
 
     // Initial data fetch when the grid first mounts.
     onMount(() => {
-        void loadData();
+        if (isReady) {
+            void loadData();
+            return;
+        }
+
+        hasInitiallyLoaded = true;
     });
 </script>
 
@@ -264,10 +292,37 @@
     {:else}
         <form
             class="result-grid__filters"
-            aria-label="Date filters"
+            aria-label="Analyzer filters"
             onsubmit={submitFilters}
             onreset={resetFilters}
         >
+            {#snippet actionButtons()}
+                <div class="result-grid__filters-actions">
+                    {#if isReloadingData && hasInitiallyLoaded}
+                        <div class="result-grid__soft-loading" aria-live="polite">
+                            <Loading withOverlay={false} small />
+                        </div>
+                    {/if}
+                    <Button
+                        kind="primary"
+                        size="small"
+                        type="submit"
+                        disabled={isReloadingData || !isReady}
+                    >
+                        {isReloadingData ? 'Loading...' : 'Apply'}
+                    </Button>
+                    <Button kind="secondary" size="small" type="reset" disabled={isReloadingData}>
+                        Clear
+                    </Button>
+                </div>
+            {/snippet}
+
+            {#if parameters}
+                <div class="result-grid__filters-row result-grid__filters-row--parameters">
+                    {@render parameters(isReloadingData)}
+                </div>
+            {/if}
+
             <div class="result-grid__filters-row result-grid__filters-row--main">
                 {#key datePickerResetKey}
                     <DateRangeFields
@@ -278,20 +333,16 @@
                         disabled={isReloadingData}
                     />
                 {/key}
-                <div class="result-grid__filters-actions">
-                    {#if isReloadingData && hasInitiallyLoaded}
-                        <div class="result-grid__soft-loading" aria-live="polite">
-                            <Loading withOverlay={false} small />
-                        </div>
-                    {/if}
-                    <Button kind="primary" size="small" type="submit" disabled={isReloadingData}>
-                        {isReloadingData ? 'Loading...' : 'Apply'}
-                    </Button>
-                    <Button kind="secondary" size="small" type="reset" disabled={isReloadingData}>
-                        Clear
-                    </Button>
-                </div>
+                {#if !parameters}
+                    {@render actionButtons()}
+                {/if}
             </div>
+
+            {#if parameters}
+                <div class="result-grid__filters-row result-grid__filters-row--actions">
+                    {@render actionButtons()}
+                </div>
+            {/if}
         </form>
 
         {#if charts && rows.length && !errorMessage}
@@ -304,7 +355,14 @@
             </div>
         {/if}
 
-        {#if errorMessage}
+        {#if !isReady && notReadyMessage}
+            <InlineNotification
+                class="result-grid__error"
+                kind="info"
+                title="Waiting for input"
+                subtitle={notReadyMessage}
+            />
+        {:else if errorMessage}
             <InlineNotification
                 class="result-grid__error"
                 kind="error"

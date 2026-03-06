@@ -33,16 +33,22 @@
     display: flex;
     justify-content: center;
     align-items: end;
-    width: auto;
+    width: 100%;
+}
+
+.result-grid__filters-row--parameters {
+    align-items: stretch;
+}
+
+.result-grid__filters-row--actions {
+    justify-content: center;
 }
 
 .result-grid__filters-actions {
     display: flex;
     gap: 0.75rem;
-    justify-content: flex-end;
+    justify-content: center;
     align-items: center;
-    margin-left: 0;
-    align-self: end;
 }
 
 .result-grid__soft-loading {
