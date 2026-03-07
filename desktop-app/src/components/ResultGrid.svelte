@@ -3,7 +3,7 @@
     import { buildDateFilterArgs, type DateFilterState } from '$lib/dateFilters';
     import { Grid, WillowDark } from '@svar-ui/svelte-grid';
     import { Button, Loading } from 'carbon-components-svelte';
-    import { onMount, type Snippet } from 'svelte';
+    import { onMount, type Snippet, untrack } from 'svelte';
     import { SvelteMap } from 'svelte/reactivity';
     import '../styles/result-grid.css';
     import type { GridColumn } from '../types';
@@ -204,48 +204,73 @@
         });
     }
 
+    let previousCommandStr = $state('');
+    let currentLoadId = $state(0);
+
     // Loads grid data from ICA using any currently applied date filters.
     async function loadData(filters: DateFilterState = appliedFilters) {
         if (!isReady) {
             return;
         }
+
+        currentLoadId += 1;
+        const loadId = currentLoadId;
+
         isReloadingData = true;
         errorMessage = '';
         try {
             const filterArgs = buildDateFilterArgs(filters);
             const result = await invokeIcaCsv([...command, ...filterArgs]);
+
+            if (loadId !== currentLoadId) return;
+
             rows = result.rows;
             columns = createColumns(result.headers, result.rows);
         } catch (error) {
+            if (loadId !== currentLoadId) return;
+
             if (error instanceof MissingContactError) {
                 errorMessage = error.message;
             } else {
                 errorMessage = error instanceof Error ? error.message : String(error);
             }
         } finally {
-            isReloadingData = false;
-            hasInitiallyLoaded = true;
+            if (loadId === currentLoadId) {
+                isReloadingData = false;
+                hasInitiallyLoaded = true;
+            }
         }
     }
 
-    // Applies in-progress date input values as the next active filter set.
-    function applyFilters() {
-        if (!isReady) {
+    $effect(() => {
+        if (!hasInitiallyLoaded) {
+            previousCommandStr = JSON.stringify(command);
             return;
         }
-        const nextFilters: DateFilterState = {
-            fromDate: fromDateInput,
-            toDate: toDateInput
-        };
-        appliedFilters = nextFilters;
-        void loadData(nextFilters);
-    }
 
-    // Handles form submit so Apply triggers filtered data reload.
-    function submitFilters(event: Event) {
-        event.preventDefault();
-        applyFilters();
-    }
+        const currentCommandStr = JSON.stringify(command);
+        const currentFrom = fromDateInput;
+        const currentTo = toDateInput;
+        const currentReady = isReady;
+
+        untrack(() => {
+            let shouldLoad = false;
+
+            if (currentCommandStr !== previousCommandStr) {
+                previousCommandStr = currentCommandStr;
+                shouldLoad = true;
+            }
+
+            if (currentFrom !== appliedFilters.fromDate || currentTo !== appliedFilters.toDate) {
+                appliedFilters = { fromDate: currentFrom, toDate: currentTo };
+                shouldLoad = true;
+            }
+
+            if (shouldLoad && currentReady) {
+                void loadData(appliedFilters);
+            }
+        });
+    });
 
     // Handles form reset so Clear runs custom reset behavior.
     function resetFilters(event: Event) {
@@ -253,19 +278,11 @@
         clearFilters();
     }
 
-    // Resets date filters to empty and reloads unfiltered results.
+    // Resets date inputs. The `$effect` observer will automatically reload the grid.
     function clearFilters() {
         fromDateInput = '';
         toDateInput = '';
         datePickerResetKey += 1;
-        const cleared: DateFilterState = {
-            fromDate: '',
-            toDate: ''
-        };
-        appliedFilters = cleared;
-        if (isReady) {
-            void loadData(cleared);
-        }
     }
 
     // Initial data fetch when the grid first mounts.
@@ -290,33 +307,7 @@
             <Loading withOverlay={false} />
         </div>
     {:else}
-        <form
-            class="result-grid__filters"
-            aria-label="Analyzer filters"
-            onsubmit={submitFilters}
-            onreset={resetFilters}
-        >
-            {#snippet actionButtons()}
-                <div class="result-grid__filters-actions">
-                    {#if isReloadingData && hasInitiallyLoaded}
-                        <div class="result-grid__soft-loading" aria-live="polite">
-                            <Loading withOverlay={false} small />
-                        </div>
-                    {/if}
-                    <Button
-                        kind="primary"
-                        size="small"
-                        type="submit"
-                        disabled={isReloadingData || !isReady}
-                    >
-                        {isReloadingData ? 'Loading...' : 'Apply'}
-                    </Button>
-                    <Button kind="secondary" size="small" type="reset" disabled={isReloadingData}>
-                        Clear
-                    </Button>
-                </div>
-            {/snippet}
-
+        <form class="result-grid__filters" aria-label="Analyzer filters" onreset={resetFilters}>
             {#if parameters}
                 <div class="result-grid__filters-row result-grid__filters-row--parameters">
                     {@render parameters(isReloadingData)}
@@ -330,19 +321,17 @@
                         toDateInputId="result-grid-to-date"
                         bind:fromDate={fromDateInput}
                         bind:toDate={toDateInput}
-                        disabled={isReloadingData}
                     />
                 {/key}
-                {#if !parameters}
-                    {@render actionButtons()}
-                {/if}
-            </div>
-
-            {#if parameters}
-                <div class="result-grid__filters-row result-grid__filters-row--actions">
-                    {@render actionButtons()}
+                <div class="result-grid__filters-actions">
+                    {#if isReloadingData && hasInitiallyLoaded}
+                        <div class="result-grid__soft-loading" aria-live="polite">
+                            <Loading withOverlay={false} small />
+                        </div>
+                    {/if}
+                    <Button kind="secondary" size="small" type="reset">Clear</Button>
                 </div>
-            {/if}
+            </div>
         </form>
 
         {#if charts && rows.length && !errorMessage}

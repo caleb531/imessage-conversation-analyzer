@@ -40,10 +40,6 @@
     align-items: stretch;
 }
 
-.result-grid__filters-row--actions {
-    justify-content: center;
-}
-
 .result-grid__filters-actions {
     display: flex;
     gap: 0.75rem;

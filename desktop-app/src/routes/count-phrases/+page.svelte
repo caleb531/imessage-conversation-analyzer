@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Button, Checkbox, Tag, TextInput } from 'carbon-components-svelte';
+    import { Checkbox, Tag, TextInput } from 'carbon-components-svelte';
     import ResultGrid from '../../components/ResultGrid.svelte';
 
     // Stores the current freeform phrase value before users add it to the active list.
@@ -84,16 +84,6 @@
     function removePhrase(phraseToRemove: string) {
         phrases = phrases.filter((phrase) => phrase !== phraseToRemove);
     }
-
-    // Adds a phrase on Enter while preventing the parent filter form from submitting.
-    function onPhraseInputKeydown(event: KeyboardEvent) {
-        if (event.key !== 'Enter') {
-            return;
-        }
-
-        event.preventDefault();
-        addPhrase();
-    }
 </script>
 
 <ResultGrid
@@ -105,31 +95,19 @@
 >
     {#snippet parameters(isReloadingData)}
         <div class="count-phrases-params">
-            <div class="count-phrases-params__add-row">
+            <div
+                class="count-phrases-params__add-row"
+                class:has-error={Boolean(phraseErrorMessage)}
+            >
                 <TextInput
                     id="count-phrases-input"
                     labelText="Phrase"
-                    placeholder="Type a phrase and click Add"
+                    placeholder="Type a phrase and press Enter"
                     bind:value={phraseInput}
-                    disabled={isReloadingData}
                     invalid={Boolean(phraseErrorMessage)}
                     invalidText={phraseErrorMessage}
-                    on:keydown={onPhraseInputKeydown}
+                    on:change={addPhrase}
                 />
-                <div class="count-phrases-params__add-button-wrapper">
-                    <Button
-                        kind="secondary"
-                        size="small"
-                        type="button"
-                        disabled={isReloadingData ||
-                            (!canAddPhrase &&
-                                phrases.includes(phraseInput.trim()) === false &&
-                                phraseInput.trim() !== '')}
-                        onclick={addPhrase}
-                    >
-                        Add
-                    </Button>
-                </div>
             </div>
 
             <div class="count-phrases-params__toggles" aria-label="Phrase options">
@@ -137,13 +115,11 @@
                     id="count-phrases-case-sensitive"
                     labelText="Case sensitive"
                     bind:checked={caseSensitive}
-                    disabled={isReloadingData}
                 />
                 <Checkbox
                     id="count-phrases-use-regex"
                     labelText="Use regular expressions"
                     bind:checked={useRegex}
-                    disabled={isReloadingData}
                 />
             </div>
 
@@ -153,7 +129,6 @@
                         <Tag
                             filter
                             title={`Remove phrase ${phrase}`}
-                            disabled={isReloadingData}
                             on:close={() => {
                                 removePhrase(phrase);
                             }}
@@ -184,10 +159,6 @@
         width: 100%;
     }
 
-    .count-phrases-params__add-button-wrapper {
-        margin-top: 24px;
-    }
-
     .count-phrases-params__toggles {
         display: flex;
         flex-wrap: wrap;
@@ -209,10 +180,6 @@
         .count-phrases-params__add-row {
             flex-direction: column;
             align-items: stretch;
-        }
-
-        .count-phrases-params__add-button-wrapper {
-            margin-top: 0;
         }
     }
 </style>
