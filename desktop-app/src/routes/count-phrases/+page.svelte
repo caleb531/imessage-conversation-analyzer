@@ -162,7 +162,7 @@
     .count-phrases-params__toggles {
         display: flex;
         flex-wrap: wrap;
-        margin-bottom: 0.75rem;
+        margin: 0.75rem 0;
     }
 
     /* Reduce the natural margin appended by Carbon checkboxes to bring them closer together */
