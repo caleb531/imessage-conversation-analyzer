@@ -93,7 +93,7 @@
     isReady={isReadyToAnalyze}
     notReadyMessage="Add phrases to begin analysis."
 >
-    {#snippet parameters(isReloadingData)}
+    {#snippet parameters()}
         <div class="count-phrases-params">
             <div
                 class="count-phrases-params__add-row"
