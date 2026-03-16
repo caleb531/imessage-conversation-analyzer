@@ -1,6 +1,6 @@
 import { invoke } from '@tauri-apps/api/core';
-import { load } from '@tauri-apps/plugin-store';
 import type { Contact } from '../types';
+import { getPersistentStore } from './store.svelte';
 
 // Alias for selected-contact arrays used across store helpers.
 export type ContactValues = Contact[];
@@ -8,20 +8,10 @@ export type ContactValues = Contact[];
 // Reactive in-memory selected contacts mirrored from persisted store data.
 export const selectedContacts = $state<{ value: ContactValues }>({ value: [] });
 
-// Lazy-initialized promise for the plugin-store instance.
-let storePromise: Promise<Awaited<ReturnType<typeof load>>> | undefined;
 // In-flight initialization promise used to coalesce concurrent bootstrap calls.
 let initPromise: Promise<void> | null = null;
 // Guard that prevents reloading from disk on every caller request.
 let hasLoaded = false;
-
-// Returns the persisted store instance, creating it on first use.
-async function getStore() {
-    if (!storePromise) {
-        storePromise = load('store.json');
-    }
-    return storePromise;
-}
 
 // Normalizes persisted contacts and removes invalid or duplicate entries by contact ID.
 function normalizeContacts(contacts: ContactValues | null | undefined): ContactValues {
@@ -70,7 +60,7 @@ function normalizeOptionalString(value: unknown): string | undefined {
 
 // Loads selected contacts from persistence into reactive in-memory state.
 async function initializeSelectedContacts() {
-    const store = await getStore();
+    const store = await getPersistentStore();
     const stored = await store.get<ContactValues>('selectedContacts');
     selectedContacts.value = normalizeContacts(stored);
     hasLoaded = true;
@@ -98,7 +88,7 @@ export async function getSelectedContacts() {
 
 // Persists and updates the in-memory selected contacts list.
 export async function setSelectedContacts(contacts: ContactValues | null | undefined) {
-    const store = await getStore();
+    const store = await getPersistentStore();
     const normalizedContacts = normalizeContacts(contacts);
     if (normalizedContacts.length > 0) {
         await store.set('selectedContacts', normalizedContacts);

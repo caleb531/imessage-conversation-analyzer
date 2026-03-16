@@ -1,6 +1,9 @@
 <script lang="ts">
     import { Checkbox, Tag, TextInput } from 'carbon-components-svelte';
+    import { onMount } from 'svelte';
+    import InlineNotification from '../../components/InlineNotification.svelte';
     import ResultGrid from '../../components/ResultGrid.svelte';
+    import { getCountPhrasesState, setCountPhrasesState } from '../../lib/countPhrases.svelte';
 
     // Stores the current freeform phrase value before users add it to the active list.
     let phraseInput = $state('');
@@ -12,6 +15,12 @@
     let caseSensitive = $state(false);
     // Tracks whether the user has attempted to construct a tag and failed (used to show empty errors).
     let hasAttemptedAdd = $state(false);
+    // Tracks persistence load/save failures shown to users inline.
+    let persistenceError = $state('');
+    // Indicates that persisted state hydration has completed.
+    let hasInitializedPersistence = $state(false);
+    // Tracks most recent save request so stale async failures can be ignored.
+    let saveRequestVersion = 0;
 
     // Returns true when at least one phrase is available for analysis.
     const isReadyToAnalyze = $derived(phrases.length > 0);
@@ -43,6 +52,53 @@
         if (phraseInput.length > 0) {
             hasAttemptedAdd = false;
         }
+    });
+
+    // Loads any saved phrase-builder state before enabling autosave effects.
+    onMount(async () => {
+        try {
+            const persistedState = await getCountPhrasesState();
+            phrases = [...persistedState.phrases];
+            useRegex = persistedState.useRegex;
+            caseSensitive = persistedState.caseSensitive;
+        } catch (error) {
+            persistenceError = error instanceof Error ? error.message : String(error);
+        } finally {
+            hasInitializedPersistence = true;
+        }
+    });
+
+    // Persists current route state and only surfaces failures from the latest request.
+    async function persistCountPhrasesState(
+        activePhrases: string[],
+        shouldUseRegex: boolean,
+        shouldUseCaseSensitive: boolean
+    ) {
+        // Captures the current request sequence to avoid showing stale save errors.
+        const requestVersion = saveRequestVersion + 1;
+        saveRequestVersion = requestVersion;
+        persistenceError = '';
+
+        try {
+            await setCountPhrasesState({
+                phrases: activePhrases,
+                useRegex: shouldUseRegex,
+                caseSensitive: shouldUseCaseSensitive
+            });
+        } catch (error) {
+            if (requestVersion === saveRequestVersion) {
+                persistenceError = error instanceof Error ? error.message : String(error);
+            }
+        }
+    }
+
+    // Automatically persists state after initial hydration whenever phrases or toggles change.
+    $effect(() => {
+        if (!hasInitializedPersistence) {
+            return;
+        }
+
+        void persistCountPhrasesState([...phrases], useRegex, caseSensitive);
     });
 
     // Converts local UI state into the CLI argument list expected by `count_phrases`.
@@ -137,6 +193,14 @@
                         </Tag>
                     {/each}
                 </div>
+            {/if}
+
+            {#if persistenceError}
+                <InlineNotification
+                    kind="error"
+                    title="Error"
+                    subtitle={`Failed to save phrase settings: ${persistenceError}`}
+                />
             {/if}
         </div>
     {/snippet}
