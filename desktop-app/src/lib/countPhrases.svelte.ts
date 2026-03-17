@@ -1,9 +1,9 @@
 import { getPersistentStore } from './store.svelte';
 
-// Store key used to persist Count Phrases route state across app launches.
-const COUNT_PHRASES_STATE_KEY = 'countPhrasesState';
+// Store key used to persist Phrases route state across app launches.
+const COUNT_PHRASES_STATE_KEY = 'phrasesState';
 
-// Serializable state shape used by the Count Phrases route.
+// Serializable state shape used by the Phrases route.
 export type CountPhrasesState = {
     phrases: string[];
     useRegex: boolean;
@@ -50,7 +50,7 @@ function normalizePhrases(value: unknown): string[] {
     return normalizedPhrases;
 }
 
-// Converts unknown persisted data into a fully normalized Count Phrases state object.
+// Converts unknown persisted data into a fully normalized Phrases state object.
 function normalizeCountPhrasesState(value: unknown): CountPhrasesState {
     if (!value || typeof value !== 'object') {
         return { ...DEFAULT_COUNT_PHRASES_STATE };
@@ -69,14 +69,14 @@ function isDefaultCountPhrasesState(state: CountPhrasesState): boolean {
     return state.phrases.length === 0 && !state.useRegex && !state.caseSensitive;
 }
 
-// Loads and normalizes persisted Count Phrases route state.
+// Loads and normalizes persisted Phrases route state.
 export async function getCountPhrasesState(): Promise<CountPhrasesState> {
     const store = await getPersistentStore();
     const persistedState = await store.get<CountPhrasesState>(COUNT_PHRASES_STATE_KEY);
     return normalizeCountPhrasesState(persistedState);
 }
 
-// Persists a normalized Count Phrases route state and removes defaults to keep storage compact.
+// Persists a normalized Phrases route state and removes defaults to keep storage compact.
 export async function setCountPhrasesState(state: CountPhrasesState): Promise<CountPhrasesState> {
     const store = await getPersistentStore();
     const normalizedState = normalizeCountPhrasesState(state);

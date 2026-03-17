@@ -143,21 +143,18 @@
 </script>
 
 <ResultGrid
-    title="Count Phrases"
+    title="Phrases"
     description="Count how often one or more custom phrases appear in your conversation."
     {command}
     isReady={isReadyToAnalyze}
     notReadyMessage="Add phrases to begin analysis."
-    dateFilterPersistenceKey="count-phrases"
+    dateFilterPersistenceKey="phrases"
 >
     {#snippet parameters()}
-        <div class="count-phrases-params">
-            <div
-                class="count-phrases-params__add-row"
-                class:has-error={Boolean(phraseErrorMessage)}
-            >
+        <div class="phrases-params">
+            <div class="phrases-params__add-row" class:has-error={Boolean(phraseErrorMessage)}>
                 <TextInput
-                    id="count-phrases-input"
+                    id="phrases-input"
                     labelText="Phrase"
                     placeholder="Type a phrase and press Enter"
                     bind:value={phraseInput}
@@ -167,21 +164,21 @@
                 />
             </div>
 
-            <div class="count-phrases-params__toggles" aria-label="Phrase options">
+            <div class="phrases-params__toggles" aria-label="Phrase options">
                 <Checkbox
-                    id="count-phrases-case-sensitive"
+                    id="phrases-case-sensitive"
                     labelText="Case sensitive"
                     bind:checked={caseSensitive}
                 />
                 <Checkbox
-                    id="count-phrases-use-regex"
+                    id="phrases-use-regex"
                     labelText="Use regular expressions"
                     bind:checked={useRegex}
                 />
             </div>
 
             {#if phrases.length > 0}
-                <div class="count-phrases-params__tags" aria-label="Active phrases">
+                <div class="phrases-params__tags" aria-label="Active phrases">
                     {#each phrases as phrase (phrase)}
                         <Tag
                             filter
@@ -208,41 +205,41 @@
 </ResultGrid>
 
 <style>
-    .count-phrases-params {
+    .phrases-params {
         width: min(100%, 52rem);
         display: flex;
         flex-direction: column;
     }
 
-    .count-phrases-params__add-row {
+    .phrases-params__add-row {
         display: flex;
         align-items: flex-start;
         gap: 0.75rem;
     }
 
-    :global(.count-phrases-params__add-row .bx--text-input__field-wrapper) {
+    :global(.phrases-params__add-row .bx--text-input__field-wrapper) {
         width: 100%;
     }
 
-    .count-phrases-params__toggles {
+    .phrases-params__toggles {
         display: flex;
         flex-wrap: wrap;
         margin: 0.75rem 0;
     }
 
     /* Reduce the natural margin appended by Carbon checkboxes to bring them closer together */
-    :global(.count-phrases-params__toggles .bx--checkbox-wrapper) {
+    :global(.phrases-params__toggles .bx--checkbox-wrapper) {
         margin-right: 1.5rem;
     }
 
-    .count-phrases-params__tags {
+    .phrases-params__tags {
         display: flex;
         flex-wrap: wrap;
         gap: 0.5rem;
     }
 
     @media (max-width: 42rem) {
-        .count-phrases-params__add-row {
+        .phrases-params__add-row {
             flex-direction: column;
             align-items: stretch;
         }

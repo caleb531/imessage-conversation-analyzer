@@ -37,10 +37,10 @@
 </script>
 
 <ResultGrid
-    title="Message Totals"
+    title="Messages"
     description="Review aggregated conversation metrics like the total number of messages sent and received."
     command={['message_totals']}
-    dateFilterPersistenceKey="message-totals"
+    dateFilterPersistenceKey="messages"
 >
     {#snippet charts(rows, columns)}
         <MetricPieChart

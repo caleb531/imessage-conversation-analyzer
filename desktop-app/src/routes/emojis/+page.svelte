@@ -4,7 +4,7 @@
     import ResultGrid from '../../components/ResultGrid.svelte';
     import type { GridColumn } from '../../types';
 
-    // Builds horizontal stacked-bar chart props from grid rows/columns.
+    // Builds stacked-bar chart props for emoji frequency and per-contact counts.
     function getStackedChartProps({
         rows,
         columns
@@ -19,13 +19,13 @@
             return { data: [], series: [] };
         }
 
-        const keyColumn = columns.find((column) => /Type/i.test(column.header)) ?? columns[0];
+        const keyColumn = columns.find((column) => /Emoji/i.test(column.header)) ?? columns[0];
         if (!keyColumn) {
             return { data: [], series: [] };
         }
 
         const matchedSeries = columns.filter(
-            (column) => /total\s*from/i.test(column.header) || /^totalFrom/i.test(column.id)
+            (column) => /count\s*from/i.test(column.header) || /^countFrom/i.test(column.id)
         );
         const seriesColumns = matchedSeries.length
             ? matchedSeries
@@ -33,7 +33,7 @@
                   if (column.id === keyColumn.id) {
                       return false;
                   }
-                  return !/^total$/i.test(column.header) && !/^count$/i.test(column.header);
+                  return !/^count$/i.test(column.header) && !/^total$/i.test(column.header);
               });
 
         if (!seriesColumns.length) {
@@ -81,18 +81,17 @@
 </script>
 
 <ResultGrid
-    title="Attachment Totals"
-    description="Review aggregated totals for each type of attachment in your conversation."
-    command={['attachment_totals']}
-    chartsClass="result-grid-charts--attachment"
-    dateFilterPersistenceKey="attachment-totals"
+    title="Emojis"
+    description="See which emojis are used most frequently in your conversation."
+    command={['most_frequent_emojis']}
+    dateFilterPersistenceKey="emojis"
 >
     {#snippet charts(rows, columns)}
         {@const chartProps = getStackedChartProps({ rows, columns })}
         <MetricStackedBarChart
             data={chartProps.data}
             series={chartProps.series}
-            orientation="horizontal"
+            labelType="emoji"
             showAllCategoryLabels
         />
     {/snippet}

@@ -58,7 +58,7 @@
     async function redirectToMainFlow() {
         try {
             const contacts = await getSelectedContacts();
-            await goto(resolve(contacts.length > 0 ? '/message-totals' : '/set-contacts'));
+            await goto(resolve(contacts.length > 0 ? '/messages' : '/set-contacts'));
         } catch (error) {
             console.error('Failed to resolve selected contacts during startup redirect', error);
             await goto(resolve('/set-contacts'));
