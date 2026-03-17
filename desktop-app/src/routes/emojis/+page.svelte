@@ -1,5 +1,6 @@
 <script lang="ts">
     import { chartColors } from '../../colors';
+    import MetricSection from '../../components/MetricSection.svelte';
     import MetricStackedBarChart from '../../components/MetricStackedBarChart.svelte';
     import ResultGrid from '../../components/ResultGrid.svelte';
     import type { GridColumn } from '../../types';
@@ -80,19 +81,20 @@
     }
 </script>
 
-<ResultGrid
+<MetricSection
     title="Emojis"
     description="See which emojis are used most frequently in your conversation."
-    command={['most_frequent_emojis']}
-    dateFilterPersistenceKey="emojis"
+    level={2}
 >
-    {#snippet charts(rows, columns)}
-        {@const chartProps = getStackedChartProps({ rows, columns })}
-        <MetricStackedBarChart
-            data={chartProps.data}
-            series={chartProps.series}
-            labelType="emoji"
-            showAllCategoryLabels
-        />
-    {/snippet}
-</ResultGrid>
+    <ResultGrid command={['most_frequent_emojis']} dateFilterPersistenceKey="emojis">
+        {#snippet charts(rows, columns)}
+            {@const chartProps = getStackedChartProps({ rows, columns })}
+            <MetricStackedBarChart
+                data={chartProps.data}
+                series={chartProps.series}
+                labelType="emoji"
+                showAllCategoryLabels
+            />
+        {/snippet}
+    </ResultGrid>
+</MetricSection>

@@ -1,5 +1,6 @@
 <script lang="ts">
     import { chartColors } from '../../colors';
+    import MetricSection from '../../components/MetricSection.svelte';
     import MetricStackedBarChart from '../../components/MetricStackedBarChart.svelte';
     import ResultGrid from '../../components/ResultGrid.svelte';
     import type { GridColumn } from '../../types';
@@ -80,20 +81,24 @@
     }
 </script>
 
-<ResultGrid
+<MetricSection
     title="Attachments"
     description="Review aggregated totals for each type of attachment in your conversation."
-    command={['attachment_totals']}
-    chartsClass="result-grid-charts--attachment"
-    dateFilterPersistenceKey="attachments"
+    level={2}
 >
-    {#snippet charts(rows, columns)}
-        {@const chartProps = getStackedChartProps({ rows, columns })}
-        <MetricStackedBarChart
-            data={chartProps.data}
-            series={chartProps.series}
-            orientation="horizontal"
-            showAllCategoryLabels
-        />
-    {/snippet}
-</ResultGrid>
+    <ResultGrid
+        command={['attachment_totals']}
+        chartsClass="result-grid-charts--attachment"
+        dateFilterPersistenceKey="attachments"
+    >
+        {#snippet charts(rows, columns)}
+            {@const chartProps = getStackedChartProps({ rows, columns })}
+            <MetricStackedBarChart
+                data={chartProps.data}
+                series={chartProps.series}
+                orientation="horizontal"
+                showAllCategoryLabels
+            />
+        {/snippet}
+    </ResultGrid>
+</MetricSection>

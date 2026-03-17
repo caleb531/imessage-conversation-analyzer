@@ -14,8 +14,6 @@
 
     // Props used by ResultGrid across all metric routes.
     interface Props {
-        title: string;
-        description: string;
         command: string[];
         charts?: Snippet<[Array<Record<string, unknown>>, GridColumn[]]>;
         chartsClass?: string;
@@ -27,19 +25,26 @@
         notReadyMessage?: string;
         // Stable key that isolates persisted date-filter values for this specific ResultGrid.
         dateFilterPersistenceKey?: string;
+        // Prefix used to keep date input element IDs unique on pages with multiple ResultGrid instances.
+        dateInputIdPrefix?: string;
     }
 
     let {
-        title,
-        description,
         command,
         charts,
         chartsClass,
         parameters,
         isReady = true,
         notReadyMessage = '',
-        dateFilterPersistenceKey
+        dateFilterPersistenceKey,
+        dateInputIdPrefix
     }: Props = $props();
+
+    // Generates stable date input IDs and avoids collisions when multiple grids render on one page.
+    function buildDateInputId(field: 'from' | 'to'): string {
+        const prefixCandidate = dateInputIdPrefix?.trim() || dateFilterPersistenceKey?.trim();
+        return `${prefixCandidate ?? 'result-grid'}-${field}-date`;
+    }
 
     // UI and data state for asynchronous loading lifecycle.
     let isReloadingData = $state(false);
@@ -320,12 +325,7 @@
     });
 </script>
 
-<section class="result-grid">
-    <header>
-        <h2>{title}</h2>
-        <p>{description}</p>
-    </header>
-
+<article class="result-grid">
     {#if isReloadingData && !hasInitiallyLoaded}
         <div class="result-grid__loading">
             <Loading withOverlay={false} />
@@ -341,8 +341,8 @@
             <div class="result-grid__filters-row result-grid__filters-row--main">
                 {#key datePickerResetKey}
                     <DateRangeFields
-                        fromDateInputId="result-grid-from-date"
-                        toDateInputId="result-grid-to-date"
+                        fromDateInputId={buildDateInputId('from')}
+                        toDateInputId={buildDateInputId('to')}
                         {dateFilterPersistenceKey}
                         bind:persistenceError={dateFilterPersistenceError}
                         bind:hasLoadedPersistedDateFilters
@@ -402,4 +402,4 @@
             </article>
         {/if}
     {/if}
-</section>
+</article>

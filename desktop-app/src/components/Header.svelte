@@ -10,7 +10,6 @@
         <HeaderNavItem href="/attachments">Attachments</HeaderNavItem>
         <HeaderNavItem href="/emojis">Emojis</HeaderNavItem>
         <HeaderNavItem href="/phrases">Phrases</HeaderNavItem>
-        <HeaderNavItem href="/totals-by-day">Totals by Day</HeaderNavItem>
         <HeaderNavItem href="/transcript">Transcript</HeaderNavItem>
     </HeaderNav>
     <HeaderUtilities>

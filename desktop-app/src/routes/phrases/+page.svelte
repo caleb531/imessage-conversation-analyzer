@@ -2,6 +2,7 @@
     import { Checkbox, Tag, TextInput } from 'carbon-components-svelte';
     import { onMount } from 'svelte';
     import InlineNotification from '../../components/InlineNotification.svelte';
+    import MetricSection from '../../components/MetricSection.svelte';
     import ResultGrid from '../../components/ResultGrid.svelte';
     import { getCountPhrasesState, setCountPhrasesState } from '../../lib/countPhrases.svelte';
 
@@ -142,67 +143,71 @@
     }
 </script>
 
-<ResultGrid
+<MetricSection
     title="Phrases"
     description="Count how often one or more custom phrases appear in your conversation."
-    {command}
-    isReady={isReadyToAnalyze}
-    notReadyMessage="Add phrases to begin analysis."
-    dateFilterPersistenceKey="phrases"
+    level={2}
 >
-    {#snippet parameters()}
-        <div class="phrases-params">
-            <div class="phrases-params__add-row" class:has-error={Boolean(phraseErrorMessage)}>
-                <TextInput
-                    id="phrases-input"
-                    labelText="Phrase"
-                    placeholder="Type a phrase and press Enter"
-                    bind:value={phraseInput}
-                    invalid={Boolean(phraseErrorMessage)}
-                    invalidText={phraseErrorMessage}
-                    on:change={addPhrase}
-                />
-            </div>
-
-            <div class="phrases-params__toggles" aria-label="Phrase options">
-                <Checkbox
-                    id="phrases-case-sensitive"
-                    labelText="Case sensitive"
-                    bind:checked={caseSensitive}
-                />
-                <Checkbox
-                    id="phrases-use-regex"
-                    labelText="Use regular expressions"
-                    bind:checked={useRegex}
-                />
-            </div>
-
-            {#if phrases.length > 0}
-                <div class="phrases-params__tags" aria-label="Active phrases">
-                    {#each phrases as phrase (phrase)}
-                        <Tag
-                            filter
-                            title={`Remove phrase ${phrase}`}
-                            on:close={() => {
-                                removePhrase(phrase);
-                            }}
-                        >
-                            {phrase}
-                        </Tag>
-                    {/each}
+    <ResultGrid
+        {command}
+        isReady={isReadyToAnalyze}
+        notReadyMessage="Add phrases to begin analysis."
+        dateFilterPersistenceKey="phrases"
+    >
+        {#snippet parameters()}
+            <div class="phrases-params">
+                <div class="phrases-params__add-row" class:has-error={Boolean(phraseErrorMessage)}>
+                    <TextInput
+                        id="phrases-input"
+                        labelText="Phrase"
+                        placeholder="Type a phrase and press Enter"
+                        bind:value={phraseInput}
+                        invalid={Boolean(phraseErrorMessage)}
+                        invalidText={phraseErrorMessage}
+                        on:change={addPhrase}
+                    />
                 </div>
-            {/if}
 
-            {#if persistenceError}
-                <InlineNotification
-                    kind="error"
-                    title="Error"
-                    subtitle={`Failed to save phrase settings: ${persistenceError}`}
-                />
-            {/if}
-        </div>
-    {/snippet}
-</ResultGrid>
+                <div class="phrases-params__toggles" aria-label="Phrase options">
+                    <Checkbox
+                        id="phrases-case-sensitive"
+                        labelText="Case sensitive"
+                        bind:checked={caseSensitive}
+                    />
+                    <Checkbox
+                        id="phrases-use-regex"
+                        labelText="Use regular expressions"
+                        bind:checked={useRegex}
+                    />
+                </div>
+
+                {#if phrases.length > 0}
+                    <div class="phrases-params__tags" aria-label="Active phrases">
+                        {#each phrases as phrase (phrase)}
+                            <Tag
+                                filter
+                                title={`Remove phrase ${phrase}`}
+                                on:close={() => {
+                                    removePhrase(phrase);
+                                }}
+                            >
+                                {phrase}
+                            </Tag>
+                        {/each}
+                    </div>
+                {/if}
+
+                {#if persistenceError}
+                    <InlineNotification
+                        kind="error"
+                        title="Error"
+                        subtitle={`Failed to save phrase settings: ${persistenceError}`}
+                    />
+                {/if}
+            </div>
+        {/snippet}
+    </ResultGrid>
+</MetricSection>
 
 <style>
     .phrases-params {

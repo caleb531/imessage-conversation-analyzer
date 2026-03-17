@@ -52,6 +52,9 @@ section {
 section header {
     text-align: center;
 }
+section header p {
+    margin-bottom: 20px;
+}
 form {
     display: flex;
     flex-direction: column;
@@ -64,7 +67,8 @@ form {
 }
 
 h1,
-h2 {
+h2,
+h3 {
     text-align: center;
 }
 h1 {
