@@ -3,7 +3,7 @@
     import { buildDateFilterArgs, type DateFilterState } from '$lib/dateFilters';
     import { Grid, WillowDark } from '@svar-ui/svelte-grid';
     import { Button, Loading } from 'carbon-components-svelte';
-    import { onMount, type Snippet, untrack } from 'svelte';
+    import { onMount, untrack, type Snippet } from 'svelte';
     import { SvelteMap } from 'svelte/reactivity';
     import '../styles/result-grid.css';
     import type { GridColumn } from '../types';
@@ -25,6 +25,8 @@
         isReady?: boolean;
         // User-facing explanation shown while analysis is gated by missing inputs.
         notReadyMessage?: string;
+        // Stable key that isolates persisted date-filter values for this specific ResultGrid.
+        dateFilterPersistenceKey?: string;
     }
 
     let {
@@ -35,7 +37,8 @@
         chartsClass,
         parameters,
         isReady = true,
-        notReadyMessage = ''
+        notReadyMessage = '',
+        dateFilterPersistenceKey
     }: Props = $props();
 
     // UI and data state for asynchronous loading lifecycle.
@@ -48,6 +51,10 @@
     // Controlled date picker values and currently applied filter snapshot.
     let fromDateInput = $state('');
     let toDateInput = $state('');
+    // Mirrors DateRangeFields persistence readiness so first load can wait for hydrated values.
+    let hasLoadedPersistedDateFilters = $state(false);
+    // Holds non-blocking persistence errors shown below filter controls.
+    let dateFilterPersistenceError = $state('');
     // Forces date picker subtree recreation when clearing values.
     let datePickerResetKey = $state(0);
     let appliedFilters = $state<DateFilterState>({
@@ -243,7 +250,7 @@
     }
 
     $effect(() => {
-        if (!hasInitiallyLoaded) {
+        if (!hasInitiallyLoaded || !hasLoadedPersistedDateFilters) {
             previousCommandStr = JSON.stringify(command);
             return;
         }
@@ -272,6 +279,28 @@
         });
     });
 
+    // Performs the first data load only after DateRangeFields has finished hydrating persisted values.
+    $effect(() => {
+        if (hasInitiallyLoaded || !hasLoadedPersistedDateFilters) {
+            return;
+        }
+
+        const currentFrom = fromDateInput;
+        const currentTo = toDateInput;
+        const currentReady = isReady;
+
+        untrack(() => {
+            appliedFilters = { fromDate: currentFrom, toDate: currentTo };
+
+            if (currentReady) {
+                void loadData(appliedFilters);
+                return;
+            }
+
+            hasInitiallyLoaded = true;
+        });
+    });
+
     // Handles form reset so Clear runs custom reset behavior.
     function resetFilters(event: Event) {
         event.preventDefault();
@@ -285,14 +314,9 @@
         datePickerResetKey += 1;
     }
 
-    // Initial data fetch when the grid first mounts.
+    // Initializes command tracking; first data load is handled by a readiness-aware effect.
     onMount(() => {
-        if (isReady) {
-            void loadData();
-            return;
-        }
-
-        hasInitiallyLoaded = true;
+        previousCommandStr = JSON.stringify(command);
     });
 </script>
 
@@ -319,6 +343,9 @@
                     <DateRangeFields
                         fromDateInputId="result-grid-from-date"
                         toDateInputId="result-grid-to-date"
+                        {dateFilterPersistenceKey}
+                        bind:persistenceError={dateFilterPersistenceError}
+                        bind:hasLoadedPersistedDateFilters
                         bind:fromDate={fromDateInput}
                         bind:toDate={toDateInput}
                     />
@@ -332,6 +359,15 @@
                     <Button kind="secondary" size="small" type="reset">Clear</Button>
                 </div>
             </div>
+
+            {#if dateFilterPersistenceError}
+                <InlineNotification
+                    class="result-grid__error"
+                    kind="error"
+                    title="Error"
+                    subtitle={`Failed to save date filters: ${dateFilterPersistenceError}`}
+                />
+            {/if}
         </form>
 
         {#if charts && rows.length && !errorMessage}

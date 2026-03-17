@@ -1,6 +1,11 @@
 <script lang="ts">
     import { DatePicker, DatePickerInput, TooltipIcon } from 'carbon-components-svelte';
     import Information from 'carbon-icons-svelte/lib/Information.svelte';
+    import { onMount, untrack } from 'svelte';
+    import {
+        getResultGridDateFilterState,
+        setResultGridDateFilterState
+    } from '../lib/resultGridDateFilters.svelte';
 
     // Public API for the shared date-range picker pair.
     interface Props {
@@ -9,6 +14,9 @@
         disabled?: boolean;
         fromDateInputId?: string;
         toDateInputId?: string;
+        dateFilterPersistenceKey?: string;
+        persistenceError?: string;
+        hasLoadedPersistedDateFilters?: boolean;
     }
 
     // Bindable values allow parent components to fully control the selected dates.
@@ -17,8 +25,70 @@
         toDate = $bindable(''),
         disabled = false,
         fromDateInputId = 'from-date',
-        toDateInputId = 'to-date'
+        toDateInputId = 'to-date',
+        dateFilterPersistenceKey,
+        // eslint-disable-next-line no-useless-assignment
+        persistenceError = $bindable(),
+        hasLoadedPersistedDateFilters = $bindable()
     }: Props = $props();
+
+    // Tracks the latest save operation so stale async failures do not overwrite newer outcomes.
+    let saveRequestVersion = $state(0);
+
+    // Persists current field values when a persistence key is provided.
+    async function persistDateFilterState(nextFromDate: string, nextToDate: string) {
+        if (!dateFilterPersistenceKey) {
+            return;
+        }
+
+        saveRequestVersion += 1;
+        const requestVersion = saveRequestVersion;
+        persistenceError = '';
+
+        try {
+            await setResultGridDateFilterState(dateFilterPersistenceKey, {
+                fromDate: nextFromDate,
+                toDate: nextToDate
+            });
+        } catch (error) {
+            if (requestVersion === saveRequestVersion) {
+                persistenceError = error instanceof Error ? error.message : String(error);
+            }
+        }
+    }
+
+    // Loads persisted values once so parent components can gate initial data loads.
+    onMount(async () => {
+        if (!dateFilterPersistenceKey) {
+            hasLoadedPersistedDateFilters = true;
+            return;
+        }
+
+        try {
+            const persistedDateFilters =
+                await getResultGridDateFilterState(dateFilterPersistenceKey);
+            fromDate = persistedDateFilters.fromDate;
+            toDate = persistedDateFilters.toDate;
+        } catch (error) {
+            persistenceError = error instanceof Error ? error.message : String(error);
+        } finally {
+            hasLoadedPersistedDateFilters = true;
+        }
+    });
+
+    // Saves value changes after initial hydration to avoid overwriting persisted values on mount.
+    $effect(() => {
+        if (!hasLoadedPersistedDateFilters) {
+            return;
+        }
+
+        const currentFromDate = fromDate;
+        const currentToDate = toDate;
+
+        untrack(() => {
+            void persistDateFilterState(currentFromDate, currentToDate);
+        });
+    });
 </script>
 
 <div class="date-range-fields">

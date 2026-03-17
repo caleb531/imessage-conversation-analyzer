@@ -17,6 +17,8 @@
     // User-entered date range values consumed by date filter arg builder.
     let fromDateInput = $state('');
     let toDateInput = $state('');
+    // Surfaces date filter persistence failures from DateRangeFields.
+    let dateFilterPersistenceError = $state('');
     // UI feedback state for success/error notifications.
     let errorMessage = $state('');
     let successMessage = $state('');
@@ -88,6 +90,8 @@
                 <DateRangeFields
                     fromDateInputId="transcript-from-date"
                     toDateInputId="transcript-to-date"
+                    dateFilterPersistenceKey="transcript"
+                    bind:persistenceError={dateFilterPersistenceError}
                     bind:fromDate={fromDateInput}
                     bind:toDate={toDateInput}
                     disabled={isExporting}
@@ -120,6 +124,16 @@
                 </Button>
             </div>
         </form>
+
+        {#if dateFilterPersistenceError}
+            <div class="transcript-export__notification">
+                <InlineNotification
+                    kind="error"
+                    title="Date filter persistence failed"
+                    subtitle={dateFilterPersistenceError}
+                />
+            </div>
+        {/if}
 
         {#if successMessage}
             <div class="transcript-export__notification">

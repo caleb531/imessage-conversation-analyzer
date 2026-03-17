@@ -84,6 +84,7 @@
     title="Most Frequent Emojis"
     description="See which emojis are used most frequently in your conversation."
     command={['most_frequent_emojis']}
+    dateFilterPersistenceKey="most-frequent-emojis"
 >
     {#snippet charts(rows, columns)}
         {@const chartProps = getStackedChartProps({ rows, columns })}

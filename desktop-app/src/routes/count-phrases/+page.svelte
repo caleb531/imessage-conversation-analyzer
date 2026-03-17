@@ -148,6 +148,7 @@
     {command}
     isReady={isReadyToAnalyze}
     notReadyMessage="Add phrases to begin analysis."
+    dateFilterPersistenceKey="count-phrases"
 >
     {#snippet parameters()}
         <div class="count-phrases-params">

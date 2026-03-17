@@ -40,6 +40,7 @@
     title="Message Totals"
     description="Review aggregated conversation metrics like the total number of messages sent and received."
     command={['message_totals']}
+    dateFilterPersistenceKey="message-totals"
 >
     {#snippet charts(rows, columns)}
         <MetricPieChart

@@ -85,6 +85,7 @@
     description="Review aggregated totals for each type of attachment in your conversation."
     command={['attachment_totals']}
     chartsClass="result-grid-charts--attachment"
+    dateFilterPersistenceKey="attachment-totals"
 >
     {#snippet charts(rows, columns)}
         {@const chartProps = getStackedChartProps({ rows, columns })}

@@ -143,6 +143,7 @@
     description="See your message totals, per person or overall, for each day you've messaged"
     command={['totals_by_day']}
     chartsClass="result-grid-charts--wide"
+    dateFilterPersistenceKey="totals-by-day"
 >
     {#snippet charts(rows, columns)}
         {@const chartProps = getStackedChartProps({ rows, columns })}
