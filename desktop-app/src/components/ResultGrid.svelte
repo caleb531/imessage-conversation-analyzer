@@ -17,6 +17,10 @@
         command: string[];
         charts?: Snippet<[Array<Record<string, unknown>>, GridColumn[]]>;
         chartsClass?: string;
+        // Controls chart+grid placement: vertical stacks, horizontal places them side-by-side.
+        layout?: 'vertical' | 'horizontal';
+        // Controls chart area arrangement when more than one chart is rendered.
+        chartLayout?: 'vertical' | 'horizontal';
         // Optional analyzer-specific controls rendered above date filters.
         parameters?: Snippet<[boolean]>;
         // Gates analysis execution until required analyzer inputs are present.
@@ -33,6 +37,8 @@
         command,
         charts,
         chartsClass,
+        layout = 'vertical',
+        chartLayout = 'horizontal',
         parameters,
         isReady = true,
         notReadyMessage = '',
@@ -370,36 +376,40 @@
             {/if}
         </form>
 
-        {#if charts && rows.length && !errorMessage}
-            <div
-                class={`result-grid-charts${chartsClass ? ` ${chartsClass}` : ''}`}
-                aria-label="Chart area"
-                role="img"
-            >
-                {@render charts(rows, columns)}
-            </div>
-        {/if}
+        <div class={`result-grid__content result-grid__content--${layout}`}>
+            {#if charts && rows.length && !errorMessage}
+                <div
+                    class={`result-grid-charts result-grid-charts--${chartLayout}${chartsClass ? ` ${chartsClass}` : ''}`}
+                    aria-label="Chart area"
+                    role="img"
+                >
+                    {@render charts(rows, columns)}
+                </div>
+            {/if}
 
-        {#if !isReady && notReadyMessage}
-            <InlineNotification
-                class="result-grid__error"
-                kind="info"
-                title="Waiting for input"
-                subtitle={notReadyMessage}
-            />
-        {:else if errorMessage}
-            <InlineNotification
-                class="result-grid__error"
-                kind="error"
-                title="Error"
-                subtitle={errorMessage}
-            />
-        {:else}
-            <article class="result-grid__grid-container">
-                <WillowDark>
-                    <Grid data={rows} {columns} />
-                </WillowDark>
-            </article>
-        {/if}
+            <section class="result-grid__grid-region">
+                {#if !isReady && notReadyMessage}
+                    <InlineNotification
+                        class="result-grid__error"
+                        kind="info"
+                        title="Waiting for input"
+                        subtitle={notReadyMessage}
+                    />
+                {:else if errorMessage}
+                    <InlineNotification
+                        class="result-grid__error"
+                        kind="error"
+                        title="Error"
+                        subtitle={errorMessage}
+                    />
+                {:else}
+                    <article class="result-grid__grid-container">
+                        <WillowDark>
+                            <Grid data={rows} {columns} />
+                        </WillowDark>
+                    </article>
+                {/if}
+            </section>
+        </div>
     {/if}
 </article>

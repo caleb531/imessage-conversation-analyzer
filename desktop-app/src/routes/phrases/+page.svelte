@@ -211,7 +211,6 @@
 
 <style>
     .phrases-params {
-        width: min(100%, 52rem);
         display: flex;
         flex-direction: column;
     }

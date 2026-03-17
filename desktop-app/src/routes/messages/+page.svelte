@@ -178,7 +178,12 @@
         description="Review aggregated conversation metrics like the total number of messages sent and received."
         level={3}
     >
-        <ResultGrid command={['message_totals']} dateFilterPersistenceKey="messages">
+        <ResultGrid
+            command={['message_totals']}
+            layout="horizontal"
+            chartLayout="vertical"
+            dateFilterPersistenceKey="messages"
+        >
             {#snippet charts(rows, columns)}
                 <MetricPieChart
                     data={getChartDataFromMetrics({
