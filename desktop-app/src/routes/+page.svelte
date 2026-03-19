@@ -239,7 +239,7 @@
 <style>
     .permissions-splash__panel {
         width: 100%;
-        max-width: 50rem;
+        max-width: var(--layout-width);
         margin: 0 auto;
         background: var(--color-surface-secondary);
         border: 1px solid var(--color-border-secondary);

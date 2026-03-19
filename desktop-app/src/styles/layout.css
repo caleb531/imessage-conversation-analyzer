@@ -1,3 +1,10 @@
+:root {
+    /* Shared layout width cap used across route and component styles. */
+    --layout-width: 50rem;
+    --layout-chart-width-wide-vw: 90vw;
+    --layout-chart-width-attachment-vw: 75vw;
+}
+
 * {
     box-sizing: border-box;
 }
@@ -60,7 +67,7 @@ form {
     flex-direction: column;
     align-items: center;
     gap: 1.5rem 0;
-    max-width: 320px;
+    max-width: 20rem;
     width: 100%;
     margin: 0 auto;
     margin-bottom: 1.5rem;

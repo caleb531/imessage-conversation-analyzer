@@ -16,7 +16,7 @@
     align-items: center;
     gap: 1rem;
     width: 100%;
-    max-width: 48rem;
+    max-width: var(--layout-width);
     margin: 0 auto;
     align-self: center;
 }
@@ -57,7 +57,7 @@
 
 .result-grid__error {
     margin: 0 auto;
-    max-width: 48rem;
+    max-width: var(--layout-width);
 }
 
 .result-grid__content {
@@ -145,9 +145,9 @@
 }
 
 .result-grid-charts--wide {
-    width: min(100%, 90vw);
+    width: min(100%, var(--layout-chart-width-wide-vw));
 }
 
 .result-grid-charts--attachment {
-    width: min(100%, 75vw);
+    width: min(100%, var(--layout-chart-width-attachment-vw));
 }

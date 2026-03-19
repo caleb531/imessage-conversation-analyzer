@@ -156,7 +156,7 @@
 <style>
     .transcript-export {
         width: 100%;
-        max-width: 56rem;
+        max-width: var(--layout-width);
         margin: 0 auto;
         display: flex;
         flex-direction: column;
@@ -164,7 +164,7 @@
     }
 
     .transcript-export__description {
-        max-width: 44rem;
+        max-width: var(--layout-width);
         margin: 0 auto;
     }
 
