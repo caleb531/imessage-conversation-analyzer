@@ -11,6 +11,7 @@
 .metric-pie-chart__chart {
     width: var(--container-size);
     height: var(--container-size);
+    margin: 0;
 }
 
 .metric-pie-chart__label {

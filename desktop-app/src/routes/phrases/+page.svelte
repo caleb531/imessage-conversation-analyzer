@@ -168,7 +168,7 @@
                     />
                 </div>
 
-                <div class="phrases-params__toggles" aria-label="Phrase options">
+                <fieldset class="phrases-params__toggles" aria-label="Phrase options">
                     <Checkbox
                         id="phrases-case-sensitive"
                         labelText="Case sensitive"
@@ -179,22 +179,24 @@
                         labelText="Use regular expressions"
                         bind:checked={useRegex}
                     />
-                </div>
+                </fieldset>
 
                 {#if phrases.length > 0}
-                    <div class="phrases-params__tags" aria-label="Active phrases">
+                    <ul class="phrases-params__tags" aria-label="Active phrases">
                         {#each phrases as phrase (phrase)}
-                            <Tag
-                                filter
-                                title={`Remove phrase ${phrase}`}
-                                on:close={() => {
-                                    removePhrase(phrase);
-                                }}
-                            >
-                                {phrase}
-                            </Tag>
+                            <li>
+                                <Tag
+                                    filter
+                                    title={`Remove phrase ${phrase}`}
+                                    on:close={() => {
+                                        removePhrase(phrase);
+                                    }}
+                                >
+                                    {phrase}
+                                </Tag>
+                            </li>
                         {/each}
-                    </div>
+                    </ul>
                 {/if}
 
                 {#if persistenceError}
@@ -226,9 +228,11 @@
     }
 
     .phrases-params__toggles {
+        border: 0;
         display: flex;
         flex-wrap: wrap;
         margin: 0.75rem 0;
+        padding: 0;
     }
 
     /* Reduce the natural margin appended by Carbon checkboxes to bring them closer together */
@@ -240,6 +244,9 @@
         display: flex;
         flex-wrap: wrap;
         gap: 0.5rem;
+        list-style: none;
+        margin: 0;
+        padding: 0;
     }
 
     @media (max-width: 42rem) {

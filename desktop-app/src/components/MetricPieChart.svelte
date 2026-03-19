@@ -27,7 +27,7 @@
 
 {#if data.length > 0}
     <article class="metric-pie-chart">
-        <div class="metric-pie-chart__chart">
+        <figure class="metric-pie-chart__chart">
             <PieChart
                 {data}
                 key="key"
@@ -57,7 +57,7 @@
                     </text>
                 </svelte:fragment>
             </PieChart>
-        </div>
+        </figure>
         <ul class="metric-pie-chart__legend" aria-label={`${label} legend`}>
             {#each data as point, index (point.key)}
                 <li class="metric-pie-chart__legend-item">

@@ -146,7 +146,7 @@
             </header>
 
             <div class="permissions-splash__rows">
-                <div class="permissions-splash__row">
+                <section class="permissions-splash__row">
                     <div class="permissions-splash__info">
                         <h2>Contacts</h2>
                         <p>Needed to display the names of people in your conversations.</p>
@@ -174,9 +174,9 @@
                             {/if}
                         </Button>
                     </div>
-                </div>
+                </section>
 
-                <div class="permissions-splash__row">
+                <section class="permissions-splash__row">
                     <div class="permissions-splash__info">
                         <h2>Full Disk Access</h2>
                         <p>
@@ -205,7 +205,7 @@
                             {/if}
                         </Button>
                     </div>
-                </div>
+                </section>
             </div>
 
             <footer class="permissions-splash__footer">

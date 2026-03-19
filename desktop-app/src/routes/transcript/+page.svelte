@@ -76,91 +76,85 @@
 </script>
 
 <section class="transcript-export">
-    <div class="transcript-export__content">
-        <header>
-            <h2>Transcript</h2>
-            <p class="transcript-export__description">
-                Export your full conversation transcript. The exported file will be saved to your
-                Downloads folder.
-            </p>
-        </header>
+    <header>
+        <h2>Transcript</h2>
+        <p class="transcript-export__description">
+            Export your full conversation transcript. The exported file will be saved to your
+            Downloads folder.
+        </p>
+    </header>
 
-        <form class="transcript-export__form" onsubmit={exportTranscript}>
-            <div class="transcript-export__row transcript-export__row--dates">
-                <DateRangeFields
-                    fromDateInputId="transcript-from-date"
-                    toDateInputId="transcript-to-date"
-                    dateFilterPersistenceKey="transcript"
-                    bind:persistenceError={dateFilterPersistenceError}
-                    bind:fromDate={fromDateInput}
-                    bind:toDate={toDateInput}
-                    disabled={isExporting}
-                />
-                <Button
-                    kind="secondary"
-                    size="small"
-                    type="button"
-                    disabled={isExporting}
-                    onclick={clearDateFilters}
-                >
-                    Clear
-                </Button>
+    <form class="transcript-export__form" onsubmit={exportTranscript}>
+        <div class="transcript-export__row transcript-export__row--dates">
+            <DateRangeFields
+                fromDateInputId="transcript-from-date"
+                toDateInputId="transcript-to-date"
+                dateFilterPersistenceKey="transcript"
+                bind:persistenceError={dateFilterPersistenceError}
+                bind:fromDate={fromDateInput}
+                bind:toDate={toDateInput}
+                disabled={isExporting}
+            />
+            <Button
+                kind="secondary"
+                size="small"
+                type="button"
+                disabled={isExporting}
+                onclick={clearDateFilters}
+            >
+                Clear
+            </Button>
+        </div>
+
+        <div class="transcript-export__row transcript-export__row--actions">
+            <div class="transcript-export__format">
+                <Select labelText="Format" bind:selected={format} disabled={isExporting}>
+                    <SelectItem value="csv" text="CSV" />
+                    <SelectItem value="xlsx" text="Excel" />
+                </Select>
             </div>
 
-            <div class="transcript-export__row transcript-export__row--actions">
-                <div class="transcript-export__format">
-                    <Select labelText="Format" bind:selected={format} disabled={isExporting}>
-                        <SelectItem value="csv" text="CSV" />
-                        <SelectItem value="xlsx" text="Excel" />
-                    </Select>
-                </div>
+            <Button type="submit" kind="primary" disabled={isExporting}>
+                {#if isExporting}
+                    Exporting…
+                {:else}
+                    Export Transcript
+                {/if}
+            </Button>
+        </div>
+    </form>
 
-                <Button type="submit" kind="primary" disabled={isExporting}>
-                    {#if isExporting}
-                        Exporting…
-                    {:else}
-                        Export Transcript
-                    {/if}
-                </Button>
-            </div>
-        </form>
+    {#if dateFilterPersistenceError}
+        <aside class="transcript-export__notification">
+            <InlineNotification
+                kind="error"
+                title="Date filter persistence failed"
+                subtitle={dateFilterPersistenceError}
+            />
+        </aside>
+    {/if}
 
-        {#if dateFilterPersistenceError}
-            <div class="transcript-export__notification">
-                <InlineNotification
-                    kind="error"
-                    title="Date filter persistence failed"
-                    subtitle={dateFilterPersistenceError}
-                />
-            </div>
-        {/if}
+    {#if successMessage}
+        <aside class="transcript-export__notification">
+            <InlineNotification
+                kind="success"
+                title="Export complete"
+                subtitle={successMessage}
+                actionLabel="Reveal in Finder"
+                onAction={openDownloads}
+            />
+        </aside>
+    {/if}
 
-        {#if successMessage}
-            <div class="transcript-export__notification">
-                <InlineNotification
-                    kind="success"
-                    title="Export complete"
-                    subtitle={successMessage}
-                    actionLabel="Reveal in Finder"
-                    onAction={openDownloads}
-                />
-            </div>
-        {/if}
-
-        {#if errorMessage}
-            <div class="transcript-export__notification">
-                <InlineNotification kind="error" title="Export failed" subtitle={errorMessage} />
-            </div>
-        {/if}
-    </div>
+    {#if errorMessage}
+        <aside class="transcript-export__notification">
+            <InlineNotification kind="error" title="Export failed" subtitle={errorMessage} />
+        </aside>
+    {/if}
 </section>
 
 <style>
     .transcript-export {
-        align-items: center;
-    }
-
-    .transcript-export__content {
         width: 100%;
         max-width: 56rem;
         margin: 0 auto;
@@ -205,8 +199,6 @@
 
     .transcript-export__notification {
         width: 100%;
-        max-width: 56rem;
-        margin: 0 auto;
         display: flex;
         justify-content: center;
     }

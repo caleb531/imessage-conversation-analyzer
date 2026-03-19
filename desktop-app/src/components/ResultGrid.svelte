@@ -378,13 +378,13 @@
 
         <div class={`result-grid__content result-grid__content--${layout}`}>
             {#if charts && rows.length && !errorMessage}
-                <div
+                <figure
                     class={`result-grid-charts result-grid-charts--${chartLayout}${chartsClass ? ` ${chartsClass}` : ''}`}
                     aria-label="Chart area"
                     role="img"
                 >
                     {@render charts(rows, columns)}
-                </div>
+                </figure>
             {/if}
 
             <section class="result-grid__grid-region">

@@ -91,7 +91,7 @@
     });
 </script>
 
-<div class="date-range-fields">
+<fieldset class="date-range-fields">
     <DatePicker datePickerType="single" dateFormat="m/d/Y" bind:value={fromDate}>
         <DatePickerInput
             id={fromDateInputId}
@@ -129,15 +129,18 @@
             {/snippet}
         </DatePickerInput>
     </DatePicker>
-</div>
+</fieldset>
 
 <style>
     .date-range-fields {
+        border: 0;
         display: grid;
         grid-template-columns: repeat(2, minmax(9rem, 1fr));
         gap: 1rem 0.5rem;
+        margin: 0;
         width: auto;
         max-width: none;
+        padding: 0;
         align-items: end;
     }
 
