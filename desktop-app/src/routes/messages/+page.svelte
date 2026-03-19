@@ -181,7 +181,7 @@
         <ResultGrid
             command={['message_totals']}
             layout="horizontal"
-            chartLayout="vertical"
+            chartLayout="horizontal"
             dateFilterPersistenceKey="messages"
         >
             {#snippet charts(rows, columns)}
