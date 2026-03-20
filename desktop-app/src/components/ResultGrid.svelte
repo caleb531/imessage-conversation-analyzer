@@ -221,6 +221,7 @@
             return {
                 id: header.id,
                 header: header.original,
+                sort: true,
                 width: computeColumnWidth(header, dataRows),
                 ...(ValueFormatter ? { cell: ValueFormatter } : {})
             } satisfies GridColumn;
