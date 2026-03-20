@@ -113,6 +113,23 @@
               }
     );
 
+    // Show only the requested axis gridlines by orientation.
+    const gridProps = $derived(
+        isHorizontal
+            ? {
+                  x: {
+                      class: 'metric-stacked-bar-chart__gridline'
+                  },
+                  y: false
+              }
+            : {
+                  x: false,
+                  y: {
+                      class: 'metric-stacked-bar-chart__gridline'
+                  }
+              }
+    );
+
     // Resolves CSS variable colors into concrete values for legend/chart consistency.
     function resolveColor(color: string): string {
         if (typeof window === 'undefined') {
@@ -249,6 +266,7 @@
                         {orientation}
                         series={chartSeries}
                         {bandPadding}
+                        grid={gridProps}
                         seriesLayout="stack"
                         padding={chartPadding}
                         props={{

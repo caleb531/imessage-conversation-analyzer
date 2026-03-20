@@ -21,6 +21,7 @@
     --palette-gray-200: #e0e0e0;
     --palette-gray-400: #9aa0a6;
     --palette-gray-500: #525252;
+    --palette-gray-600: #3f3f3f;
 
     --palette-white-hsl: 0 0% 100%;
     --palette-gray-100-hsl: 0 0% 96%;
@@ -63,4 +64,6 @@
     --color-chart-7: var(--palette-pink-60);
 
     --color-chart-legend-fallback: var(--palette-gray-400);
+    --color-chart-subaxis-label: var(--palette-gray-400);
+    --color-chart-gridline: var(--palette-gray-600);
 }

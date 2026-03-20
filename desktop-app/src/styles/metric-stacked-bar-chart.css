@@ -22,6 +22,11 @@
     width: 100%;
 }
 
+.metric-stacked-bar-chart__gridline {
+    stroke: var(--color-chart-gridline);
+    stroke-width: 1px;
+}
+
 .metric-stacked-bar-chart__subaxis {
     position: relative;
     height: 1rem;
@@ -35,7 +40,7 @@
     left: 0;
     font-size: 0.72rem;
     line-height: 1;
-    color: var(--color-text-quaternary);
+    color: var(--color-chart-subaxis-label);
     white-space: nowrap;
 }
 
@@ -62,6 +67,10 @@
     height: 0.8rem;
     border-radius: 0.2rem;
     background: var(--legend-color, var(--color-chart-legend-fallback));
+}
+
+.metric-stacked-bar-chart__gridline {
+    stroke: var(--color-chart-gridline);
 }
 
 /* Force Apple Color Emoji to ensure emojis are rendered as graphics, not text */
