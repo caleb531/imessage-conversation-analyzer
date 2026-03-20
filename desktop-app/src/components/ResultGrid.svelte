@@ -1,9 +1,13 @@
 <script lang="ts">
     import { invokeIcaCsv, MissingContactError, type IcaCsvHeader } from '$lib/cli';
+    import {
+        loadPersistedDateFilters,
+        persistDateFiltersForKey
+    } from '$lib/dateFilterPersistence.svelte';
     import { buildDateFilterArgs, type DateFilterState } from '$lib/dateFilters';
     import { Grid, WillowDark } from '@svar-ui/svelte-grid';
     import { Button, Loading } from 'carbon-components-svelte';
-    import { onMount, untrack, type Snippet } from 'svelte';
+    import { onMount, type Snippet } from 'svelte';
     import { SvelteMap } from 'svelte/reactivity';
     import '../styles/result-grid.css';
     import type { GridColumn } from '../types';
@@ -59,19 +63,20 @@
     let rows = $state<Array<Record<string, unknown>>>([]);
     let columns = $state<GridColumn[]>([]);
 
-    // Controlled date picker values and currently applied filter snapshot.
+    // Controlled date picker values and date filter initialization lifecycle state.
     let fromDateInput = $state('');
     let toDateInput = $state('');
-    // Mirrors DateRangeFields persistence readiness so first load can wait for hydrated values.
-    let hasLoadedPersistedDateFilters = $state(false);
+    // Marks when persisted filters are loaded so effects stay gated until initialization completes.
+    let dateFiltersInitState = $state<'pending' | 'done'>('pending');
+    const areDateFiltersInitialized = $derived(dateFiltersInitState === 'done');
     // Holds non-blocking persistence errors shown below filter controls.
     let dateFilterPersistenceError = $state('');
     // Forces date picker subtree recreation when clearing values.
     let datePickerResetKey = $state(0);
-    let appliedFilters = $state<DateFilterState>({
-        fromDate: '',
-        toDate: ''
-    });
+    // Stable request signature dedupes reloads across command/filter/readiness changes.
+    const requestSignature = $derived(
+        JSON.stringify({ command, fromDate: fromDateInput, toDate: toDateInput, isReady })
+    );
 
     const FALLBACK_PIXELS_PER_CHAR = 10;
     const FALLBACK_FONT_WEIGHT = '400';
@@ -222,11 +227,11 @@
         });
     }
 
-    let previousCommandStr = $state('');
+    let lastLoadedRequestSignature = $state('');
     let currentLoadId = $state(0);
 
     // Loads grid data from ICA using any currently applied date filters.
-    async function loadData(filters: DateFilterState = appliedFilters) {
+    async function loadData(filters: DateFilterState) {
         if (!isReady) {
             return;
         }
@@ -260,56 +265,57 @@
         }
     }
 
+    // Loads data whenever command/filters/readiness change after hydration, with signature dedupe.
     $effect(() => {
-        if (!hasInitiallyLoaded || !hasLoadedPersistedDateFilters) {
-            previousCommandStr = JSON.stringify(command);
+        if (!areDateFiltersInitialized) {
             return;
         }
 
-        const currentCommandStr = JSON.stringify(command);
-        const currentFrom = fromDateInput;
-        const currentTo = toDateInput;
-        const currentReady = isReady;
+        const signature = requestSignature;
+        if (signature === lastLoadedRequestSignature) {
+            return;
+        }
 
-        untrack(() => {
-            let shouldLoad = false;
+        lastLoadedRequestSignature = signature;
 
-            if (currentCommandStr !== previousCommandStr) {
-                previousCommandStr = currentCommandStr;
-                shouldLoad = true;
+        if (!isReady) {
+            // Avoid a blocking first-load spinner when analyzer parameters are still incomplete.
+            if (!hasInitiallyLoaded) {
+                hasInitiallyLoaded = true;
             }
+            return;
+        }
 
-            if (currentFrom !== appliedFilters.fromDate || currentTo !== appliedFilters.toDate) {
-                appliedFilters = { fromDate: currentFrom, toDate: currentTo };
-                shouldLoad = true;
-            }
-
-            if (shouldLoad && currentReady) {
-                void loadData(appliedFilters);
-            }
+        void loadData({
+            fromDate: fromDateInput,
+            toDate: toDateInput
         });
     });
 
-    // Performs the first data load only after DateRangeFields has finished hydrating persisted values.
+    // Persists date filter edits after initial hydration so storage always mirrors current inputs.
     $effect(() => {
-        if (hasInitiallyLoaded || !hasLoadedPersistedDateFilters) {
+        if (!areDateFiltersInitialized) {
             return;
         }
 
         const currentFrom = fromDateInput;
         const currentTo = toDateInput;
-        const currentReady = isReady;
 
-        untrack(() => {
-            appliedFilters = { fromDate: currentFrom, toDate: currentTo };
-
-            if (currentReady) {
-                void loadData(appliedFilters);
-                return;
+        void persistDateFiltersForKey(
+            dateFilterPersistenceKey,
+            {
+                fromDate: currentFrom,
+                toDate: currentTo
+            },
+            {
+                onStart: () => {
+                    dateFilterPersistenceError = '';
+                },
+                onError: (message) => {
+                    dateFilterPersistenceError = message;
+                }
             }
-
-            hasInitiallyLoaded = true;
-        });
+        );
     });
 
     // Handles form reset so Clear runs custom reset behavior.
@@ -318,16 +324,24 @@
         clearFilters();
     }
 
-    // Resets date inputs. The `$effect` observer will automatically reload the grid.
+    // Resets date inputs; load/persist effects react declaratively.
     function clearFilters() {
         fromDateInput = '';
         toDateInput = '';
         datePickerResetKey += 1;
     }
 
-    // Initializes command tracking; first data load is handled by a readiness-aware effect.
-    onMount(() => {
-        previousCommandStr = JSON.stringify(command);
+    // Hydrates persisted filters before load/persist effects are allowed to run.
+    onMount(async () => {
+        try {
+            const persistedFilters = await loadPersistedDateFilters(dateFilterPersistenceKey);
+            fromDateInput = persistedFilters.fromDate;
+            toDateInput = persistedFilters.toDate;
+        } catch (error) {
+            dateFilterPersistenceError = error instanceof Error ? error.message : String(error);
+        } finally {
+            dateFiltersInitState = 'done';
+        }
     });
 </script>
 
@@ -349,9 +363,6 @@
                     <DateRangeFields
                         fromDateInputId={buildDateInputId('from')}
                         toDateInputId={buildDateInputId('to')}
-                        {dateFilterPersistenceKey}
-                        bind:persistenceError={dateFilterPersistenceError}
-                        bind:hasLoadedPersistedDateFilters
                         bind:fromDate={fromDateInput}
                         bind:toDate={toDateInput}
                     />

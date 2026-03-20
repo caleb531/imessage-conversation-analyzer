@@ -2,13 +2,20 @@
     import { invoke } from '@tauri-apps/api/core';
     import { revealItemInDir } from '@tauri-apps/plugin-opener';
     import { Button, Select, SelectItem } from 'carbon-components-svelte';
+    import { onMount } from 'svelte';
     import DateRangeFields from '../../components/DateRangeFields.svelte';
     import InlineNotification from '../../components/InlineNotification.svelte';
     import { invokeIcaCsvToFile, MissingContactError } from '../../lib/cli';
+    import {
+        loadPersistedDateFilters,
+        persistDateFiltersForKey
+    } from '../../lib/dateFilterPersistence.svelte';
     import { buildDateFilterArgs } from '../../lib/dateFilters';
 
     // Base file stem used when generating the export filename.
     const baseFilename = 'transcript';
+    // Persistence key used to isolate transcript date filters from other routes.
+    const TRANSCRIPT_DATE_FILTER_KEY = 'transcript';
 
     // Tracks export progress to disable controls while work is running.
     let isExporting = $state(false);
@@ -17,7 +24,10 @@
     // User-entered date range values consumed by date filter arg builder.
     let fromDateInput = $state('');
     let toDateInput = $state('');
-    // Surfaces date filter persistence failures from DateRangeFields.
+    // Marks when persisted values are available so persistence effects stay gated.
+    let dateFiltersInitState = $state<'pending' | 'done'>('pending');
+    const areDateFiltersInitialized = $derived(dateFiltersInitState === 'done');
+    // Surfaces parent-side date filter persistence failures.
     let dateFilterPersistenceError = $state('');
     // UI feedback state for success/error notifications.
     let errorMessage = $state('');
@@ -73,6 +83,45 @@
         fromDateInput = '';
         toDateInput = '';
     }
+
+    // Hydrates persisted transcript date filters once when the page mounts.
+    onMount(async () => {
+        try {
+            const persistedFilters = await loadPersistedDateFilters(TRANSCRIPT_DATE_FILTER_KEY);
+            fromDateInput = persistedFilters.fromDate;
+            toDateInput = persistedFilters.toDate;
+        } catch (error) {
+            dateFilterPersistenceError = error instanceof Error ? error.message : String(error);
+        } finally {
+            dateFiltersInitState = 'done';
+        }
+    });
+
+    // Saves date filter edits after hydration so persistence mirrors the latest form values.
+    $effect(() => {
+        if (!areDateFiltersInitialized) {
+            return;
+        }
+
+        const currentFrom = fromDateInput;
+        const currentTo = toDateInput;
+
+        void persistDateFiltersForKey(
+            TRANSCRIPT_DATE_FILTER_KEY,
+            {
+                fromDate: currentFrom,
+                toDate: currentTo
+            },
+            {
+                onStart: () => {
+                    dateFilterPersistenceError = '';
+                },
+                onError: (message) => {
+                    dateFilterPersistenceError = message;
+                }
+            }
+        );
+    });
 </script>
 
 <section class="transcript-export">
@@ -89,8 +138,6 @@
             <DateRangeFields
                 fromDateInputId="transcript-from-date"
                 toDateInputId="transcript-to-date"
-                dateFilterPersistenceKey="transcript"
-                bind:persistenceError={dateFilterPersistenceError}
                 bind:fromDate={fromDateInput}
                 bind:toDate={toDateInput}
                 disabled={isExporting}
