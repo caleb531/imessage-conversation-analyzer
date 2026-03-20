@@ -1,10 +1,7 @@
-// Grid column metadata consumed by the Svar grid component.
-export interface GridColumn {
-    id: string;
-    header: string;
-    width?: number;
-    flexgrow?: number;
-}
+import type { IColumn } from '@svar-ui/svelte-grid';
+
+// Grid column metadata consumed by the SVAR grid component; we always
+export type GridColumn = IColumn & { header: string };
 
 // Generic key/value pair used by chart components.
 export interface DataPoint {
