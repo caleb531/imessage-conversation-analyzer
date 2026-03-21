@@ -5,6 +5,7 @@
     import 'carbon-components-svelte/css/all.css';
     import { onMount } from 'svelte';
     import Header from '../components/Header.svelte';
+    import { setLastVisitedPage } from '../lib/lastVisitedPage.svelte';
     import {
         hasMissingRequiredPermissions,
         refreshPermissionStatus
@@ -34,6 +35,11 @@
         if (hasMissingPermissions && !isRootRoute) {
             await goto(resolve('/'), { replaceState: true, noScroll: true });
             isRootRoute = true;
+            return;
+        }
+
+        if (!hasMissingPermissions && !isRootRoute) {
+            await setLastVisitedPage(window.location.pathname);
         }
     }
 

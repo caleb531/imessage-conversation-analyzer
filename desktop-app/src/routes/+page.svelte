@@ -5,6 +5,7 @@
     import { onMount } from 'svelte';
     import InlineNotification from '../components/InlineNotification.svelte';
     import { getSelectedContacts } from '../lib/contacts.svelte';
+    import { getLastVisitedPage } from '../lib/lastVisitedPage.svelte';
     import {
         hasMissingRequiredPermissions,
         isPermissionStatusLoading,
@@ -58,7 +59,9 @@
     async function redirectToMainFlow() {
         try {
             const contacts = await getSelectedContacts();
-            await goto(resolve(contacts.length > 0 ? '/messages' : '/set-contacts'));
+            const destinationRoute =
+                contacts.length > 0 ? await getLastVisitedPage() : '/set-contacts';
+            await goto(resolve(destinationRoute));
         } catch (error) {
             console.error('Failed to resolve selected contacts during startup redirect', error);
             await goto(resolve('/set-contacts'));
