@@ -7,10 +7,10 @@
     import InlineNotification from '../../components/InlineNotification.svelte';
     import { invokeIcaCsvToFile, MissingContactError } from '../../lib/cli';
     import {
+        buildDateFilterArgs,
         loadPersistedDateFilters,
         persistDateFiltersForKey
-    } from '../../lib/dateFilterPersistence.svelte';
-    import { buildDateFilterArgs } from '../../lib/dateFilters';
+    } from '../../lib/dateFilters.svelte';
 
     // Base file stem used when generating the export filename.
     const baseFilename = 'transcript';
