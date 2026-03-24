@@ -239,6 +239,9 @@
     :global(.phrases-params__toggles .bx--checkbox-wrapper) {
         margin-right: 1.5rem;
     }
+    :global(.phrases-params__toggles .bx--checkbox-wrapper:first-of-type) {
+        margin-top: 0;
+    }
 
     .phrases-params__tags {
         display: flex;
