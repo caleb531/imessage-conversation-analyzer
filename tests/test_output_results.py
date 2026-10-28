@@ -254,6 +254,38 @@ def test_output_results_bytes_buffer() -> None:
         assert expected_df.to_dict(orient="index") == actual_df.to_dict(orient="index")
 
 
+@pytest.mark.parametrize("format", ["excel", "xlsx"])
+def test_output_results_excel_text_buffer(format: str) -> None:
+    """Reject text buffers before Excel can write any output."""
+    # The incompatible buffer should remain empty after the error.
+    out = StringIO()
+    with pytest.raises(TypeError, match="Excel output requires"):
+        ica.output_results(test_cases[0][1], format=format, output=out)
+    assert out.getvalue() == ""
+
+
+@pytest.mark.parametrize("format", [None, "markdown", "md"])
+def test_output_results_text_binary_buffer(format: Optional[str]) -> None:
+    """Reject binary buffers for Markdown and plain text output."""
+    # The incompatible buffer should remain empty after the error.
+    out = BytesIO()
+    with pytest.raises(TypeError, match="output requires a path or a StringIO buffer"):
+        ica.output_results(test_cases[0][1], format=format, output=out)
+    assert out.getvalue() == b""
+
+
+@pytest.mark.parametrize("format", ["csv", "json"])
+def test_output_results_text_formats_with_binary_buffer(format: str) -> None:
+    """Keep binary buffer support for CSV and JSON output."""
+    # The text output provides the expected UTF-8 contents of the binary buffer.
+    text_out = StringIO()
+    # CSV and JSON support writing their encoded output to a binary buffer.
+    binary_out = BytesIO()
+    ica.output_results(test_cases[0][1], format=format, output=text_out)
+    ica.output_results(test_cases[0][1], format=format, output=binary_out)
+    assert binary_out.getvalue().decode("utf-8") == text_out.getvalue()
+
+
 def test_output_results_invalid_format() -> None:
     """Should raise an error if format is invalid."""
     test_name, df, use_default_index = test_cases[0]

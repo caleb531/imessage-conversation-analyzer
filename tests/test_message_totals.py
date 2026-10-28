@@ -1,12 +1,43 @@
 #!/usr/bin/env python3
 """test the message_totals built-in analyzer"""
 
+from typing import Optional
 from unittest.mock import MagicMock, patch
 
 import pandas as pd
+import pytest
 from freezegun import freeze_time
 
 import ica.analyzers.message_totals as message_totals
+from ica import DataFrameNamespace
+
+
+@pytest.mark.parametrize(
+    ("dates", "expected"),
+    [
+        ([], None),
+        ([None], None),
+        (["2024-01-08 23:30:00", "2024-01-09 10:00:00"], "2024-01-08"),
+    ],
+)
+def test_first_message_date(
+    dates: list[Optional[str]], expected: Optional[str]
+) -> None:
+    """Return the earliest local date, or None if there are no valid dates."""
+    # The messages include a timezone to check that we retain their local date.
+    dfs = DataFrameNamespace(
+        messages=pd.DataFrame(
+            {"datetime": pd.Series(dates, dtype="datetime64[ns, America/Los_Angeles]")}
+        ),
+        attachments=pd.DataFrame(),
+        handles=pd.DataFrame(),
+    )
+    # The first date should have no time or timezone information.
+    result = message_totals.get_first_message_date(dfs)
+    if expected is None:
+        assert result is None
+    else:
+        assert result == pd.Timestamp(expected)
 
 
 @patch("ica.output_results")

@@ -448,8 +448,16 @@ def get_dataframes(
     """
     Return all dataframes for a specific macOS Messages conversation
     """
-    # Validate date range before querying
-    if from_date and to_date and pd.Timestamp(from_date) > pd.Timestamp(to_date):
+    # The lower date bound, parsed before we access contacts or the database
+    from_ts = pd.Timestamp(from_date) if from_date else None
+    # The exclusive upper bound, if one was supplied
+    to_ts = pd.Timestamp(to_date) if to_date else None
+    # Reject NaT so that its numeric sentinel can't become a SQL date bound
+    if from_ts is not None and not isinstance(from_ts, pd.Timestamp):
+        raise DateRangeInvalidError("Start date must be a date/time")
+    if to_ts is not None and not isinstance(to_ts, pd.Timestamp):
+        raise DateRangeInvalidError("End date must be a date/time")
+    if from_ts is not None and to_ts is not None and from_ts > to_ts:
         raise DateRangeInvalidError("Date range is backwards")
 
     contact_records = get_contact_records(contacts)
@@ -615,7 +623,12 @@ def output_results(
 
     # Output executed DataFrame to correct format
     if format in ("xlsx", "excel"):
-        output_df.to_excel(output, **output_args)
+        # Excel writes bytes, so reject text buffers before starting the export
+        if isinstance(output, StringIO):
+            raise TypeError("Excel output requires a path or a BytesIO buffer")
+        # pandas requires truncate(size=...), but BytesIO makes size positional-only;
+        # Excel accepts BytesIO at runtime, as covered by the buffer output test
+        output_df.to_excel(output, **output_args)  # ty: ignore[invalid-argument-type]
     elif format == "csv":
         output_df.to_csv(output, **output_args)
     elif format == "json":
@@ -625,8 +638,14 @@ def output_results(
         )
         json_output_df.to_json(output, orient="records", date_format="iso", indent=2)
     elif format in ("md", "markdown"):
+        # Markdown writes text, so it can't write to a binary buffer
+        if isinstance(output, BytesIO):
+            raise TypeError("Markdown output requires a path or a StringIO buffer")
         output_df.to_markdown(output, **output_args)
     else:
+        # Plain text output also requires a buffer that accepts strings
+        if isinstance(output, BytesIO):
+            raise TypeError("Plain text output requires a path or a StringIO buffer")
         (
             output_df
             # When we output the dataframe with to_string(), if the index has a

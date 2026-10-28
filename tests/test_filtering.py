@@ -3,7 +3,7 @@
 
 import contextlib
 import importlib
-from typing import Any
+from typing import Any, Optional
 from unittest.mock import patch
 
 import pandas as pd
@@ -85,6 +85,28 @@ def test_invalid_date_range() -> None:
             from_date="2024-01-17",
             to_date="2024-01-11",
         )
+
+
+@pytest.mark.parametrize(
+    ("from_date", "to_date"),
+    [
+        ("NaT", None),
+        (None, "NaT"),
+        ("NaT", "2024-01-17"),
+        ("2024-01-11", "NaT"),
+        ("nan", None),
+        (None, "nan"),
+    ],
+)
+def test_missing_date_bound(from_date: Optional[str], to_date: Optional[str]) -> None:
+    """Reject missing timestamps before looking up contacts or querying messages."""
+    # Contact lookup must not run when a supplied date resolves to NaT.
+    with patch("ica.core.get_contact_records") as get_contacts:
+        with pytest.raises(ica.DateRangeInvalidError, match="must be a date/time"):
+            ica.get_dataframes(
+                contacts=["Jane Fernbrook"], from_date=from_date, to_date=to_date
+            )
+        get_contacts.assert_not_called()
 
 
 def test_from_person_me() -> None:

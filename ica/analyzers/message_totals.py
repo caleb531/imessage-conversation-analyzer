@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
 import datetime
+from typing import Optional
 
 import pandas as pd
 
 import ica
 
 
-def get_first_message_date(dfs: ica.DataFrameNamespace) -> pd.Timestamp:
+def get_first_message_date(dfs: ica.DataFrameNamespace) -> Optional[pd.Timestamp]:
     """
-    Retrieve the date of the very first message sent in the conversation
+    Retrieve the first message date; return None if no message has a date
     """
-    return pd.Timestamp(dfs.messages["datetime"].min().date())
+    # The earliest message date, without its time or timezone
+    first_message_date = pd.Timestamp(dfs.messages["datetime"].min().date())
+    return first_message_date if isinstance(first_message_date, pd.Timestamp) else None
 
 
 def get_sums_by_day(dfs: ica.DataFrameNamespace) -> pd.DataFrame:
@@ -77,7 +80,7 @@ def main() -> None:
     else:
         date_upper_bound = today
 
-    if pd.isna(first_message_date):
+    if first_message_date is None:
         total_days = 0
     else:
         total_days = (date_upper_bound - first_message_date).days + 1
