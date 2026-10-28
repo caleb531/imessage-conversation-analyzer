@@ -45,11 +45,13 @@ def main() -> None:
     )
 
     attachments = dfs.attachments.assign(
-        sender_column=lambda data: data["sender_handle"]
-        .map(handles_by_identifier)
-        .where(
-            data["is_from_me"].eq(False),
-            "Me",
+        sender_column=lambda data: (
+            data["sender_handle"]
+            .map(handles_by_identifier)
+            .where(
+                data["is_from_me"].eq(False),
+                "Me",
+            )
         )
     )
 

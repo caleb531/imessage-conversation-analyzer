@@ -36,9 +36,9 @@ def main() -> None:
 
     # Rename columns
     daily_counts = daily_counts.rename(
-        columns=lambda col: "total_sent_by_me"
-        if col == "Me"
-        else f"total_sent_by_{col}"
+        columns=lambda col: (
+            "total_sent_by_me" if col == "Me" else f"total_sent_by_{col}"
+        )
     )
 
     # Calculate total sent
