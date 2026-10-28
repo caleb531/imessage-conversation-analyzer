@@ -362,7 +362,9 @@ def test_output_results_locale_aware_separators() -> None:
     try:
         locale.setlocale(locale.LC_ALL, "de_DE.UTF-8")
     except locale.Error:
-        pytest.skip("de_DE.UTF-8 locale not supported")
+        # Raise the public skip exception because ty misreads pytest 8's
+        # callable wrapper
+        raise pytest.skip.Exception("de_DE.UTF-8 locale not supported")
 
     with redirect_stdout(StringIO()) as out:
         ica.output_results(df)
@@ -374,7 +376,7 @@ def test_output_results_locale_aware_separators() -> None:
     try:
         locale.setlocale(locale.LC_ALL, "en_US.UTF-8")
     except locale.Error:
-        pytest.skip("en_US.UTF-8 locale not supported")
+        raise pytest.skip.Exception("en_US.UTF-8 locale not supported")
 
     with redirect_stdout(StringIO()) as out:
         ica.output_results(df)
@@ -401,7 +403,7 @@ def test_output_results_initializes_numeric_locale() -> None:
         try:
             locale.setlocale(locale.LC_CTYPE, "en_US.UTF-8")
         except locale.Error:
-            pytest.skip("en_US.UTF-8 locale not supported")
+            raise pytest.skip.Exception("en_US.UTF-8 locale not supported")
 
         # Verify preconditions
         # getlocale() (which defaults to LC_CTYPE) should return en_US
